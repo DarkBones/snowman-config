@@ -12,6 +12,7 @@ in {
       pnpm
       docker
       gcc
+      figlet
     ];
   };
 }

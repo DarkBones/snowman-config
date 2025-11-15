@@ -18,7 +18,8 @@
 
     snowman = {
       # url = "github:DarkBones/snowman";
-      url = "github:DarkBones/snowman/main-v3--roles"; # TODO: switch to `main` when ready
+      url =
+        "github:DarkBones/snowman/main-v3--roles"; # TODO: switch to `main` when ready
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -60,9 +61,7 @@
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
 
-        extraHomeImports = [
-          ./home/roles/dev.nix
-        ];
+        extraHomeImports = [ ./home/roles ];
       };
 
       mkHost = name: attrs:
