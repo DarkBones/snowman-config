@@ -34,24 +34,6 @@
         "type": "github"
       }
     },
-    "disko_2": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_3"
-      },
-      "locked": {
-        "lastModified": 1762276996,
-        "narHash": "sha256-TtcPgPmp2f0FAnc+DMEw4ardEgv1SGNR3/WFGH0N19M=",
-        "owner": "nix-community",
-        "repo": "disko",
-        "rev": "af087d076d3860760b3323f6b583f4d828c1ac17",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "disko",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -75,7 +57,7 @@
     },
     "home-manager_2": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
         "lastModified": 1758463745,
@@ -157,22 +139,6 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1752596105,
-        "narHash": "sha256-lFNVsu/mHLq3q11MuGkMhUUoSXEdQjCHvpReaGP1S2k=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "dab3a6e781554f965bde3def0aa2fda4eb8f1708",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_4": {
-      "locked": {
         "lastModified": 1753345091,
         "narHash": "sha256-CdX2Rtvp5I8HGu9swBmYuq+ILwRxpXdJwlpg8jvN4tU=",
         "owner": "NixOS",
@@ -187,7 +153,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_5": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1762361079,
         "narHash": "sha256-lz718rr1BDpZBYk7+G8cE6wee3PiBUpn8aomG/vLLiY=",
@@ -217,7 +183,6 @@
     },
     "snowman": {
       "inputs": {
-        "disko": "disko_2",
         "home-manager": "home-manager_2",
         "nixpkgs": [
           "nixpkgs"
@@ -225,23 +190,23 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1763214457,
-        "narHash": "sha256-JdMWClkXhzkoJkQkcIZkFTMBBSiPWRhvizpY005bddc=",
+        "lastModified": 1763231014,
+        "narHash": "sha256-CbXJqPWLzpY369csJZdmR48zijvS1LOivNkPtET8VlE=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "51f3f808b541d48a42ce68212b4e854f44daa3f2",
+        "rev": "14e85975591dd1e4c7dab1909142b8d8a553062a",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "main-v3--polish",
+        "ref": "main-v3",
         "repo": "snowman",
         "type": "github"
       }
     },
     "sops-nix": {
       "inputs": {
-        "nixpkgs": "nixpkgs_5"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1763069729,

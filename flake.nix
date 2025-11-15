@@ -19,7 +19,7 @@
     snowman = {
       # url = "github:DarkBones/snowman";
       url =
-        "github:DarkBones/snowman/main-v3--polish"; # TODO: switch to `main` when ready
+        "github:DarkBones/snowman/main-v3"; # TODO: switch to `main` when ready
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -39,9 +39,7 @@
       inv = import ./inventory.nix;
 
       # This is you map your dotfile inputs
-      dotfilesSources = {
-        bas = inputs.bas-dotfiles;
-      };
+      dotfilesSources = { bas = inputs.bas-dotfiles; };
 
       # Standard Snowman setup
       makePkgs = system:
@@ -69,13 +67,9 @@
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
           modules = [
-            # Import the modules from the Snowman input
             snowman.nixosModules.default
-
             home-manager.nixosModules.home-manager
-
-            # (Optional) A place for your host-specific .nix files
-            # ./hosts/${name}.nix
+            ./hosts/${name}.nix
           ];
         };
     in {
