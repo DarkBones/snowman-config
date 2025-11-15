@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "bas-dotfiles": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1762787078,
+        "narHash": "sha256-XDpweeTqvnJANx17YhGVcs1X5CJprgnw3VT0VfCWCJc=",
+        "owner": "DarkBones",
+        "repo": "dotfiles",
+        "rev": "f26c66941f97d8ef259bd2eff34893eb197968bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DarkBones",
+        "repo": "dotfiles",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -189,6 +205,7 @@
     },
     "root": {
       "inputs": {
+        "bas-dotfiles": "bas-dotfiles",
         "disko": "disko",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",
@@ -208,16 +225,16 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1763207028,
-        "narHash": "sha256-f7gO1qSL1wjioqOQypENxty9y4W5E6LmptFzbADPE7I=",
+        "lastModified": 1763214457,
+        "narHash": "sha256-JdMWClkXhzkoJkQkcIZkFTMBBSiPWRhvizpY005bddc=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "19346f17639e6fe6adb6a8ad8f5fb26c1d0ba84a",
+        "rev": "51f3f808b541d48a42ce68212b4e854f44daa3f2",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "main-v3--roles",
+        "ref": "main-v3--polish",
         "repo": "snowman",
         "type": "github"
       }

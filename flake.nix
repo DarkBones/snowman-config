@@ -19,15 +19,15 @@
     snowman = {
       # url = "github:DarkBones/snowman";
       url =
-        "github:DarkBones/snowman/main-v3--roles"; # TODO: switch to `main` when ready
+        "github:DarkBones/snowman/main-v3--polish"; # TODO: switch to `main` when ready
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Add your pinned dotfiles here, e.g.:
-    # bas-dotfiles = {
-    #   url = "github:DarkBones/dotfiles";
-    #   flake = false;
-    # };
+    bas-dotfiles = {
+      url = "github:DarkBones/dotfiles";
+      flake = false;
+    };
   };
 
   outputs =
@@ -40,7 +40,7 @@
 
       # This is you map your dotfile inputs
       dotfilesSources = {
-        # bas = inputs.bas-dotfiles;
+        bas = inputs.bas-dotfiles;
       };
 
       # Standard Snowman setup

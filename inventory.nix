@@ -93,18 +93,18 @@
           ############################################################
 
           # Pinned mode (reproducible; uses flake input)
-          # default = home.username if omitted
-          # sourceKey = "bas";
+          # default = "username" # Defaults to `home.username` if omitted
+          sourceKey = "bas";
 
           ############################################################
           ## GIT MODE (NON-REPRODUCIBLE)
           ##
           ## Only used when pinned mode is not active.
           ############################################################
-          repo = "git@github.com:DarkBones/.dotfiles.git";
-          dir = "Developer/dotfiles";
-          branch = "nix"; # TODO: Make `main` default later
-          sparse = [ "nvim" "zsh" ];
+          # repo = "git@github.com:DarkBones/.dotfiles.git";
+          # dir = "Developer/dotfiles";
+          # branch = "nix"; # TODO: Make `main` default later
+          # sparse = [ "nvim" "zsh" ];
 
           ############################################################
           ## SHARED SETTINGS (BOTH MODES)
