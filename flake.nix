@@ -19,7 +19,7 @@
     snowman = {
       # url = "github:DarkBones/snowman";
       url =
-        "github:DarkBones/snowman/main-v3"; # TODO: switch to `main` when ready
+        "github:DarkBones/snowman/main"; # TODO: switch to `main` when ready
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
