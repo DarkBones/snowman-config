@@ -57,7 +57,7 @@
       };
     };
 
-    vm-snowman-test = {
+    vm-snowman-test-2 = {
       system = "x86_64-linux";
       mutableUsers = false; # Defaults to `true` if omitted
       provision.disk.enable = false;
@@ -85,9 +85,9 @@
         };
       };
 
-      profiles = [
-        "qemu-guest"
-      ]; # ONLY for VMs. On normal machines, simply omit this key
+      # profiles = [
+      #   "qemu-guest"
+      # ]; # ONLY for VMs. On normal machines, simply omit this key
 
       hardware = {
         boot = { firmware = "bios"; }; # "bios" | "efi"
