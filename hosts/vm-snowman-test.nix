@@ -1,5 +1,5 @@
 { ... }: {
-  imports = [ ./vm-snowman-hardware-test-configuration.nix ];
+  imports = [ ./vm-snowman-test-hardware-configuration.nix ];
 
   boot.loader.grub = {
     enable = true;
