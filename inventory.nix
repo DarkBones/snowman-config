@@ -91,7 +91,6 @@
 
       hardware = {
         boot = { firmware = "bios"; }; # "bios" | "efi"
-        # disk = { device = "/dev/vda"; }; # VM disk
         bootDevice = "/dev/vda";
         fs = {
           type = "ext4";
