@@ -17,7 +17,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman/main";
+      url = "github:DarkBones/snowman/qol-improvements";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
