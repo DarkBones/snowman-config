@@ -106,7 +106,7 @@
           ############################################################
           # repo = "git@github.com:DarkBones/.dotfiles.git";
           # dir = "Developer/dotfiles";
-          # branch = "nix"; # TODO: Make `main` default later
+          # branch = "main";
           # sparse = [ "nvim" "zsh" ];
 
           ############################################################
@@ -117,8 +117,6 @@
             ".zsh" = "zsh/.zsh";
             ".zshrc" = "zsh/.zshrc";
           };
-
-          # TODO (future): deployTokenKey / deployKeySecret for private SSH access
         };
       };
     };
