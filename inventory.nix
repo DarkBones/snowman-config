@@ -71,9 +71,9 @@
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
         keys = [ "password_hash" "test" ];
-        userPasswordHashKey = "password_hash";
+        # userPasswordHashKey = "password_hash";
       };
-      # initialPassword = "changeme";
+      initialPassword = "changeme";
 
       envFile = ./users/env/bas.nix;
 
