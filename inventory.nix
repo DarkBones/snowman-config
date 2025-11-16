@@ -56,6 +56,60 @@
         fsType = "vfat";
       };
     };
+
+    vm-snowman-test = {
+      system = "x86_64-linux";
+      mutableUsers = false; # Defaults to `true` if omitted
+      provision.disk.enable = false;
+      # useDHCP = true; # Default if omitted
+
+      secrets = {
+        sopsFile = ./hosts/secrets/vm-snowman-test_secrets.yml;
+
+        items = {
+          test = {
+            # path inside the YAML
+            key = "test";
+            # file owner/group/mode for the concrete secret file
+            owner = "root";
+            group = "root";
+            mode = "0400";
+          };
+
+          wireguard-private-key = {
+            key = "wireguard-private-key";
+            owner = "root";
+            group = "root";
+            mode = "0400";
+          };
+        };
+      };
+
+      profiles = [
+        "qemu-guest"
+      ]; # ONLY for VMs. On normal machines, simply omit this key
+
+      hardware = {
+        boot = { firmware = "bios"; }; # "bios" | "efi"
+        # disk = { device = "/dev/vda"; }; # VM disk
+        bootDevice = "/dev/vda";
+        fs = {
+          type = "ext4";
+          partition = 1; # /dev/vda1
+          # swapGiB = 0;
+        };
+      };
+
+      users = [ "bas" ];
+
+      bootstrap.usb = {
+        enable = true;
+        label = "SNOWMANKEY";
+        path = "/mnt/snowman";
+        keyFile = "snowman.key";
+        fsType = "vfat";
+      };
+    };
     # macs later via nix-darwin
   };
 
