@@ -108,6 +108,16 @@
         keyFile = "snowman.key";
         fsType = "vfat";
       };
+
+      extraModules = [
+        ({ ... }: {
+          boot.kernelParams = [
+            "boot.shell_on_fail"
+            "systemd.log_level=debug"
+            "systemd.log_target=console"
+          ];
+        })
+      ];
     };
     # macs later via nix-darwin
   };
