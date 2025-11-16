@@ -100,12 +100,14 @@
                 '';
               }];
             })
-
           ] ++ (attrs.extraModules or [ ]);
         };
     in {
-      nixosConfigurations = lib.mapAttrs mkHost inv.hosts;
-
-      # ... (homeConfigurations, etc.)
+      nixosConfigurations = lib.mapAttrs mkHost inv.hosts // {
+        debug = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./hosts/debug.nix ];
+        };
+      };
     };
 }
