@@ -17,7 +17,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman/main-v4";
+      url = "github:DarkBones/snowman/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
