@@ -102,12 +102,5 @@
             })
           ] ++ (attrs.extraModules or [ ]);
         };
-    in {
-      nixosConfigurations = lib.mapAttrs mkHost inv.hosts // {
-        debug = lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./hosts/debug.nix ];
-        };
-      };
-    };
+    in { nixosConfigurations = lib.mapAttrs mkHost inv.hosts; };
 }
