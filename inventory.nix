@@ -85,19 +85,19 @@
         };
       };
 
-      profiles = [
-        "qemu-guest"
-      ]; # ONLY for VMs. On normal machines, simply omit this key
-
-      hardware = {
-        boot = { firmware = "bios"; }; # "bios" | "efi"
-        bootDevice = "/dev/vda";
-        fs = {
-          type = "ext4";
-          partition = 1; # /dev/vda1
-          # swapGiB = 0;
-        };
-      };
+      # profiles = [
+      #   "qemu-guest"
+      # ]; # ONLY for VMs. On normal machines, simply omit this key
+      #
+      # hardware = {
+      #   boot = { firmware = "bios"; }; # "bios" | "efi"
+      #   bootDevice = "/dev/vda";
+      #   fs = {
+      #     type = "ext4";
+      #     partition = 1; # /dev/vda1
+      #     # swapGiB = 0;
+      #   };
+      # };
 
       users = [ "bas" ];
 
