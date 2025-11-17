@@ -90,7 +90,7 @@
       ]; # ONLY for VMs. On normal machines, simply omit this key
 
       hardware = {
-        boot = { firmware = "none"; }; # "bios" | "efi"
+        boot = { firmware = "bios"; }; # "bios" | "efi"
         bootDevice = "/dev/vda";
         fs = {
           type = "ext4";
