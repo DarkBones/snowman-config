@@ -17,7 +17,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman";
+      url = "github:DarkBones/snowman/auto-key";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -56,6 +56,7 @@
         pkgsUnstable = makePkgsUnstable attrs.system;
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
+        sopsConfigPath = ./.. + "/.sops.yaml";
 
         extraHomeImports = [ ./home/roles ];
       };
