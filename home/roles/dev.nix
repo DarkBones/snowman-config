@@ -13,6 +13,7 @@ in {
       docker
       gcc
       figlet
+      tokei
     ];
   };
 }
