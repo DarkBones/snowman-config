@@ -56,7 +56,7 @@
         pkgsUnstable = makePkgsUnstable attrs.system;
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
-        sopsConfigPath = ./.. + "/.sops.yaml";
+        sopsConfigPath = ./.sops.yaml;
 
         extraHomeImports = [ ./home/roles ];
       };
