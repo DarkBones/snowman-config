@@ -199,7 +199,6 @@
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "auto-key",
         "repo": "snowman",
         "type": "github"
       }
