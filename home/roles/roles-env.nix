@@ -9,5 +9,5 @@ let
     (_: roleCfg: if roleCfg ? enable then roleCfg.enable else false) allRoles);
 in {
   # Export as space-separated list for consumption
-  home.sessionVariables.ROLES = lib.concatStringsSep " " enabledRoles;
+  home.sessionVariables.ROLES = "TEST" + lib.concatStringsSep " " enabledRoles;
 }
