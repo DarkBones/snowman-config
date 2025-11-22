@@ -10,5 +10,5 @@ let
   modules = map (name: here + "/${name}") nixFiles;
 in {
   imports = modules;
-  config.home.packages = with pkgsUnstable; [ neofetch starship ];
+  config.home.packages = with pkgsUnstable; [ neofetch starship eza bat ];
 }
