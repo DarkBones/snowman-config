@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgsUnstable, ... }:
 let
   here = ./.;
   entries = builtins.readDir here;
@@ -8,4 +8,7 @@ let
     != "default.nix") (builtins.attrNames entries);
 
   modules = map (name: here + "/${name}") nixFiles;
-in { imports = modules; }
+in {
+  imports = modules;
+  config.home.packages = with pkgsUnstable; [ neofetch starship ];
+}
