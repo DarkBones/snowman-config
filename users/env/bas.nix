@@ -10,5 +10,6 @@
     FLAKE = "~/Developer/snowman";
 
     BOOB_SECRET_PATH = osConfig.sops.secrets.test.path;
+    OPENAI_API_KEY_SECRET_PATH = osConfig.sops.secrets.openai_api_key.path;
   };
 }
