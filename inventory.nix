@@ -61,7 +61,7 @@
       system = "x86_64-linux";
       mutableUsers = false; # Defaults to `true` if omitted
       provision.disk.enable = false;
-      availableRoles = ["bas" "secrets"];
+      availableRoles = ["bas" "secrets" "dslfkjsdflkj" "dev"];
       # useDHCP = true; # Default if omitted
 
       secrets = {
