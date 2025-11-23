@@ -16,7 +16,6 @@ in {
       neovim
       networkmanager
       ripgrep
-      secure-delete
       starship
       tmux
       zoxide
