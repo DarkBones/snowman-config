@@ -10,4 +10,5 @@ let
 in {
   # Export as space-separated list for consumption
   home.sessionVariables.ROLES = lib.concatStringsSep " " enabledRoles;
+  home.sessionVariables.FOO = "FLURPLES";
 }
