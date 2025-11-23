@@ -3,11 +3,11 @@
     "bas-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1763882733,
-        "narHash": "sha256-8XTabwGItVCHy9Ei8aYB1sSEWzLEdc1scXX7QQNFBTk=",
+        "lastModified": 1763886438,
+        "narHash": "sha256-bCFP9DFM+Jmg2o+lvT0SGwX/mfOrOO5qoVaucoGw4EA=",
         "owner": "DarkBones",
         "repo": "dotfiles",
-        "rev": "eb36dd7ad448f599aeeb3338dbdf65bf058d0d31",
+        "rev": "3e01b1bad72c45835edc5b7b894135016369d141",
         "type": "github"
       },
       "original": {
@@ -191,11 +191,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1763486519,
-        "narHash": "sha256-B5KacpkqieL7xdPfOBNMfkU0yFBBfRQWOPL4ymzwUio=",
+        "lastModified": 1763887579,
+        "narHash": "sha256-5pHVVXlyjhYL17GNIMFlAqiXNq/5yoUutUb9cgNYC0U=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "246d1bd4904080b782277b30a6f9e2b8b24802be",
+        "rev": "adcc8fa743559494bb7b013d062d52296f2815de",
         "type": "github"
       },
       "original": {
