@@ -1,7 +1,7 @@
 { lib, pkgsUnstable, config, ... }:
 let cfg = config.roles.bas;
 in {
-  options.roles.dev.enable = lib.mkEnableOption "Bas role";
+  options.roles.bas.enable = lib.mkEnableOption "Bas role";
 
   config = lib.mkIf cfg.enable {
     home.packages = with pkgsUnstable; [
