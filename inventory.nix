@@ -123,7 +123,7 @@
 
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [ "password_hash" "test" ];
+        keys = [ "password_hash" "test" "openai_api_key" ];
         userPasswordHashKey = "password_hash";
       };
       # initialPassword = "changeme";
