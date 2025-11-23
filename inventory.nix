@@ -131,6 +131,7 @@
       envFile = ./users/env/bas.nix;
 
       roles = {
+        bas.enable = true;
         dev.enable = true;
         ssh.enable = true;
         secrets.enable = true;
