@@ -23,7 +23,7 @@
 
     # Add your pinned dotfiles here, e.g.:
     bas-dotfiles = {
-      url = "github:DarkBones/dotfiles/zsh-config";
+      url = "github:DarkBones/dotfiles";
       flake = false;
     };
   };
