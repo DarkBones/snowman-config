@@ -1,4 +1,4 @@
-{ lib, pkgsUnstable, config, ... }:
+{ lib, pkgs, pkgsUnstable, config, ... }:
 let cfg = config.roles.bas;
 in {
   options.roles.bas.enable = lib.mkEnableOption "Bas role";
@@ -7,10 +7,8 @@ in {
     home.packages = with pkgsUnstable; [
       bat
       btop
-      entr
       eza
       fzf
-      git
       less
       neofetch
       neovim

@@ -5,14 +5,15 @@ in {
 
   config = lib.mkIf cfg.enable {
     home.packages = with pkgsUnstable; [
-      neovim
-      pkgs.git
-      fzf
       cowsay
-      pnpm
       docker
-      gcc
+      entr
       figlet
+      fzf
+      gcc
+      pkgs.git
+      neovim
+      pnpm
       tokei
     ];
   };
