@@ -171,6 +171,7 @@
             ".config/nvim" = "nvim/.config/nvim";
             ".zsh" = "zsh/.zsh";
             ".zshrc" = "zsh/.zshrc";
+            "tmux" = "tmux/tmux";
             ".tmux.conf" = "tmux/.tmux.conf";
           };
         };
