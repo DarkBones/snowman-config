@@ -14,6 +14,7 @@ in {
       pkgs.git
       neovim
       pnpm
+      starship
       tokei
     ];
   };

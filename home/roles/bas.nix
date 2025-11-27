@@ -14,7 +14,6 @@ in {
       neovim
       networkmanager
       ripgrep
-      starship
       tmux
       zoxide
     ];
