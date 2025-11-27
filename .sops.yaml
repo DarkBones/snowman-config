@@ -5,6 +5,7 @@ keys:
   - &hosts:
     - &nix-vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
     - &arch age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
+    - &rpi4 age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
 creation_rules:
   # Per-user secrets files, e.g. users/secrets/bas_secrets.yaml
   - path_regex: ^users\/secrets\/.+_secrets\.(yml|yaml)$
@@ -14,6 +15,7 @@ creation_rules:
           - *archuser
           - *nix-vm
           - *arch
+          - *rpi4
 
   # Per-host secrets files, e.g. hosts/secrets/vm-snowman.yaml
   - path_regex: ^hosts\/secrets\/.+_secrets\.(yml|yaml)$
@@ -23,6 +25,7 @@ creation_rules:
           - *archuser
           - *nix-vm
           - *arch
+          - *rpi4
 
   - path_regex: ^secrets\.(yml|yaml)$
     key_groups:
@@ -31,3 +34,4 @@ creation_rules:
           - *archuser
           - *nix-vm
           - *arch
+          - *rpi4
