@@ -1,5 +1,5 @@
 { lib, pkgs, pkgsUnstable, config, ... }:
-let cfg = config.roles.dev;
+let cfg = config.roles.dev-heavy;
 in {
   options.roles.dev-heavy.enable = lib.mkEnableOption "Dev role";
 

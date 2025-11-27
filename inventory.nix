@@ -142,7 +142,7 @@
       roles = {
         bas.enable = true;
         dev.enable = true;
-        dev-heavy.enable = true;
+        dev-heavy.enable = false;
         ssh.enable = true;
         secrets.enable = true;
 
