@@ -15,7 +15,10 @@
     LANG = "en_US.UTF-8";
     FLAKE = "~/Developer/snowman";
 
-    TEST_SECRET_PATH = maybe "test";
-    OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
+    # TEST_SECRET_PATH = maybe "test";
+    # OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
+    # TODO: FIX
+    TEST_SECRET_PATH = osConfig.sops.secrets.test.path;
+    OPENAI_API_KEY_SECRET_PATH = osConfig.sops.secrets.openai_api_key.path;
   };
 }
