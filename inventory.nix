@@ -130,12 +130,12 @@
       # sshPubKeys = [ (builtins.readFile ./users/keys/bas-arch.pub) ];
       sshPubKeyFiles = [ ./users/keys/bas-arch.pub ];
 
-      # secrets = {
-      #   sopsFile = ./users/secrets/bas_secrets.yml;
-      #   keys = [ "password_hash" "test" "openai_api_key" ];
-      #   userPasswordHashKey = "password_hash";
-      # };
-      initialPassword = "snowman";
+      secrets = {
+        sopsFile = ./users/secrets/bas_secrets.yml;
+        keys = [ "password_hash" "test" "openai_api_key" ];
+        userPasswordHashKey = "password_hash";
+      };
+      # initialPassword = "snowman";
 
       envFile = ./users/env/bas.nix;
 
