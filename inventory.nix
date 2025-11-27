@@ -115,7 +115,7 @@
       system = "aarch64-linux";
       mutableUsers = true;
       provision.disk.enable = false; # TODO: Ensure this is optional
-      availableRoles = [ "bas" "dev" "dotfiles" "ssh" ];
+      availableRoles = [ "bas" "dotfiles" "ssh" ];
 
       users = [ "bas" ];
     };
