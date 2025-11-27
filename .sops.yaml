@@ -2,10 +2,11 @@ keys:
   - &users:
     - &usb age1smd4h5lk3984s3qdapz5hxsayy8fenc7eee8293ffzqm7mkgscgsmx9x5d
     - &archuser age1gah8tr5mjzx5hguakmcsay724r84djr00sgtlr264j3x0gwqsfuqqcc0qa
+    - &rpi4 age1pm2xh3t07qvs77jeajgcgm43r4kv8ntl00l7hrfcgt4y5w7upszqxhes50
   - &hosts:
     - &nix-vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
     - &arch age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
-    - &rpi4 age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
+    # - &rpi4 age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
 creation_rules:
   # Per-user secrets files, e.g. users/secrets/bas_secrets.yaml
   - path_regex: ^users\/secrets\/.+_secrets\.(yml|yaml)$
