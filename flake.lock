@@ -190,11 +190,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1764343575,
-        "narHash": "sha256-cYSn+qK/iz0y+IPs9qQlfooon/g7jqaoeNyhQVt0atg=",
+        "lastModified": 1764344393,
+        "narHash": "sha256-+6bR+1MITxP/X/C+M9mfxC7c1KNiSN5pZvSB95u+13E=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "674f60ef1840eca977b4a790f8bef9f945b53de3",
+        "rev": "e6b4e096a292d1d5b8d3749d6681081379fc6521",
         "type": "github"
       },
       "original": {
