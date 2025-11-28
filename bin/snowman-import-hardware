@@ -2,25 +2,64 @@
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 <host-name>" >&2
+  echo "Usage: $(basename "$0") <host-name>" >&2
   exit 1
 fi
 
 HOST="$1"
-DEST_DIR="$(dirname "${BASH_SOURCE[0]}")/../hosts"
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." >/dev/null 2>&1 && pwd)"
+DEST_DIR="${REPO_ROOT}/hosts"
 DEST_FILE="${DEST_DIR}/${HOST}-hardware-configuration.nix"
 
+# Ensure /etc/nixos/hardware-configuration.nix exists, or generate it
 if [ ! -f /etc/nixos/hardware-configuration.nix ]; then
-  echo "ERROR: /etc/nixos/hardware-configuration.nix not found. Are you on the installed system?" >&2
-  exit 1
+  echo "[snowman] /etc/nixos/hardware-configuration.nix is missing."
+  echo "[snowman] Generating it with: nixos-generate-config --no-config"
+
+  if ! command -v nixos-generate-config >/dev/null 2>&1; then
+    echo "ERROR: nixos-generate-config not found in PATH." >&2
+    exit 1
+  fi
+
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "[snowman] This requires root privileges. Asking for sudo..."
+    sudo nixos-generate-config --no-config
+  else
+    nixos-generate-config --no-config
+  fi
+
+  if [ ! -f /etc/nixos/hardware-configuration.nix ]; then
+    echo "ERROR: Could not generate /etc/nixos/hardware-configuration.nix." >&2
+    exit 1
+  fi
+
+  echo "[snowman] Successfully generated hardware configuration."
 fi
 
 mkdir -p "$DEST_DIR"
 
-if [ -f "$DEST_FILE" ]; then
-  echo "Refusing to overwrite existing $DEST_FILE" >&2
+if [ -e "$DEST_FILE" ]; then
+  echo "ERROR: $DEST_FILE already exists. Refusing to overwrite." >&2
   exit 1
 fi
 
 cp /etc/nixos/hardware-configuration.nix "$DEST_FILE"
 echo "✅ Copied /etc/nixos/hardware-configuration.nix → $DEST_FILE"
+
+# Git auto-add if possible
+if command -v git >/dev/null 2>&1; then
+  if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if git -C "$REPO_ROOT" add "$DEST_FILE"; then
+      echo "📦 Added $DEST_FILE to git index."
+    else
+      echo "⚠️  Could not git add $DEST_FILE (check repo state)." >&2
+    fi
+  else
+    echo "ℹ️  Repo is not a Git work tree. File is not tracked."
+  fi
+else
+  echo "⚠️  'git' not installed — file not tracked. Install git and run:"
+  echo "      git add hosts/$(basename "$DEST_FILE")"
+fi
