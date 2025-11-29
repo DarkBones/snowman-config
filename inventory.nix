@@ -125,14 +125,14 @@
             # file owner/group/mode for the concrete secret file
             owner = "root";
             group = "root";
-            mode = "0400";
+            mode = "0444";
           };
 
           wifi_password = {
             key = "wifi_password";
             owner = "root";
             group = "root";
-            mode = "0400";
+            mode = "0444";
           };
         };
       };
