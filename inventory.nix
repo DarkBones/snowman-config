@@ -4,7 +4,7 @@ rec {
   networks = {
     home = {
       ssid = "frizzlesnizzle";
-      passwordSecret = "home.password";
+      passwordSecret = "home/password";
     };
   };
 
