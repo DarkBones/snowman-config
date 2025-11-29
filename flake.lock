@@ -190,15 +190,16 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1764344393,
-        "narHash": "sha256-+6bR+1MITxP/X/C+M9mfxC7c1KNiSN5pZvSB95u+13E=",
+        "lastModified": 1764416212,
+        "narHash": "sha256-f50qLq8M5Jt/4CeEc+yOPOfRCDKjaK9WaIz5ZEPuH8I=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "e6b4e096a292d1d5b8d3749d6681081379fc6521",
+        "rev": "ffccdbaeec9daab5ddda85978e6e9ad28d5bbd74",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
+        "ref": "add-wifi-connectivity",
         "repo": "snowman",
         "type": "github"
       }

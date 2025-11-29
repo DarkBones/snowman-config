@@ -1,5 +1,12 @@
-{
+rec {
   release = "25.05";
+
+  networks = {
+    home = {
+      ssid = "frizzlesnizzle";
+      passwordSecret = "home.password";
+    };
+  };
 
   hosts = {
     vm-snowman = {
@@ -7,7 +14,12 @@
       mutableUsers = false; # Defaults to `true` if omitted
       hostname = "vm-snowman"; # Optional, defaults to hosts.[name]
       provision.disk.enable = false;
-      # useDHCP = true; # Default if omitted
+      wifi = {
+        mode = "static-wifi";
+        interface = "wlan0";
+        useDHCP = true;
+        networks = [ "home" ];
+      };
 
       secrets = {
         sopsFile = ./hosts/secrets/vm-snowman_secrets.yml;
@@ -62,7 +74,12 @@
       mutableUsers = false; # Defaults to `true` if omitted
       provision.disk.enable = false;
       # availableRoles = ["bas" "secrets" "dev"];
-      # useDHCP = true; # Default if omitted
+      wifi = {
+        mode = "static-wifi";
+        interface = "wlan0";
+        useDHCP = true;
+        networks = [ "home" ];
+      };
 
       secrets = {
         sopsFile = ./hosts/secrets/vm-snowman-test_secrets.yml;
@@ -115,6 +132,14 @@
       system = "aarch64-linux";
       mutableUsers = true;
       provision.disk.enable = false; # TODO: Ensure this is optional
+
+      wifi = {
+        mode = "static-wifi";
+        interface = "wlan0";
+        useDHCP = true;
+        networks = [ "home" ];
+      };
+
       secrets = {
         sopsFile = ./hosts/secrets/rpi4_secrets.yml;
 

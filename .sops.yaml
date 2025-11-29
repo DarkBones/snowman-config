@@ -1,38 +1,43 @@
 keys:
-  - &users:
+  # Keys tied to people / removable media
+  - &age_users
     - &usb age1smd4h5lk3984s3qdapz5hxsayy8fenc7eee8293ffzqm7mkgscgsmx9x5d
     - &archuser age1gah8tr5mjzx5hguakmcsay724r84djr00sgtlr264j3x0gwqsfuqqcc0qa
-    - &rpi4 age1pm2xh3t07qvs77jeajgcgm43r4kv8ntl00l7hrfcgt4y5w7upszqxhes50
-  - &hosts:
-    - &nix-vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
-    - &arch age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
-    # - &rpi4 age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
+    - &rpi4_user age1pm2xh3t07qvs77jeajgcgm43r4kv8ntl00l7hrfcgt4y5w7upszqxhes50
+
+  # Keys tied to machines
+  - &age_hosts
+    - &nix_vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
+    - &arch_host age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
+    - &rpi4_host age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
+
+  # Convenience: union of all keys
+  - &age_all
+    - *usb
+    - *archuser
+    - *rpi4_user
+    - *nix_vm
+    - *arch_host
+    - *rpi4_host
+
 creation_rules:
-  # Per-user secrets files, e.g. users/secrets/bas_secrets.yaml
-  - path_regex: ^users\/secrets\/.+_secrets\.(yml|yaml)$
+  # Shared network secrets (Wi-Fi SSIDs, passwords, etc.)
+  # File: networks/secrets.yml
+  - path_regex: ^networks/secrets\.(yml|yaml)$
     key_groups:
-      - age:
-          - *usb
-          - *archuser
-          - *nix-vm
-          - *arch
-          - *rpi4
+      - age: *age_all
 
-  # Per-host secrets files, e.g. hosts/secrets/vm-snowman.yaml
-  - path_regex: ^hosts\/secrets\/.+_secrets\.(yml|yaml)$
+  # Per-user secrets files, e.g. users/secrets/bas_secrets.yml
+  - path_regex: ^users/secrets/.+_secrets\.(yml|yaml)$
     key_groups:
-      - age:
-          - *usb
-          - *archuser
-          - *nix-vm
-          - *arch
-          - *rpi4
+      - age: *age_users
 
+  # Per-host secrets files, e.g. hosts/secrets/vm-snowman_secrets.yml
+  - path_regex: ^hosts/secrets/.+_secrets\.(yml|yaml)$
+    key_groups:
+      - age: *age_hosts
+
+  # Optional catch-all for a top-level secrets.yml
   - path_regex: ^secrets\.(yml|yaml)$
     key_groups:
-      - age:
-          - *usb
-          - *archuser
-          - *nix-vm
-          - *arch
-          - *rpi4
+      - age: *age_all
