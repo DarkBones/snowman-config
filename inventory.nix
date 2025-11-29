@@ -115,6 +115,28 @@
       system = "aarch64-linux";
       mutableUsers = true;
       provision.disk.enable = false; # TODO: Ensure this is optional
+      secrets = {
+        sopsFile = ./hosts/secrets/rpi4_secrets.yml;
+
+        items = {
+          test = {
+            # path inside the YAML
+            key = "wifi_ssid";
+            # file owner/group/mode for the concrete secret file
+            owner = "root";
+            group = "root";
+            mode = "0400";
+          };
+
+          wireguard-private-key = {
+            key = "wifi_password";
+            owner = "root";
+            group = "root";
+            mode = "0400";
+          };
+        };
+      };
+
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
 
       users = [ "bas" ];
