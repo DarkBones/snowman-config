@@ -135,8 +135,8 @@ rec {
 
       wifi = {
         mode = "static-wifi";
-        interface = "wlan0";
-        useDHCP = true;
+        # interface = "wlan0";
+        # useDHCP = true;
         networks = [ "home" ];
       };
 
