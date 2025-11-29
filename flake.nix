@@ -56,7 +56,7 @@
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
-        networkSecretsPath = ./networks/secrets.env;
+        networkSecretsPath = ./networks/secrets.yml;
 
         extraHomeImports = [ ./home/roles ];
       };
