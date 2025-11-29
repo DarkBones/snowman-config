@@ -45,6 +45,14 @@
         networks = [ "home" ];
       };
 
+      bootstrap.usb = {
+        enable = true;
+        label = "SNOWMANKEY";
+        path = "/mnt/snowman";
+        keyFile = "snowman.key";
+        fsType = "vfat";
+      };
+
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
 
       users = [ "bas" ];
@@ -60,12 +68,12 @@
       sshPubKeyFiles =
         [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
 
-      initialPassword = "changeme";
-      # secrets = {
-      #   sopsFile = ./users/secrets/bas_secrets.yml;
-      #   keys = [ "password_hash" "test" "openai_api_key" ];
-      #   userPasswordHashKey = "password_hash";
-      # };
+      # initialPassword = "changeme";
+      secrets = {
+        sopsFile = ./users/secrets/bas_secrets.yml;
+        keys = [ "password_hash" "test" "openai_api_key" ];
+        userPasswordHashKey = "password_hash";
+      };
 
       envFile = ./users/env/bas.nix;
 
