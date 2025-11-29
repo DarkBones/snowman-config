@@ -17,7 +17,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman";
+      url = "github:DarkBones/snowman/add-wifi-connectivity";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
