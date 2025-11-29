@@ -16,63 +16,39 @@ rec {
       users = [ "bas" ];
       availableRoles = [ "bas" "ssh" ];
     };
-  };
 
-  dorkbones = {
-    system = "x86_64-linux";
-    mutableUsers = false;
-    users = [ "bas" ];
+    dorkbones = {
+      system = "x86_64-linux";
+      mutableUsers = false;
+      users = [ "bas" ];
 
-    wifi = {
-      mode = "static-wifi";
-      networks = [ "home" ];
-    };
+      wifi = {
+        mode = "static-wifi";
+        networks = [ "home" ];
+      };
 
-    bootstrap.usb = {
-      enable = true;
-      label = "SNOWMANKEY";
-      path = "/mnt/snowman";
-      keyFile = "snowman.key";
-      fsType = "vfat";
-    };
-  };
-
-  rpi4 = {
-    system = "aarch64-linux";
-    mutableUsers = true;
-
-    wifi = {
-      mode = "static-wifi";
-      # interface = "wlan0";
-      # useDHCP = true;
-      networks = [ "home" ];
-    };
-
-    secrets = {
-      sopsFile = ./hosts/secrets/rpi4_secrets.yml;
-
-      items = {
-        wifi_ssid = {
-          # path inside the YAML
-          key = "wifi_ssid";
-          # file owner/group/mode for the concrete secret file
-          owner = "root";
-          group = "root";
-          mode = "0444";
-        };
-
-        wifi_password = {
-          key = "wifi_password";
-          owner = "root";
-          group = "root";
-          mode = "0444";
-        };
+      bootstrap.usb = {
+        enable = true;
+        label = "SNOWMANKEY";
+        path = "/mnt/snowman";
+        keyFile = "snowman.key";
+        fsType = "vfat";
       };
     };
 
-    availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
+    rpi4 = {
+      system = "aarch64-linux";
+      mutableUsers = true;
 
-    users = [ "bas" ];
+      wifi = {
+        mode = "static-wifi";
+        networks = [ "home" ];
+      };
+
+      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
+
+      users = [ "bas" ];
+    };
   };
 
   users = {
@@ -81,7 +57,8 @@ rec {
       homeManaged = true;
       groups = [ "wheel" ];
       shell = "zsh";
-      sshPubKeyFiles = [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
+      sshPubKeyFiles =
+        [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
 
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
