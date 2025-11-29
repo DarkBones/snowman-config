@@ -1,4 +1,4 @@
-rec {
+{
   release = "25.05";
 
   networks = {
