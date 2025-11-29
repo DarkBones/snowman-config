@@ -17,5 +17,7 @@
 
     TEST_SECRET_PATH = maybe "test";
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
+    WIFI_SSID_SECRET_PATH = maybe "wifi_ssid";
+    WIFI_PASSWORD_SECRET_PATH = maybe "wifi_password";
   };
 }
