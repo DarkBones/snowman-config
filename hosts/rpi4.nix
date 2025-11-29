@@ -6,7 +6,8 @@
     allowPing = true;
     allowedTCPPorts = [ 22 ];
 
-    trustedInterfaces = [ "wlan0" ];
     checkReversePath = "loose";
+
+    trustedInterfaces = [ "wlan0" ];
   };
 }
