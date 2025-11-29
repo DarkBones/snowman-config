@@ -1,0 +1,127 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i python3 -p "python3.withPackages (ps: [ ps.ruamel-yaml ])" ssh-to-age sops openssh
+
+import sys
+import subprocess
+import os
+from ruamel.yaml import YAML
+from ruamel.yaml.scalarstring import PlainScalarString
+
+# --- Configuration ---
+SOPS_FILE = ".sops.yaml"
+
+def run_command(cmd, input_text=None):
+    """Runs a shell command and returns stdout."""
+    try:
+        result = subprocess.run(
+            cmd, 
+            input=input_text, 
+            capture_output=True, 
+            text=True, 
+            check=True, 
+            shell=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error running command: {cmd}")
+        print(f"   Stderr: {e.stderr}")
+        sys.exit(1)
+
+def get_host_key(target_host):
+    """Fetches the Ed25519 public key via SSH."""
+    print(f"🔍 Fetching SSH key from {target_host}...")
+    # We use cat to ensure we get the specific file we need
+    return run_command(f"ssh {target_host} 'cat /etc/ssh/ssh_host_ed25519_key.pub'")
+
+def convert_to_age(ssh_key):
+    """Converts SSH public key to Age format using ssh-to-age."""
+    print("🔐 Converting to Age format...")
+    return run_command("ssh-to-age", input_text=ssh_key)
+
+def update_sops_yaml(host_name, age_key):
+    """Safely updates .sops.yaml using ruamel.yaml to preserve comments/anchors."""
+    yaml = YAML()
+    yaml.preserve_quotes = True
+    # Match the indentation style of your template
+    yaml.indent(mapping=2, sequence=4, offset=2)
+    
+    if not os.path.exists(SOPS_FILE):
+        print(f"❌ {SOPS_FILE} not found in current directory.")
+        sys.exit(1)
+
+    with open(SOPS_FILE, 'r') as f:
+        data = yaml.load(f)
+
+    if 'keys' not in data or not isinstance(data['keys'], list):
+        print("❌ Invalid .sops.yaml structure (missing 'keys' list).")
+        sys.exit(1)
+
+    # Helper to check if key exists recursively
+    def has_key(obj, key_str):
+        if isinstance(obj, list):
+            return any(has_key(x, key_str) for x in obj)
+        if isinstance(obj, str):
+            return key_str in obj
+        return False
+
+    if has_key(data['keys'], age_key):
+        print(f"⚠️  Key for {host_name} already exists in {SOPS_FILE}. Skipping add.")
+        return
+
+    print(f"📝 Adding {host_name} to {SOPS_FILE}...")
+    
+    # Create a string object with an anchor (&hostname)
+    new_entry = PlainScalarString(age_key)
+    new_entry.yaml_anchor = host_name
+
+    # We assume the template structure: keys[0] is users, keys[1] is hosts.
+    # We append to the second group.
+    try:
+        target_list = data['keys'][1]
+        target_list.append(new_entry)
+    except IndexError:
+        print("⚠️  Could not find the second key group (hosts). Appending to end of keys list.")
+        data['keys'].append([new_entry])
+
+    with open(SOPS_FILE, 'w') as f:
+        yaml.dump(data, f)
+    
+    print("✅ .sops.yaml updated.")
+
+def main():
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} <host-name-in-inventory> <ssh-target>")
+        print("Example: ./bin/snowman-rotate-keys my-laptop root@192.168.1.50")
+        sys.exit(1)
+
+    host_name = sys.argv[1]
+    target = sys.argv[2]
+
+    # 1. Get Key
+    ssh_key = get_host_key(target)
+    
+    # 2. Convert
+    age_key = convert_to_age(ssh_key)
+    print(f"   Key: {age_key}")
+
+    # 3. Edit YAML
+    update_sops_yaml(host_name, age_key)
+
+    # 4. Re-encrypt
+    print("🔄 Running sops updatekeys...")
+    # Finds all files ending in secrets.yml or secrets.yaml
+    cmd = "find . -name '*secrets.y*ml' | xargs -I {} sops updatekeys {}"
+    subprocess.run(cmd, shell=True, check=True)
+    
+    print("\n🎉 Rotation Complete!")
+    print("---------------------------------------------------")
+    print(f"Snowman has detected the anchor &{host_name} in .sops.yaml.")
+    print("When you deploy next, the system will automatically:")
+    print("  1. Disable the USB bootstrap service.")
+    print("  2. Switch to using the internal SSH host key.")
+    print("---------------------------------------------------")
+    print("👉 Action: git commit && git push")
+
+if __name__ == "__main__":
+    main()
+
