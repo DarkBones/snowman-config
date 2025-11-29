@@ -7,5 +7,6 @@
     allowedTCPPorts = [ 22 ];
 
     trustedInterfaces = [ "wlan0" ];
+    checkReversePath = "loose";
   };
 }
