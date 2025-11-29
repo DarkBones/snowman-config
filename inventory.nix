@@ -78,10 +78,6 @@ rec {
         dotfiles = {
           enable = true;
 
-          # Pinned mode (reproducible; uses flake input)
-          # default = "username" # Defaults to `home.username` if omitted
-          # sourceKey = "bas"; # TODO: Remove line and above comment if working
-
           linkMap = {
             ".config/nvim" = "nvim/.config/nvim";
             ".zsh" = "zsh/.zsh";
