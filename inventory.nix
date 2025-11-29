@@ -69,7 +69,7 @@ rec {
       };
     };
 
-    vm-snowman-test-2 = {
+    vm-snowman-test-3 = {
       system = "x86_64-linux";
       mutableUsers = false; # Defaults to `true` if omitted
       provision.disk.enable = false;
