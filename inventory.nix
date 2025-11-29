@@ -9,163 +9,70 @@ rec {
   };
 
   hosts = {
-    vm-snowman = {
+    vm = {
       system = "x86_64-linux";
-      mutableUsers = false; # Defaults to `true` if omitted
-      hostname = "vm-snowman"; # Optional, defaults to hosts.[name]
-      provision.disk.enable = false;
-      wifi = {
-        mode = "static-wifi";
-        interface = "wlan0";
-        useDHCP = true;
-        networks = [ "home" ];
-      };
-
-      secrets = {
-        sopsFile = ./hosts/secrets/vm-snowman_secrets.yml;
-
-        items = {
-          test = {
-            # path inside the YAML
-            key = "test";
-            # file owner/group/mode for the concrete secret file
-            owner = "root";
-            group = "root";
-            mode = "0400";
-          };
-
-          wireguard-private-key = {
-            key = "wireguard-private-key";
-            owner = "root";
-            group = "root";
-            mode = "0400";
-          };
-        };
-      };
-
-      profiles = [
-        "qemu-guest"
-      ]; # ONLY for VMs. On normal machines, simply omit this key
-
-      hardware = {
-        boot = { firmware = "bios"; }; # "bios" | "efi"
-        # disk = { device = "/dev/vda"; }; # VM disk
-        bootDevice = "/dev/vda";
-        fs = {
-          type = "ext4";
-          partition = 1; # /dev/vda1
-          # swapGiB = 0;
-        };
-      };
-
+      mutableUsers = false;
+      profiles = [ "qemu-guest" ];
       users = [ "bas" ];
+      availableRoles = [ "bas" "ssh" ];
+    };
+  };
 
-      bootstrap.usb = {
-        enable = false;
-        label = "SNOWMANKEY";
-        path = "/mnt/snowman";
-        keyFile = "snowman.key";
-        fsType = "vfat";
+  dorkbones = {
+    system = "x86_64-linux";
+    mutableUsers = false;
+    users = [ "bas" ];
+
+    wifi = {
+      mode = "static-wifi";
+      networks = [ "home" ];
+    };
+
+    bootstrap.usb = {
+      enable = true;
+      label = "SNOWMANKEY";
+      path = "/mnt/snowman";
+      keyFile = "snowman.key";
+      fsType = "vfat";
+    };
+  };
+
+  rpi4 = {
+    system = "aarch64-linux";
+    mutableUsers = true;
+
+    wifi = {
+      mode = "static-wifi";
+      # interface = "wlan0";
+      # useDHCP = true;
+      networks = [ "home" ];
+    };
+
+    secrets = {
+      sopsFile = ./hosts/secrets/rpi4_secrets.yml;
+
+      items = {
+        wifi_ssid = {
+          # path inside the YAML
+          key = "wifi_ssid";
+          # file owner/group/mode for the concrete secret file
+          owner = "root";
+          group = "root";
+          mode = "0444";
+        };
+
+        wifi_password = {
+          key = "wifi_password";
+          owner = "root";
+          group = "root";
+          mode = "0444";
+        };
       };
     };
 
-    vm-snowman-test-3 = {
-      system = "x86_64-linux";
-      mutableUsers = false; # Defaults to `true` if omitted
-      provision.disk.enable = false;
-      # availableRoles = ["bas" "secrets" "dev"];
-      wifi = {
-        mode = "static-wifi";
-        interface = "wlan0";
-        useDHCP = true;
-        networks = [ "home" ];
-      };
+    availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
 
-      secrets = {
-        sopsFile = ./hosts/secrets/vm-snowman-test_secrets.yml;
-
-        items = {
-          test = {
-            # path inside the YAML
-            key = "test";
-            # file owner/group/mode for the concrete secret file
-            owner = "root";
-            group = "root";
-            mode = "0400";
-          };
-
-          wireguard-private-key = {
-            key = "wireguard-private-key";
-            owner = "root";
-            group = "root";
-            mode = "0400";
-          };
-        };
-      };
-
-      # profiles = [
-      #   "qemu-guest"
-      # ]; # ONLY for VMs. On normal machines, simply omit this key
-      #
-      # hardware = {
-      #   boot = { firmware = "bios"; }; # "bios" | "efi"
-      #   bootDevice = "/dev/vda";
-      #   fs = {
-      #     type = "ext4";
-      #     partition = 1; # /dev/vda1
-      #     # swapGiB = 0;
-      #   };
-      # };
-
-      users = [ "bas" ];
-
-      bootstrap.usb = {
-        enable = false;
-        label = "SNOWMANKEY";
-        path = "/mnt/snowman";
-        keyFile = "snowman.key";
-        fsType = "vfat";
-      };
-    };
-
-    rpi4 = {
-      system = "aarch64-linux";
-      mutableUsers = true;
-      provision.disk.enable = false; # TODO: Ensure this is optional
-
-      wifi = {
-        mode = "static-wifi";
-        # interface = "wlan0";
-        # useDHCP = true;
-        networks = [ "home" ];
-      };
-
-      secrets = {
-        sopsFile = ./hosts/secrets/rpi4_secrets.yml;
-
-        items = {
-          wifi_ssid = {
-            # path inside the YAML
-            key = "wifi_ssid";
-            # file owner/group/mode for the concrete secret file
-            owner = "root";
-            group = "root";
-            mode = "0444";
-          };
-
-          wifi_password = {
-            key = "wifi_password";
-            owner = "root";
-            group = "root";
-            mode = "0444";
-          };
-        };
-      };
-
-      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
-
-      users = [ "bas" ];
-    };
+    users = [ "bas" ];
   };
 
   users = {
@@ -174,15 +81,13 @@ rec {
       homeManaged = true;
       groups = [ "wheel" ];
       shell = "zsh";
-      # sshPubKeys = [ (builtins.readFile ./users/keys/bas-arch.pub) ];
-      sshPubKeyFiles = [ ./users/keys/bas-arch.pub ];
+      sshPubKeyFiles = [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
 
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
         keys = [ "password_hash" "test" "openai_api_key" ];
         userPasswordHashKey = "password_hash";
       };
-      # initialPassword = "snowman";
 
       envFile = ./users/env/bas.nix;
 
@@ -196,33 +101,10 @@ rec {
         dotfiles = {
           enable = true;
 
-          ############################################################
-          ## MODE SELECTION
-          ##
-          ## If `sourceKey` resolves in dotfilesSources (specialArgs),
-          ## we use *pinned mode* (flake input in the Nix store).
-          ##
-          ## If `sourceKey` is null or doesn't resolve, we fall back
-          ## to *git mode* (clone/pull at activation time).
-          ############################################################
-
           # Pinned mode (reproducible; uses flake input)
           # default = "username" # Defaults to `home.username` if omitted
-          sourceKey = "bas";
+          # sourceKey = "bas"; # TODO: Remove line and above comment if working
 
-          ############################################################
-          ## GIT MODE (NON-REPRODUCIBLE)
-          ##
-          ## Only used when pinned mode is not active.
-          ############################################################
-          # repo = "git@github.com:DarkBones/.dotfiles.git";
-          # dir = "Developer/dotfiles";
-          # branch = "main";
-          # sparse = [ "nvim" "zsh" ];
-
-          ############################################################
-          ## SHARED SETTINGS (BOTH MODES)
-          ############################################################
           linkMap = {
             ".config/nvim" = "nvim/.config/nvim";
             ".zsh" = "zsh/.zsh";
