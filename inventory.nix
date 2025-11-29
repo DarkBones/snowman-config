@@ -119,7 +119,7 @@
         sopsFile = ./hosts/secrets/rpi4_secrets.yml;
 
         items = {
-          test = {
+          wifi_ssid = {
             # path inside the YAML
             key = "wifi_ssid";
             # file owner/group/mode for the concrete secret file
@@ -128,7 +128,7 @@
             mode = "0400";
           };
 
-          wireguard-private-key = {
+          wifi_password = {
             key = "wifi_password";
             owner = "root";
             group = "root";
