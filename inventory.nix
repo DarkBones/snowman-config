@@ -38,7 +38,7 @@
 
     rpi4 = {
       system = "aarch64-linux";
-      mutableUsers = true;
+      mutableUsers = false;
 
       wifi = {
         mode = "static-wifi";
