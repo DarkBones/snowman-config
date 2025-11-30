@@ -1,13 +1,14 @@
 { pkgs, lib, ... }: {
-  networking.hostName = "rpi4";
+  imports = [ ./rpi4-hardware-configuration.nix ];
+
+  boot.loader.grub.enable = false;
+  boot.loader.generic-extlinux-compatible.enable = true;
 
   networking.firewall = {
     enable = true;
     allowPing = true;
     allowedTCPPorts = [ 22 ];
-
     checkReversePath = "loose";
-
     trustedInterfaces = [ "wlan0" ];
   };
 }
