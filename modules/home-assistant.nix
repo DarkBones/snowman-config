@@ -27,6 +27,9 @@
       python3Packages."ibeacon-ble"
     ];
 
-    config = { default_config = { }; };
+    config = {
+      default_config = { };
+      automation = "!include automations.yaml";
+    };
   };
 }
