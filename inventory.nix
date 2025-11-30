@@ -46,7 +46,7 @@ rec {
         networks = [ "home" ];
       };
 
-      availableRoles = [ "bas" "secrets__zzz" "dev" "dotfiles" "ssh" ];
+      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
 
       users = [ "bas" ];
     };
@@ -61,12 +61,12 @@ rec {
       sshPubKeyFiles =
         [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
 
-      initialPassword = "snowman";
-      # secrets = {
-      #   sopsFile = ./users/secrets/bas_secrets.yml;
-      #   keys = [ "password_hash" "test" "openai_api_key" ];
-      #   userPasswordHashKey = "password_hash";
-      # };
+      # initialPassword = "snowman";
+      secrets = {
+        sopsFile = ./users/secrets/bas_secrets.yml;
+        keys = [ "password_hash" "test" "openai_api_key" ];
+        userPasswordHashKey = "password_hash";
+      };
 
       envFile = ./users/env/bas.nix;
 
