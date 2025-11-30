@@ -38,7 +38,7 @@ rec {
 
     rpi4 = {
       system = "aarch64-linux";
-      mutableUsers = true;
+      mutableUsers = false;
       hostname = "rpi4";
 
       wifi = {
