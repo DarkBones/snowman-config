@@ -8,6 +8,7 @@
       with python3Packages; [
         aiohue
         pychromecast
+        roborock
       ];
 
     config = { default_config = { }; };
