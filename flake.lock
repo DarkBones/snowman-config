@@ -199,7 +199,6 @@
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "cleanup",
         "repo": "snowman",
         "type": "github"
       }
