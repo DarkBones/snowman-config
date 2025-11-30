@@ -1,20 +1,15 @@
 { pkgs, lib, ... }: {
   services.home-assistant = {
     enable = true;
-    configDir = "/var/lib/home-assistant";
     openFirewall = true;
+    configDir = "/var/lib/home-assistant";
 
-    config = {
-      default_config = { };
+    extraPackages = python3Packages:
+      with python3Packages; [
+        aiohue
+        pychromecast
+      ];
 
-      homeassistant = {
-        name = "Home";
-        unit_system = "metric";
-        time_zone = "Europe/Berlin";
-        # latitude/longitude/elevation can be left null; fill later
-      };
-    };
+    config = { default_config = { }; };
   };
-
-  # Later: udev rules, extraPackages, etc.
 }
