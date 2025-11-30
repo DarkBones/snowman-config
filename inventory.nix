@@ -40,6 +40,7 @@ rec {
       system = "aarch64-linux";
       mutableUsers = false;
       hostname = "rpi4";
+      hardware.boot.firmware = "raspberry-pi";
 
       wifi = {
         mode = "static-wifi";
