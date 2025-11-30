@@ -1,5 +1,5 @@
 { pkgs, lib, ... }: {
-  imports = [ ./rpi4-hardware-configuration.nix ];
+  imports = [ ./rpi4-hardware-configuration.nix ../modules/home-assistant.nix ];
 
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
