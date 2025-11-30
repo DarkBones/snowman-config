@@ -27,8 +27,8 @@
 
         # for BLE integrations (if these attrs exist; if Nix complains,
         # you can comment them out and HA will just skip those integrations)
-        govee_ble
-        ibeacon_ble
+        # govee_ble
+        # ibeacon_ble
       ];
 
     config = { default_config = { }; };
