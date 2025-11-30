@@ -8,7 +8,8 @@
       with python3Packages; [
         aiohue
         pychromecast
-        roborock
+        python-roborock
+        vacuum-map-parser-roborock
       ];
 
     config = { default_config = { }; };
