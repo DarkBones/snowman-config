@@ -1,5 +1,5 @@
 { pkgs, lib, ... }: {
-  imports = [ ./rpi4-hardware-configuration.nix ../modules/home-assistant.nix ];
+  imports = [ ./rpi4-hardware-configuration.nix ];
 
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
@@ -10,5 +10,10 @@
     allowedTCPPorts = [ 22 ];
     checkReversePath = "loose";
     trustedInterfaces = [ "wlan0" ];
+  };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
   };
 }
