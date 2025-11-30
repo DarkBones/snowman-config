@@ -9,6 +9,7 @@
         aiohue
         pychromecast
         python-roborock
+        python-otbr-api
         vacuum-map-parser-roborock
       ];
 
