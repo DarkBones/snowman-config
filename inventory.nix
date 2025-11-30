@@ -10,6 +10,7 @@ rec {
 
   hosts = {
     vm = {
+      hostname = "vm-snowman";
       system = "x86_64-linux";
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
@@ -18,6 +19,7 @@ rec {
     };
 
     dorkbones = {
+      hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
       users = [ "bas" ];
@@ -37,9 +39,9 @@ rec {
     };
 
     rpi4 = {
+      hostname = "rpi4";
       system = "aarch64-linux";
       mutableUsers = false;
-      hostname = "rpi4";
       hardware.boot.firmware = "raspberry-pi";
 
       wifi = {
