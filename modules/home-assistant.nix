@@ -4,32 +4,28 @@
     openFirewall = true;
     configDir = "/var/lib/home-assistant";
 
-    extraPackages = python3Packages:
-      with python3Packages; [
-        aiohue
-        pychromecast
-        python-roborock
-        vacuum-map-parser-roborock
+    extraPackages = python3Packages: [
+      python3Packages.aiohue
+      python3Packages.pychromecast
+      python3Packages.python-roborock
+      python3Packages.vacuum-map-parser-roborock
 
-        # for thread / otbr
-        python-otbr-api
+      # for thread / otbr
+      python3Packages.python-otbr-api
 
-        # for google_translate TTS
-        gtts
+      # for google_translate TTS
+      python3Packages.gtts
 
-        # for Fritz!Box / Fritz integrations
-        fritzconnection
-        pyfritzhome
+      # for Fritz!/UPnP/etc
+      python3Packages.fritzconnection
+      python3Packages.pyfritzhome
+      python3Packages.getmac
+      python3Packages.pyipp
 
-        # for UPnP, various discovery things
-        getmac
-        pyipp
-
-        # for BLE integrations (if these attrs exist; if Nix complains,
-        # you can comment them out and HA will just skip those integrations)
-        # govee_ble
-        # ibeacon_ble
-      ];
+      # for BLE integrations
+      python3Packages."govee-ble"
+      python3Packages."ibeacon-ble"
+    ];
 
     config = { default_config = { }; };
   };
