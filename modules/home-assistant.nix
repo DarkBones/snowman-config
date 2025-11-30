@@ -4,31 +4,6 @@
     openFirewall = true;
     configDir = "/var/lib/home-assistant";
 
-    defaultIntegrations = [
-      "application_credentials"
-      "frontend"
-      "hardware"
-      "logger"
-      "network"
-      "system_health"
-      "automation"
-      "person"
-      "scene"
-      "script"
-      "tag"
-      "zone"
-      "counter"
-      "input_boolean"
-      "input_button"
-      "input_datetime"
-      "input_number"
-      "input_select"
-      "input_text"
-      "schedule"
-      "timer"
-      "backup"
-    ];
-
     extraPackages = python3Packages:
       with python3Packages; [
         aiohue
@@ -50,9 +25,10 @@
         getmac
         pyipp
 
-        # for BLE integrations
-        govee-ble
-        ibeacon-ble
+        # for BLE integrations (if these attrs exist; if Nix complains,
+        # you can comment them out and HA will just skip those integrations)
+        govee_ble
+        ibeacon_ble
       ];
 
     config = { default_config = { }; };
