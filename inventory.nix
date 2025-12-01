@@ -62,8 +62,10 @@ rec {
       homeManaged = true;
       groups = [ "wheel" ];
       shell = "zsh";
-      sshPubKeyFiles =
-        [ ./users/keys/bas-arch.pub ]; # TODO: Add macbook's public key
+      sshPubKeyFiles = [
+        ./users/keys/bas-arch.pub
+        ./users/keys/papershift-laptop.pub
+      ]; # TODO: Add macbook's public key
 
       # initialPassword = "snowman";
       secrets = {
