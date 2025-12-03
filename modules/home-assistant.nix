@@ -25,6 +25,7 @@
       # for BLE integrations
       python3Packages."govee-ble"
       python3Packages."ibeacon-ble"
+      python3Packages."kegtron-ble"
     ];
 
     config = {
