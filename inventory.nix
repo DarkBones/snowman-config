@@ -87,11 +87,23 @@ rec {
           enable = true;
 
           linkMap = {
+            "bin" = "bin/bin";
+            ".fzf" = "fzf/.fzf";
+            ".config/ghostty" = "ghostty/.config/ghostty";
+            ".gitconfig" = "git/.gitconfig";
+            ".config/autostart" = "hyprland/.config/autostart";
+            ".config/hypr" = "hyprland/.config/hypr";
+            ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
-            ".zsh" = "zsh/.zsh";
-            ".zshrc" = "zsh/.zshrc";
-            "tmux" = "tmux/tmux";
+            ".config/starship.toml" = "starship/.config/starship.toml";
+            ".config/systemd" = "systemd/.config/systemd";
             ".tmux.conf" = "tmux/.tmux.conf";
+            "tmux" = "tmux/tmux";
+            ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
+            "wallpapers" = "wallpapers/wallpapers";
+            ".config/waybar" = "waybar/.config/waybar";
+            ".config/wofi" = "wofi/.config/wofi";
+            # TODO: zen
           };
         };
       };
