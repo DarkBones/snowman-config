@@ -58,7 +58,7 @@
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
 
-        extraHomeImports = [ ./home/roles ];
+        extraHomeImports = [ ./home/roles ./home/overrides ];
       };
 
       mkHost = name: attrs:
@@ -73,11 +73,16 @@
             # Home Manager integration
             home-manager.nixosModules.home-manager
 
+            # Dotfiles dev/prod toggle
+            ./modules/snowman-dotfiles.nix
+
             # Per-host wrapper that:
             #  - imports the hardware config
             #  - asserts that it exists
             ({ lib, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
+
+              home-manager.backupFileExtension = "backup";
 
               assertions = [{
                 assertion = builtins.pathExists hwFile;

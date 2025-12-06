@@ -1,10 +1,12 @@
 { lib, pkgs, pkgsUnstable, config, ... }:
-let cfg = config.roles.dev;
+let
+  cfg = config.roles.dev;
+  neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
 in {
   options.roles.dev.enable = lib.mkEnableOption "Dev role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgsUnstable; [
+    home.packages = (with pkgsUnstable; [
       cowsay
       docker
       entr
@@ -12,9 +14,8 @@ in {
       fzf
       gcc
       pkgs.git
-      neovim
       pnpm
       tokei
-    ];
+    ]) ++ [ neovim ];
   };
 }
