@@ -79,6 +79,8 @@
             ({ lib, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
 
+              home-manager.backupFileExtension = "backup";
+
               assertions = [{
                 assertion = builtins.pathExists hwFile;
                 message = ''
