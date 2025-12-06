@@ -20,7 +20,7 @@ in {
             echo "  $TARGET_NVIM -> $target"
           else
             echo "Current Snowman dotfiles mode: PROD"
-            echo "  $TARGET_NVIM -> $"'"'{target:- (unresolvable symlink)}"
+            echo "  $TARGET_NVIM -> ''\${target:- (unresolvable symlink)}"
           fi
         elif [ -e "$TARGET_NVIM" ]; then
           echo "Current Snowman dotfiles mode: UNKNOWN"
@@ -32,7 +32,7 @@ in {
 
         echo
         echo "Usage:"
-        echo "  snowman-dotfiles dev
+        echo "  snowman-dotfiles dev    # enable dev mode (impure eval, link to repo)"
         echo "  snowman-dotfiles prod  # enable prod mode (pure eval, nix store)"
         exit 0
       fi
@@ -67,6 +67,7 @@ in {
       echo "➜ Rebuilding NixOS for host ${currentHost} in $MODE mode..."
 
       if [ "$MODE" = "dev" ]; then
+        # Dev: needs SNOWMAN_DOTFILES_MODE + --impure so builtins.getEnv works
         sudo -E nixos-rebuild switch --impure --flake "${flakeDir}#${currentHost}"
 
         if [ -d "$DEV_NVIM" ]; then
@@ -77,6 +78,7 @@ in {
           echo "⚠ DEV nvim dir '$DEV_NVIM' does not exist, skipping link." >&2
         fi
       else
+        # Prod: pure evaluation, no env dependency
         sudo nixos-rebuild switch --flake "${flakeDir}#${currentHost}"
       fi
     '')
