@@ -73,6 +73,9 @@
             # Home Manager integration
             home-manager.nixosModules.home-manager
 
+            # Dotfiles dev/prod toggle
+            ./modules/snowman-dotfiles.nix
+
             # Per-host wrapper that:
             #  - imports the hardware config
             #  - asserts that it exists
