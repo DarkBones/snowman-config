@@ -1,9 +1,6 @@
-
 { pkgs, currentHost, ... }:
-let
-  flakeDir = "/home/bas/snowman-config";
-in
-{
+let flakeDir = "/home/bas/snowman-config";
+in {
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "snowman-dotfiles" ''
       set -euo pipefail
@@ -11,6 +8,9 @@ in
       DEV_NVIM="$HOME/Developer/dotfiles/nvim/.config/nvim"
       TARGET_NVIM="$HOME/.config/nvim"
 
+      # ----------------------------------------------------------
+      # No args → show current mode
+      # ----------------------------------------------------------
       if [ "$#" -eq 0 ]; then
         if [ -L "$TARGET_NVIM" ]; then
           target="$(readlink -f "$TARGET_NVIM" 2>/dev/null || true)"
@@ -20,7 +20,7 @@ in
             echo "  $TARGET_NVIM -> $target"
           else
             echo "Current Snowman dotfiles mode: PROD"
-            echo "  $TARGET_NVIM -> ${target:-(unresolvable symlink)}"
+            echo "  $TARGET_NVIM -> $"'"'{target:- (unresolvable symlink)}"
           fi
         elif [ -e "$TARGET_NVIM" ]; then
           echo "Current Snowman dotfiles mode: UNKNOWN"
@@ -32,7 +32,7 @@ in
 
         echo
         echo "Usage:"
-        echo "  snowman-dotfiles dev   # enable dev mode (impure eval, link to repo)"
+        echo "  snowman-dotfiles dev
         echo "  snowman-dotfiles prod  # enable prod mode (pure eval, nix store)"
         exit 0
       fi
@@ -82,4 +82,3 @@ in
     '')
   ];
 }
-
