@@ -1,8 +1,6 @@
 { pkgs, currentHost, ... }:
-let
-  flakeDir = "/home/bas/snowman-config";
-in
-{
+let flakeDir = "/home/bas/snowman-config";
+in {
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "snowman-dotfiles" ''
       set -euo pipefail
