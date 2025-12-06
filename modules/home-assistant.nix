@@ -1,5 +1,4 @@
-{ pkgs, lib, ... }:
-{
+{ pkgs, lib, ... }: {
   services.home-assistant = {
     enable = true;
     configDir = "/var/lib/home-assistant";
@@ -30,8 +29,8 @@
       default_config = { };
 
       automation = "!include automations.yaml";
-      script     = "!include scripts.yaml";
-      scene      = "!include scenes.yaml";
+      script = "!include scripts.yaml";
+      scene = "!include scenes.yaml";
 
       http = {
         server_host = [ "0.0.0.0" ];
