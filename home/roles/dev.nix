@@ -12,7 +12,7 @@ in {
       fzf
       gcc
       pkgs.git
-      neovim
+      # neovim
       pnpm
       tokei
     ];
