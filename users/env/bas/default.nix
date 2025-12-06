@@ -1,4 +1,20 @@
-{ osConfig, lib, ... }: {
+{ osConfig, lib, ... }:
+let
+  programDir = ./programs;
+
+  programImports = if builtins.pathExists programDir then
+    let
+      entries = builtins.readDir programDir;
+
+      nixFiles = builtins.filter
+        (name: entries.${name} == "regular" && lib.hasSuffix ".nix" name)
+        (builtins.attrNames entries);
+    in map (name: programDir + "/${name}") nixFiles
+  else
+    [ ];
+in {
+  imports = programImports;
+
   home.sessionPath = [
     "$HOME/.local/state/nix/profiles/home-manager/bin"
     "$HOME/.nix-profile/bin"
