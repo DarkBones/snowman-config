@@ -31,6 +31,21 @@ in
 
       echo "➜ Rebuilding NixOS for host ${currentHost} in $MODE mode..."
       sudo -E nixos-rebuild switch --impure --flake "${flakeDir}#${currentHost}"
+
+      # --- post-rebuild dev hook -------------------------------------------
+      if [ "$MODE" = "dev" ]; then
+        DEV_NVIM="$HOME/Developer/dotfiles/nvim/.config/nvim"
+        TARGET_NVIM="$HOME/.config/nvim"
+
+        if [ -d "$DEV_NVIM" ]; then
+          echo "➜ Linking $TARGET_NVIM -> $DEV_NVIM (dev mode)"
+          mkdir -p "$(dirname "$TARGET_NVIM")"
+          rm -rf "$TARGET_NVIM"
+          ln -s "$DEV_NVIM" "$TARGET_NVIM"
+        else
+          echo "⚠ Dev nvim dir '$DEV_NVIM' not found; skipping link." >&2
+        fi
+      fi
     '')
   ];
 }
