@@ -74,7 +74,7 @@ rec {
         userPasswordHashKey = "password_hash";
       };
 
-      envFile = ./users/env/bas.nix;
+      envFile = ./users/env/bas;
 
       roles = {
         bas.enable = true;
