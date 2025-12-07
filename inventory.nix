@@ -95,7 +95,7 @@ rec {
             ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
-            # ".config/nvim" = "nvim/.config/nvim"; # TODO: Figure out how to add this back in without breaking dev mode
+            ".config/nvim" = "nvim/.config/nvim";
             ".config/starship.toml" = "starship/.config/starship.toml";
             # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
             ".tmux.conf" = "tmux/.tmux.conf";
