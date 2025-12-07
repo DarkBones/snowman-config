@@ -1,4 +1,3 @@
-# template/modules/snowman-dotfiles.nix
 { pkgs, currentHost, ... }: {
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "snowman-dotfiles" ''
