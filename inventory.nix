@@ -86,6 +86,7 @@ rec {
 
         dotfiles = {
           enable = true;
+          dir = "Developer/dotfiles";
 
           linkMap = {
             "bin" = "bin/bin";

@@ -8,8 +8,12 @@ let
   mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
   isDev = mode == "dev";
 
+  # Calculate the absolute path to your local repo for Dev mode
+  # e.g. /home/bas/Developer/dotfiles
   repoDir = "${config.home.homeDirectory}/${cfg.dir}";
 
+  # Determine if we should replace the activation script
+  # We do this if we are managing the files via home.file (Dev or Prod-Pinned)
   shouldReplaceScript = isDev || dotfilesRepo != null;
 
 in {
@@ -21,14 +25,17 @@ in {
     # 2. Generate home.file entries
     home.file = lib.mapAttrs (target: srcPath: 
       if isDev then 
+        # Dev Mode: Home Manager creates a symlink to your local repo
         { 
           source = config.lib.file.mkOutOfStoreSymlink "${repoDir}/${srcPath}"; 
         }
       else if dotfilesRepo != null then
+        # Prod Mode: Home Manager creates a symlink to the Nix Store
         { 
           source = "${dotfilesRepo}/${srcPath}"; 
         }
       else 
+        # Git Mode (Fallback): Do nothing, let the activation script handle it
         {}
     ) (cfg.linkMap or {});
   };
