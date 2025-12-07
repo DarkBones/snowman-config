@@ -43,6 +43,7 @@ rec {
       system = "aarch64-linux";
       mutableUsers = false;
       hardware.boot.firmware = "raspberry-pi";
+      compatibility = true;
 
       wifi = {
         mode = "static-wifi";
@@ -70,11 +71,11 @@ rec {
       # initialPassword = "snowman";
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [ "password_hash" "test" "openai_api_key" ];
+        keys = [ "password_hash" "openai_api_key" "gemini_api_key" ];
         userPasswordHashKey = "password_hash";
       };
 
-      envFile = ./users/env/bas.nix;
+      envFile = ./users/env/bas;
 
       roles = {
         bas.enable = true;
@@ -85,6 +86,7 @@ rec {
 
         dotfiles = {
           enable = true;
+          dir = "Developer/dotfiles";
 
           linkMap = {
             "bin" = "bin/bin";
