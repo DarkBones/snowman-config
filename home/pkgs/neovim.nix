@@ -1,5 +1,6 @@
 { pkgs, pkgsUnstable }:
-pkgs.symlinkJoin {
+let codeiumTools = with pkgs; [ curl gzip util-linux coreutils ];
+in pkgs.symlinkJoin {
   name = "neovim";
   paths = [ pkgsUnstable.neovim ];
   buildInputs = [ pkgs.makeWrapper ];
@@ -7,7 +8,8 @@ pkgs.symlinkJoin {
   postBuild = ''
     wrapProgram "$out/bin/nvim" \
       --prefix PATH : ${
-        pkgs.lib.makeBinPath [ pkgs.python3 pkgs.nodejs_22 pkgs.unzip ]
+        pkgs.lib.makeBinPath
+        (codeiumTools ++ [ pkgs.python3 pkgs.nodejs_22 pkgs.unzip ])
       }
   '';
 }
