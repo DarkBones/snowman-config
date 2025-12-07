@@ -43,6 +43,7 @@ rec {
       system = "aarch64-linux";
       mutableUsers = false;
       hardware.boot.firmware = "raspberry-pi";
+      compatibility = true;
 
       wifi = {
         mode = "static-wifi";
