@@ -23,7 +23,11 @@ rec {
       system = "x86_64-linux";
       mutableUsers = false;
       users = [ "bas" ];
-      extraModules = [ ./hosts/dorkbones.nix ./modules/hyprland-host.nix ];
+      extraModules = [
+        ./hosts/dorkbones.nix
+        ./modules/hyprland-host.nix
+        ./modules/nvidia.nix
+      ];
 
       wifi = {
         mode = "static-wifi";
