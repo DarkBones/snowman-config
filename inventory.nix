@@ -23,6 +23,7 @@ rec {
       system = "x86_64-linux";
       mutableUsers = false;
       users = [ "bas" ];
+      extraModules = [ ./hosts/dorkbones.nix ./modules/hyprland-host.nix ];
 
       wifi = {
         mode = "static-wifi";
@@ -81,8 +82,9 @@ rec {
         bas.enable = true;
         dev.enable = true;
         dev-heavy.enable = false;
-        ssh.enable = true;
+        hyprland.enable = true;
         secrets.enable = true;
+        ssh.enable = true;
 
         dotfiles = {
           enable = true;
