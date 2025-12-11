@@ -10,12 +10,14 @@ keys:
     - &nix_vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
     - &arch_host age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
     - &rpi4_host age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
+    - &dorkbones_host age1yqcdvusqehpp0qx7hafl5je4te2k9uaq6qga27ehtdwu7zjydyxsqkmh2f
 
   # Convenience: union of all keys
   - &age_all
     - *usb
     - *archuser
     - *rpi4_user
+    - *dorkbones_host
     - *nix_vm
     - *arch_host
     - *rpi4_host
