@@ -4,6 +4,7 @@ keys:
     - &usb age1smd4h5lk3984s3qdapz5hxsayy8fenc7eee8293ffzqm7mkgscgsmx9x5d
     - &archuser age1gah8tr5mjzx5hguakmcsay724r84djr00sgtlr264j3x0gwqsfuqqcc0qa
     - &rpi4_user age1pm2xh3t07qvs77jeajgcgm43r4kv8ntl00l7hrfcgt4y5w7upszqxhes50
+    - &dorkbones_user age1umkxadk5hzmkf9nyy3p49xyclsaqal2ud7hz2qpafy33smlhfflqvvs2ze
 
   # Keys tied to machines
   - &age_hosts
