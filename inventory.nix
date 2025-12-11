@@ -47,7 +47,7 @@ rec {
       compatibility = true;
 
       wifi = {
-        mode = "static-wifi";
+        mode = "roaming";
         networks = [ "home" ];
       };
 
