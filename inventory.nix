@@ -100,6 +100,8 @@ rec {
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
             ".config/starship.toml" = "starship/.config/starship.toml";
+            ".zshrc" = "zsh/.zshrc";
+            ".zsh" = "zsh/.zsh";
             # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
             ".tmux.conf" = "tmux/.tmux.conf";
             "tmux" = "tmux/tmux";
