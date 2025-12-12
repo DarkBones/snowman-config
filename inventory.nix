@@ -23,6 +23,8 @@ rec {
       system = "x86_64-linux";
       mutableUsers = false;
       users = [ "bas" ];
+      hardwware.boot.firmware = "efi";
+
       extraModules = [
         ./hosts/dorkbones.nix
         ./modules/hyprland-host.nix
