@@ -31,7 +31,7 @@ rec {
         ./modules/nvidia.nix
       ];
 
-      wifi = { mode = "roaming"; };
+      wifi = { mode = "static-wifi"; networks = ["home"]; };
 
       bootstrap.usb = {
         enable = true;
