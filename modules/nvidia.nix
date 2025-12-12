@@ -10,12 +10,17 @@
     XDG_SESSION_TYPE = "wayland";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   hardware.nvidia = {
     modesetting.enable = true;
+
     open = false;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
+
     nvidiaSettings = true;
   };
 }
