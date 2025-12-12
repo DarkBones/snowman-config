@@ -36,7 +36,7 @@ rec {
 
       bootstrap.usb = {
         enable = true;
-        label = "SNOWMANKEY";
+        label = "SNOWMAN_KEY";
         path = "/mnt/snowman";
         keyFile = "snowman.key";
         fsType = "vfat";
