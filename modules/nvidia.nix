@@ -3,7 +3,7 @@
 
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  boot.kernelParams = [ "nvidia_drm.modeset=1" ];
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia_drm.fbdev=1" ];
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
@@ -14,11 +14,8 @@
 
   hardware.nvidia = {
     modesetting.enable = true;
-
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
-
-    open = true;
-
+    open = false;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     nvidiaSettings = true;
   };
 }
