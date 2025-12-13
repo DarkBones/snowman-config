@@ -27,6 +27,7 @@ rec {
 
       extraModules = [
         ./hosts/dorkbones.nix
+        ./hosts/dorkbones/boot.nix
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
       ];
