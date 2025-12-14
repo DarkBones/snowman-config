@@ -21,7 +21,7 @@ in {
       nwg-look
       pavucontrol
       baobab
-      swaync
+      # swaync
 
       # Theming
       catppuccin-gtk
