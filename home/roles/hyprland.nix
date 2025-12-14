@@ -25,11 +25,6 @@ in {
       # Theming
       catppuccin-gtk
       papirus-icon-theme
-
-      # Applications
-      ghostty
-      spotify
-      zen-browser
     ];
 
     gtk = {
