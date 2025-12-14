@@ -12,14 +12,11 @@ in {
       btop
       eza
       fzf
-      ghostty
       less
       neofetch
       networkmanager
       ripgrep
-      spotify
       tmux
-      zen-browser
       zoxide
     ]) ++ [ neovim ];
   };

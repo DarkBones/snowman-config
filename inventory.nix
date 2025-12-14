@@ -84,6 +84,7 @@ rec {
 
       roles = {
         bas.enable = true;
+        desktop.enable = true;
         dev.enable = true;
         dev-heavy.enable = false;
         hyprland.enable = true;
