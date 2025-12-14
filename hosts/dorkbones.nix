@@ -12,8 +12,8 @@
       enable = true;
       allowPing = true;
 
-      # LAN access: SSH + Home Assistant
-      allowedTCPPorts = [ 22 8123 ];
+      # LAN access: SSH
+      allowedTCPPorts = [ 22 ];
 
       # LAN discovery
       allowedUDPPorts = [ 5353 ];
