@@ -1,13 +1,10 @@
-{ lib, pkgs, pkgsUnstable, config, ... }:
+{ lib, pkgsUnstable, config, zenBrowserPkg, ... }:
 let cfg = config.roles.desktop;
 in {
   options.roles.desktop.enable = lib.mkEnableOption "Desktop role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgsUnstable; [
-      ghostty
-      spotify
-      # zen 
-    ];
+    home.packages = (with pkgsUnstable; [ ghostty spotify ])
+      ++ [ zenBrowserPkg ];
   };
 }

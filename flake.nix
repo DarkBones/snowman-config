@@ -11,6 +11,11 @@
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     sops-nix = {
       url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -27,8 +32,8 @@
     };
   };
 
-  outputs =
-    { self, nixpkgs, home-manager, sops-nix, snowman, disko, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
+    , ... }@inputs:
     let
       lib = nixpkgs.lib;
 
@@ -72,6 +77,11 @@
 
             # Home Manager integration
             home-manager.nixosModules.home-manager
+            ({ pkgs, ... }: {
+              home-manager.extraSpecialArgs = {
+                zenBrowserPkg = zen-browser.packages.${pkgs.system}.default;
+              };
+            })
 
             # Dotfiles dev/prod toggle
             ./modules/snowman-dotfiles.nix
