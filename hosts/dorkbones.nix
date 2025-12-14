@@ -25,13 +25,26 @@
     };
   };
 
-  services.tailscale = {
-    enable = true;
-    openFirewall = true;
-  };
-
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
+
+  services = {
+    tailscale = {
+      enable = true;
+      openFirewall = true;
+    };
+
+    pipewire = {
+      enable = true;
+      pulse.enable = true;
+      alsa.enable = true;
+      wireplumber.enable = true;
+    };
+
+    blueman.enable = true;
+  };
+
+  security.polkit.enable = true;
 }
