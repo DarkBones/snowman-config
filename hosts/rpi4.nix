@@ -20,15 +20,22 @@
       enable = true;
       allowPing = true;
 
-      # Open HA Dashboard (8123) and SSH (22)
+      # LAN access: SSH + Home Assistant
       allowedTCPPorts = [ 22 8123 ];
 
-      # Open mDNS/Cast discovery
+      # LAN discovery
       allowedUDPPorts = [ 5353 ];
 
       checkReversePath = "loose";
-      trustedInterfaces = [ "wlan0" ];
+
+      # Trust LAN + Tailscale interfaces
+      trustedInterfaces = [ "wlan0" "tailscale0" ];
     };
+  };
+
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
   };
 
   hardware.bluetooth = {
