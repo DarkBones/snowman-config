@@ -33,5 +33,9 @@
   services.tumbler.enable = true;
 
   # --- Fonts ---
-  fonts.packages = with pkgs; [ nerd-fonts.jetbrains-mono font-awesome ];
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    font-awesome
+    ttf-crimson-text
+  ];
 }
