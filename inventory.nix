@@ -87,6 +87,7 @@ rec {
         desktop.enable = true;
         dev.enable = true;
         dev-heavy.enable = true;
+        gaming.enable = true;
         hyprland.enable = true;
         secrets.enable = true;
         ssh.enable = true;
@@ -114,7 +115,6 @@ rec {
             "wallpapers" = "wallpapers/wallpapers";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
-            # TODO: zen
           };
         };
       };
