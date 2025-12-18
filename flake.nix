@@ -70,46 +70,37 @@
       };
 
       mkHost = name: attrs:
-        let hwFile = ./hosts/${name}-hardware-configuration.nix;
+        { strictHw ? true }:
+        let
+          host = inv.hosts.${name};
+          hostName = host.hostname or name;
+          hwFile = ./hosts/${hostName}-hardware-configuration.nix;
         in lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
           modules = [
-            # Snowman engine
             snowman.nixosModules.default
-
-            # Home Manager integration
             home-manager.nixosModules.home-manager
-            ({ pkgs, ... }: {
-              home-manager.extraSpecialArgs = { inherit inputs; };
-            })
-
-            # Dotfiles dev/prod toggle
+            ({ ... }: { home-manager.extraSpecialArgs = { inherit inputs; }; })
             ./modules/snowman-dotfiles.nix
 
-            # Per-host wrapper that:
-            #  - imports the hardware config
-            #  - asserts that it exists
             ({ lib, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
-
               home-manager.backupFileExtension = "backup";
 
-              assertions = [{
+              assertions = lib.optionals strictHw [{
                 assertion = builtins.pathExists hwFile;
                 message = ''
-                  ❌ Snowman: Hardware configuration missing for host "${name}".
+                  ❌ Snowman: Hardware configuration missing for host "${name}"
+                     (hostname "${hostName}").
 
                   Expected file:
-                    hosts/${name}-hardware-configuration.nix
+                    hosts/${hostName}-hardware-configuration.nix
 
                   Fix:
                     On the machine this NixOS install is running on, execute:
 
                       ./bin/snowman-import-hardware ${name}
-
-                    This will copy /etc/nixos/hardware-configuration.nix
-                    into the correct location in your Snowman config repo.
 
                     Then re-run:
 
@@ -119,5 +110,27 @@
             })
           ] ++ (attrs.extraModules or [ ]);
         };
-    in { nixosConfigurations = lib.mapAttrs mkHost inv.hosts; };
+
+      hostHwFile = name:
+        let
+          host = inv.hosts.${name};
+          hostName = host.hostname or name;
+        in ./hosts/${hostName}-hardware-configuration.nix;
+
+      # Only hosts that already have a committed hardware configuration.
+      # This keeps `nix flake check` from failing on machines that aren't NixOS
+      # (or on hosts you haven't imported hardware for yet).
+      hostsWithHw =
+        lib.filterAttrs (name: _: builtins.pathExists (hostHwFile name))
+        inv.hosts;
+
+    in {
+      nixosConfigurations =
+        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = false; })
+        hostsWithHw;
+
+      nixosConfigurationsAll =
+        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = true; })
+        inv.hosts;
+    };
 }
