@@ -14,7 +14,7 @@
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {
-        nixpkgs.follows = "nixpkgs";
+        nixpkgs.follows = "nixpkgs-unstable";
         home-manager.follows = "home-manager";
       };
     };
@@ -81,9 +81,7 @@
             # Home Manager integration
             home-manager.nixosModules.home-manager
             ({ pkgs, ... }: {
-              home-manager.extraSpecialArgs = {
-                zenBrowserPkg = zen-browser.packages.${pkgs.system}.default;
-              };
+              home-manager.extraSpecialArgs = { inherit inputs; };
             })
 
             # Dotfiles dev/prod toggle
