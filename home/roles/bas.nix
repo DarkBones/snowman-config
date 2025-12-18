@@ -17,6 +17,7 @@ in {
       networkmanager
       ripgrep
       tmux
+      wget
       zoxide
     ]) ++ [ neovim ];
   };

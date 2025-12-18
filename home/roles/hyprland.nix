@@ -23,6 +23,12 @@ in {
       baobab
       # swaync
 
+      # Bluetooth
+      papirus-icon-theme
+      adwaita-icon-theme
+      hicolor-icon-theme
+      blueman
+
       # Theming
       catppuccin-gtk
       papirus-icon-theme
@@ -30,6 +36,12 @@ in {
 
     gtk = {
       enable = true;
+        
+      iconTheme = {
+        name = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme;
+      };
+
       theme = {
         name = "Catppuccin-Mocha-Standard-Blue-Dark";
         package = pkgs.catppuccin-gtk.override {

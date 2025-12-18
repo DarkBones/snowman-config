@@ -86,7 +86,7 @@ rec {
         bas.enable = true;
         desktop.enable = true;
         dev.enable = true;
-        dev-heavy.enable = false;
+        dev-heavy.enable = true;
         hyprland.enable = true;
         secrets.enable = true;
         ssh.enable = true;
