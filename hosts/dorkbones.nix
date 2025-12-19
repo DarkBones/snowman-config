@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+{
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   boot.initrd.systemd.enable = true;
@@ -6,7 +7,10 @@
   networking = {
     enableIPv6 = false;
 
-    nameservers = [ "1.1.1.1" "8.8.8.8" ]; # TODO: Quad 9
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ]; # TODO: Quad 9
 
     firewall = {
       enable = true;
@@ -21,7 +25,10 @@
       checkReversePath = "loose";
 
       # Trust LAN + Tailscale interfaces
-      trustedInterfaces = [ "wlan0" "tailscale0" ];
+      trustedInterfaces = [
+        "wlan0"
+        "tailscale0"
+      ];
     };
   };
 
