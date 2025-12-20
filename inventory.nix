@@ -15,7 +15,10 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [ "bas" "ssh" ];
+      availableRoles = [
+        "bas"
+        "ssh"
+      ];
     };
 
     dorkbones = {
@@ -32,7 +35,9 @@ rec {
         ./modules/nvidia.nix
       ];
 
-      wifi = { mode = "roaming"; };
+      wifi = {
+        mode = "roaming";
+      };
 
       bootstrap.usb = {
         enable = true;
@@ -55,10 +60,19 @@ rec {
         networks = [ "home" ];
       };
 
-      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
+      availableRoles = [
+        "bas"
+        "secrets"
+        "dev"
+        "dotfiles"
+        "ssh"
+      ];
       users = [ "bas" ];
 
-      extraModules = [ ./hosts/rpi4.nix ./modules/home-assistant.nix ];
+      extraModules = [
+        ./hosts/rpi4.nix
+        ./modules/home-assistant.nix
+      ];
     };
   };
 
@@ -71,12 +85,17 @@ rec {
       sshPubKeyFiles = [
         ./users/keys/bas-arch.pub
         ./users/keys/papershift-laptop.pub
-      ]; # TODO: Add macbook's public key
+        ./users/keys/bas-mbp.pub
+      ];
 
       # initialPassword = "snowman";
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [ "password_hash" "openai_api_key" "gemini_api_key" ];
+        keys = [
+          "password_hash"
+          "openai_api_key"
+          "gemini_api_key"
+        ];
         userPasswordHashKey = "password_hash";
       };
 

@@ -13,7 +13,7 @@ in {
       eza
       fzf
       less
-      neofetch
+      fastfetch
       networkmanager
       ripgrep
       tmux
