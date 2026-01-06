@@ -200,7 +200,6 @@
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "qol-v2",
         "repo": "snowman",
         "type": "github"
       }
