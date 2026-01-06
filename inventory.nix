@@ -15,10 +15,7 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [
-        "bas"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "ssh" ];
     };
 
     dorkbones = {
@@ -37,6 +34,7 @@ rec {
 
       wifi = {
         mode = "roaming";
+        networks = [ "home" ];
       };
 
       bootstrap.usb = {
@@ -60,19 +58,10 @@ rec {
         networks = [ "home" ];
       };
 
-      availableRoles = [
-        "bas"
-        "secrets"
-        "dev"
-        "dotfiles"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
 
-      extraModules = [
-        ./hosts/rpi4.nix
-        ./modules/home-assistant.nix
-      ];
+      extraModules = [ ./hosts/rpi4.nix ./modules/home-assistant.nix ];
     };
   };
 
@@ -91,11 +80,7 @@ rec {
       # initialPassword = "snowman";
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [
-          "password_hash"
-          "openai_api_key"
-          "gemini_api_key"
-        ];
+        keys = [ "password_hash" "openai_api_key" "gemini_api_key" ];
         userPasswordHashKey = "password_hash";
       };
 
