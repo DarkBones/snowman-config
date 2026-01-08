@@ -1,11 +1,12 @@
-{ lib, pkgs, config, ... }:
+# home/roles/hyprland.nix
+{ lib, pkgsUnstable, config, ... }:
 let cfg = config.roles.hyprland;
 in {
   options.roles.hyprland.enable =
     lib.mkEnableOption "Hyprland Desktop Environment";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
+    home.packages = with pkgsUnstable; [
       waybar
       wofi
       dunst
@@ -21,30 +22,38 @@ in {
       nwg-look
       pavucontrol
       baobab
-      # swaync
 
       # Bluetooth
-      papirus-icon-theme
+      blueman
       adwaita-icon-theme
       hicolor-icon-theme
-      blueman
+      papirus-icon-theme
 
       # Theming
       catppuccin-gtk
-      papirus-icon-theme
+      bibata-cursors
     ];
+
+    home.pointerCursor = {
+      gtk.enable = true;
+      x11.enable = true;
+      size = 24;
+
+      name = "Bibata-Modern-Ice";
+      package = pkgsUnstable.bibata-cursors;
+    };
 
     gtk = {
       enable = true;
-        
+
       iconTheme = {
         name = "Papirus-Dark";
-        package = pkgs.papirus-icon-theme;
+        package = pkgsUnstable.papirus-icon-theme;
       };
 
       theme = {
         name = "Catppuccin-Mocha-Standard-Blue-Dark";
-        package = pkgs.catppuccin-gtk.override {
+        package = pkgsUnstable.catppuccin-gtk.override {
           accents = [ "blue" ];
           size = "standard";
           tweaks = [ "rimless" "black" ];

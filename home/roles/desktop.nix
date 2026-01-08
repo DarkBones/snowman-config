@@ -8,6 +8,6 @@ in {
   config = lib.mkIf cfg.enable {
     programs.zen-browser.enable = true;
 
-    home.packages = with pkgsUnstable; [ ghostty spotify ];
+    home = { packages = with pkgsUnstable; [ ghostty spotify playerctl ]; };
   };
 }
