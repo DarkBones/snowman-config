@@ -30,6 +30,7 @@ rec {
         ./hosts/dorkbones/boot.nix
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
+        ./modules/gaming.nix
       ];
 
       wifi = {
