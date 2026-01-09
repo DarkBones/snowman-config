@@ -31,8 +31,7 @@ in {
 
       # Theming
       catppuccin-gtk
-      # bibata-cursors # or bibata-cursor-theme if this fails or bibata-cursor-theme-bin
-      bibata-cursor-theme-bin # try above if doesn't work
+      bibata-cursors
     ];
 
     home.pointerCursor = {
