@@ -5,13 +5,16 @@ keys:
     - &archuser age1gah8tr5mjzx5hguakmcsay724r84djr00sgtlr264j3x0gwqsfuqqcc0qa
     - &rpi4_user age1pm2xh3t07qvs77jeajgcgm43r4kv8ntl00l7hrfcgt4y5w7upszqxhes50
     - &dorkbones_user age1umkxadk5hzmkf9nyy3p49xyclsaqal2ud7hz2qpafy33smlhfflqvvs2ze
+    - &dorkbones_snowman_user age1hhn93yt6fctv0t6a8wmtyrpznvtnc0hdg9z80m4dc5wtpad9kfwsqyc9le
 
   # Keys tied to machines
   - &age_hosts
+    - *usb
     - &nix_vm age1pel05an6v9sryemdku0rwvsft4ragmtnu5520q3s6tg7svrj7y2snf2y66
     - &arch_host age1g5kwt7qc59wl4eg9g8vt7wdu9c4xjsz7mnzuhq3uw9fxyy2u6dxs6cxxwz
     - &rpi4_host age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
     - &dorkbones_host age1yqcdvusqehpp0qx7hafl5je4te2k9uaq6qga27ehtdwu7zjydyxsqkmh2f
+    - &dorkbones_snowman_host age1dv57l6fqyps0sdygr4c5qyt4rznycq29e3q8nrja69tzt49gwdgsvyey2x
 
   # Convenience: union of all keys
   - &age_all
@@ -22,6 +25,8 @@ keys:
     - *nix_vm
     - *arch_host
     - *rpi4_host
+    - *dorkbones_snowman_host
+    - *dorkbones_snowman_user
 
 creation_rules:
   # Shared network secrets (Wi-Fi SSIDs, passwords, etc.)
