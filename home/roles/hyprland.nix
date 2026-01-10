@@ -1,6 +1,8 @@
 # home/roles/hyprland.nix
 { lib, pkgsUnstable, config, ... }:
-let cfg = config.roles.hyprland;
+let
+  cfg = config.roles.hyprland;
+  gtkTheme = "catppuccin-frappe-blue-standard";
 in {
   options.roles.hyprland.enable =
     lib.mkEnableOption "Hyprland Desktop Environment";
@@ -30,6 +32,9 @@ in {
       hicolor-icon-theme
       papirus-icon-theme
 
+      # Networking
+      networkmanagerapplet
+
       # Theming
       catppuccin-gtk
       bibata-cursors
@@ -46,20 +51,36 @@ in {
 
     gtk = {
       enable = true;
-
+      theme = {
+        name = gtkTheme;
+        package = pkgsUnstable.catppuccin-gtk;
+      };
       iconTheme = {
         name = "Papirus-Dark";
         package = pkgsUnstable.papirus-icon-theme;
       };
+      font = {
+        name = "Crimson Text";
+        size = 11;
+      };
+    };
 
-      theme = {
-        name = "Catppuccin-Mocha-Standard-Blue-Dark";
-        package = pkgsUnstable.catppuccin-gtk.override {
-          accents = [ "blue" ];
-          size = "standard";
-          tweaks = [ "rimless" "black" ];
-          variant = "mocha";
-        };
+    services.xsettingsd.enable = true;
+    services.xsettingsd.settings = {
+      "Net/ThemeName" = gtkTheme;
+      "Net/IconThemeName" = "Papirus-Dark";
+      "Gtk/CursorThemeName" = "Bibata-Modern-Ice";
+      "Gtk/FontName" = "Crimson Text 11";
+    };
+
+    dconf.enable = true;
+    dconf.settings = {
+      "org/gnome/desktop/interface" = {
+        gtk-theme = gtkTheme;
+        icon-theme = "Papirus-Dark";
+        cursor-theme = "Bibata-Modern-Ice";
+        font-name = "Crimson Text 11";
+        color-scheme = "prefer-dark";
       };
     };
   };
