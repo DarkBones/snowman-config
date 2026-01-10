@@ -33,6 +33,11 @@
       url = "github:DarkBones/dotfiles/waybar-rice";
       flake = false;
     };
+
+    stylix = {
+      url = "github:nix-community/stylix/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
@@ -79,9 +84,13 @@
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
           modules = [
+            inputs.stylix.nixosModules.stylix
+            ./modules/stylix.nix
+
             snowman.nixosModules.default
             home-manager.nixosModules.home-manager
             ({ ... }: { home-manager.extraSpecialArgs = { inherit inputs; }; })
+
             ./modules/snowman-dotfiles.nix
 
             ({ lib, ... }: {
