@@ -25,7 +25,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman";
+      url = "github:DarkBones/snowman/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -141,5 +141,54 @@
       nixosConfigurationsAll =
         lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = true; })
         inv.hosts;
+
+      homeConfigurations = {
+        "bas@dorkbones" = inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = makePkgs "x86_64-linux";
+
+          # If your home roles/overrides need these (they do)
+          extraSpecialArgs = {
+            inherit inputs inv sops-nix dotfilesSources disko;
+            pkgsUnstable = makePkgsUnstable "x86_64-linux";
+            currentHost = "dorkbones";
+            sopsConfigPath = ./.sops.yaml;
+            networkSecretsPath = ./networks/secrets.yml;
+          };
+
+          modules = [
+            ({ lib, config, currentHost, ... }:
+              let
+                user = config.home.username;
+                hostName = currentHost;
+
+                hostCfg = inv.hosts.${hostName};
+                userCfg = inv.users.${user};
+
+                # roles attrset from inventory
+                userRoles = userCfg.roles or { };
+
+                # keep only roles with enable = true
+                enabledUserRoles = lib.filterAttrs
+                  (_: roleCfg: roleCfg ? enable && roleCfg.enable) userRoles;
+
+                # host.availableRoles filter (if present)
+                hostRoleFilter = hostCfg.availableRoles or null;
+
+                finalRoles = if hostRoleFilter == null then
+                  enabledUserRoles
+                else
+                  lib.filterAttrs
+                  (roleName: _: lib.elem roleName hostRoleFilter)
+                  enabledUserRoles;
+              in { roles = finalRoles; })
+
+            inputs.snowman.homeModules.default
+            ./home
+
+            ./home/roles
+            ./home/overrides
+          ];
+        };
+      };
     };
 }

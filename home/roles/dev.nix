@@ -13,6 +13,8 @@ in {
       figlet
       fzf
       gcc
+      lazydocker
+      lazygit
       pkgs.git
       pnpm
       tokei

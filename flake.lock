@@ -3,11 +3,11 @@
     "bas-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1768036336,
-        "narHash": "sha256-TK7hnDxG8wLWxY6bE4/vI3ZWENuaqrVV+mRSjLg5vR8=",
+        "lastModified": 1768045368,
+        "narHash": "sha256-TA+9mEMr5FlJEPJ0RtrtOMwehAJMuEBBpDLowlRr/Tc=",
         "owner": "DarkBones",
         "repo": "dotfiles",
-        "rev": "a3784940c950433f597b5c87c8b4ba02a328a61e",
+        "rev": "e567423cfccc211aef491f5d7ebb6bd4671712bf",
         "type": "github"
       },
       "original": {
@@ -357,15 +357,16 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1768036356,
-        "narHash": "sha256-AVvirdhxjTjTU5S+d/lYSCjEcVMIzkIQUKDA1S0IdW4=",
+        "lastModified": 1768046881,
+        "narHash": "sha256-oKNsaCEoR1wIZbflD/zEmNZ3xyTbW8SxpTY/p2SvAqw=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "16142db114c43e58b7fb26dc2a43a6160f95e101",
+        "rev": "e2ab806ba058afb76034c94327f97125e26f2bfc",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
+        "ref": "home-manager",
         "repo": "snowman",
         "type": "github"
       }
