@@ -142,53 +142,53 @@
         lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = true; })
         inv.hosts;
 
-      homeConfigurations = {
-        "bas@dorkbones" = inputs.home-manager.lib.homeManagerConfiguration {
-          pkgs = makePkgs "x86_64-linux";
+      homeConfigurations = lib.listToAttrs (lib.concatMap (hostName:
+        let host = inv.hosts.${hostName};
+        in lib.concatMap (user:
+          let cfgName = "${user}@${hostName}";
+          in [{
+            name = cfgName;
+            value = inputs.home-manager.lib.homeManagerConfiguration {
+              pkgs = makePkgs host.system or "x86_64-linux";
 
-          # If your home roles/overrides need these (they do)
-          extraSpecialArgs = {
-            inherit inputs inv sops-nix dotfilesSources disko;
-            pkgsUnstable = makePkgsUnstable "x86_64-linux";
-            currentHost = "dorkbones";
-            sopsConfigPath = ./.sops.yaml;
-            networkSecretsPath = ./networks/secrets.yml;
-          };
+              extraSpecialArgs = {
+                inherit inputs inv sops-nix dotfilesSources disko;
+                pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
+                currentHost = hostName;
+                sopsConfigPath = ./.sops.yaml;
+                networkSecretsPath = ./networks/secrets.yml;
+              };
 
-          modules = [
-            ({ lib, config, currentHost, ... }:
-              let
-                user = config.home.username;
-                hostName = currentHost;
+              modules = [
+                ({ lib, config, currentHost, ... }:
+                  let
+                    username =
+                      config.home.username; # <- must be set somewhere in ./home
+                    hostCfg = inv.hosts.${currentHost};
+                    userCfg = inv.users.${username};
 
-                hostCfg = inv.hosts.${hostName};
-                userCfg = inv.users.${user};
+                    userRoles = userCfg.roles or { };
+                    enabledUserRoles = lib.filterAttrs
+                      (_: roleCfg: roleCfg ? enable && roleCfg.enable)
+                      userRoles;
 
-                # roles attrset from inventory
-                userRoles = userCfg.roles or { };
+                    hostRoleFilter = hostCfg.availableRoles or null;
 
-                # keep only roles with enable = true
-                enabledUserRoles = lib.filterAttrs
-                  (_: roleCfg: roleCfg ? enable && roleCfg.enable) userRoles;
+                    finalRoles = if hostRoleFilter == null then
+                      enabledUserRoles
+                    else
+                      lib.filterAttrs
+                      (roleName: _: lib.elem roleName hostRoleFilter)
+                      enabledUserRoles;
+                  in { roles = finalRoles; })
 
-                # host.availableRoles filter (if present)
-                hostRoleFilter = hostCfg.availableRoles or null;
-
-                finalRoles = if hostRoleFilter == null then
-                  enabledUserRoles
-                else
-                  lib.filterAttrs
-                  (roleName: _: lib.elem roleName hostRoleFilter)
-                  enabledUserRoles;
-              in { roles = finalRoles; })
-
-            inputs.snowman.homeModules.default
-            ./home
-
-            ./home/roles
-            ./home/overrides
-          ];
-        };
-      };
+                inputs.snowman.homeModules.default
+                ./home
+                ./home/roles
+                ./home/overrides
+              ];
+            };
+          }]) (host.users or (builtins.attrNames inv.users)))
+        (builtins.attrNames inv.hosts));
     };
 }
