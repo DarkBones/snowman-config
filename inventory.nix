@@ -107,7 +107,7 @@ rec {
             ".fzf" = "fzf/.fzf";
             ".config/ghostty" = "ghostty/.config/ghostty";
             ".gitconfig" = "git/.gitconfig";
-            ".config/autostart" = "hyprland/.config/autostart";
+            # ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";

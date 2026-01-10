@@ -8,12 +8,7 @@ in {
   config = lib.mkIf cfg.enable {
     programs.zen-browser.enable = true;
 
-    home.packages = with pkgsUnstable; [
-      ghostty
-      playerctl
-      spotify
-      polkit_gnome
-    ];
+    home.packages = with pkgsUnstable; [ ghostty playerctl spotify ];
 
     # If you manage Hyprland config via Home Manager, add an exec-once:
     wayland.windowManager.hyprland.settings.exec-once = [
