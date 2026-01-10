@@ -1,5 +1,5 @@
 {
-  description = "A new Snowman user configuration";
+  description = "DarkBones' Snowman Body";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -25,7 +25,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman/home-manager";
+      url = "github:DarkBones/snowman";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -70,7 +70,6 @@
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
-
         extraHomeImports = [ ./home/roles ./home/overrides ];
       };
 
