@@ -12,6 +12,7 @@ in {
       btop
       eza
       fzf
+      jq
       less
       fastfetch
       networkmanager

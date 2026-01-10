@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   stylix = {
     enable = true;
     polarity = "dark";
@@ -25,7 +25,7 @@
     cursor = {
       name = "Bibata-Modern-Ice";
       package = pkgs.bibata-cursors;
-      size = 24;
+      size = lib.mkForce 24;
     };
 
     targets = {

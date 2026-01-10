@@ -10,7 +10,7 @@ in {
   environment = {
     variables = {
       XCURSOR_THEME = "Bibata-Modern-Classic";
-      XCURSOR_SIZE = "24";
+      XCURSOR_SIZE = lib.mkDefault 24;
     };
     systemPackages = with pkgs; [ gparted bibata-cursors ];
   };
