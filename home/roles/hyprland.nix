@@ -13,6 +13,7 @@ in {
       hyprpaper
       hyprlock
       hypridle
+      hyprshot
       wlogout
       wl-clipboard
 
