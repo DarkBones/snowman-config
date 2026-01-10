@@ -4,7 +4,7 @@ in {
   config = lib.mkIf (config.roles.desktop.enable or false) {
     home.packages = [ pkgs.polkit_gnome ];
 
-    systemd.user.startServices = "sd-switch";
+    # systemd.user.startServices = "sd-switch";
 
     xdg.configFile."autostart/polkit-gnome-authentication-agent-1.desktop".text =
       ''
