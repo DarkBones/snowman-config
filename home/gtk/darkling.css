@@ -1,166 +1,428 @@
-@define-color base00 #0d0d16;
-@define-color iron   #45475a;
-@define-color bone   #f5e0dc;
-@define-color gold   #b38b4d;
+/* --- Core Palette --- */
+@define-color base00  #0d0d16;
+@define-color surface #161625;
+@define-color iron    #45475a;
+@define-color bone    #f5e0dc;
+@define-color gold    #b38b4d;
+@define-color poison  #a6e3a1;
+@define-color ghost   #cba6f7;
 
-/* --- Global text vibe --- */
+/* GTK “theme” hints (some widgets respect these) */
+@define-color theme_bg_color            @base00;
+@define-color theme_base_color          @base00;
+@define-color theme_fg_color            @bone;
+@define-color theme_text_color          @bone;
+@define-color theme_selected_bg_color   rgba(179, 139, 77, 0.22);
+@define-color theme_selected_fg_color   @gold;
+
+/* ---------------------------------------------
+   Global typography (don’t paint backgrounds here)
+---------------------------------------------- */
 * {
-  font-weight: 600;
+  font-family: "Crimson Pro", "Crimson Text", "serif";
+  font-weight: bold;
+  -gtk-secondary-caret-color: @gold;
 }
 
-/* --- Main window background: add depth (very subtle) --- */
+label,
+text {
+  color: @bone;
+}
+
+/* --- Mono accents (paths, sizes, technical info) --- */
+.pathbar,
+.location-entry,
+treeview,
+iconview,
+.view text,
+.view label,
+cellview label {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------
+   Window + major containers (kill the “white canvas”)
+---------------------------------------------- */
 window,
 dialog,
 .background {
-  background-image:
-    radial-gradient(
-      circle at 15% 10%,
-      rgba(179, 139, 77, 0.08),
-      rgba(13, 13, 22, 0) 40%
-    ),
-    radial-gradient(
-      circle at 85% 25%,
-      rgba(203, 166, 247, 0.06),
-      rgba(13, 13, 22, 0) 45%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.03),
-      rgba(0, 0, 0, 0) 18%,
-      rgba(0, 0, 0, 0.1)
-    );
   background-color: @base00;
+  color: @bone;
+  background-image: none;
 }
 
-/* --- Headerbar: Waybar-like gradient + “ink line” --- */
-headerbar,
-.titlebar,
-.header-bar {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(179, 139, 77, 0.22),
-    rgba(13, 13, 22, 0) 55%
-  );
+scrolledwindow,
+scrolledwindow > viewport,
+viewport {
   background-color: @base00;
-
-  border-bottom: 1px solid rgba(69, 71, 90, 0.65);
-  box-shadow:
-    inset 0 -1px 0 rgba(179, 139, 77, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  background-image: none;
 }
 
-headerbar title,
-headerbar label {
+/* Thunar/Gtk often paints the “base” on these */
+.view,
+iconview,
+treeview,
+list,
+.content-view,
+.standard-view {
+  background-color: rgba(13, 13, 22, 0.94);
+  /* background-color: @base00; */
   color: @bone;
-  text-shadow: 0 0 3px rgba(179, 139, 77, 0.18);
+  background-image: none;
 }
 
-/* --- Buttons: give them “island” affordance --- */
-button {
-  border-radius: 12px;
-  border: 1px solid rgba(69, 71, 90, 0.65);
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.05),
-    rgba(0, 0, 0, 0.08)
-  );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 1px 0 rgba(0, 0, 0, 0.25);
-}
-
-button:hover {
-  border-color: rgba(179, 139, 77, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 10px rgba(179, 139, 77, 0.12);
-}
-
-button:active {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.18),
-    rgba(255, 255, 255, 0.03)
-  );
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
-}
-
-/* --- Focus ring: gilded instead of neon --- */
-*:focus-visible {
-  outline: 2px solid rgba(179, 139, 77, 0.55);
-  outline-offset: 2px;
-}
-
-/* --- Selection highlight: muted gold parchment instead of blue --- */
-selection,
-text selection,
-entry selection {
-  background-color: rgba(179, 139, 77, 0.28);
+/* Icon grids frequently go through FlowBox */
+flowbox,
+flowbox > flowboxchild {
+  background-color: @base00;
+  background-image: none;
   color: @bone;
 }
 
-/* --- Tooltips / popovers: your “parchment island” --- */
-tooltip,
-.tooltip,
-popover {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(179, 139, 77, 0.22),
-    rgba(13, 13, 22, 0) 55%
-  );
-  background-color: rgba(13, 13, 22, 0.92);
-  border: 1.5px solid rgba(69, 71, 90, 0.85);
-  border-radius: 14px;
-  box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.55),
-    0 0 12px rgba(179, 139, 77, 0.14);
-}
-
-tooltip label,
-.tooltip label {
+/* Icon labels sometimes come via cellview/cellrenderers */
+cellview,
+cellview * {
+  background-color: transparent;
+  background-image: none;
   color: @bone;
-  text-shadow: 0 0 3px rgba(179, 139, 77, 0.22);
-  font-weight: 700;
 }
 
-/* --- Sidebars (like Thunar places): add separation line --- */
+/* ---------------------------------------------
+   Sidebar (Places)
+---------------------------------------------- */
 .sidebar,
-sidebar {
-  border-right: 1px solid rgba(69, 71, 90, 0.55);
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.02);
+sidebar,
+.navigation-sidebar {
+  background-color: #090910;
+  border-right: 2px solid @iron;
 }
 
-/* --- Lists / rows: gentle hover and selection --- */
-row:hover,
-.view row:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+.sidebar row,
+.sidebar row * {
+  background-color: transparent;
+  color: @bone;
 }
 
+.sidebar row:selected {
+  background-color: rgba(179, 139, 77, 0.1);
+  border-left: 4px solid @gold;
+  border-radius: 0;
+}
+.sidebar row:selected * {
+  color: @gold;
+}
+
+/* ---------------------------------------------
+   Headerbar / toolbar
+---------------------------------------------- */
+headerbar {
+  background-color: @base00;
+  border-bottom: 2px solid @gold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  background-image: none;
+}
+
+headerbar label {
+  color: @gold;
+  text-shadow: 0 0 3px rgba(179, 139, 77, 0.3);
+}
+
+toolbar,
+menubar {
+  background-color: @base00;
+  background-image: none;
+}
+
+/* ---------------------------------------------
+   Entries (path/search)
+---------------------------------------------- */
+entry {
+  background-color: @surface;
+  color: @bone;
+  border: 1.5px solid @iron;
+  border-radius: 8px 2px 8px 2px;
+  padding: 4px 6px;
+  background-image: none;
+}
+entry:focus {
+  border-color: rgba(179, 139, 77, 0.85);
+  box-shadow: 0 0 0 2px rgba(179, 139, 77, 0.15);
+}
+
+/* ---------------------------------------------
+   Selections (FLAT: no rounded corners anywhere)
+---------------------------------------------- */
+treeview.view,
+iconview.view,
+.view,
+flowbox {
+  -gtkwidget-focus-line-width: 0;
+  -gtkwidget-focus-padding: 0;
+}
+
+/* Row selection (details/list view) */
+treeview.view row:selected,
+treeview.view row:selected:focus,
+.view row:selected,
+row:selected {
+  border-radius: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background-image: none;
+  background-color: rgba(179, 139, 77, 0.12);
+}
+
+treeview.view row:selected *,
+.view row:selected *,
+row:selected * {
+  color: @gold;
+}
+
+/* Icon grid selection (icon view / flowbox) */
+iconview.view:selected,
+iconview:selected,
+flowboxchild:selected {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background-image: none;
+  background-color: rgba(179, 139, 77, 0.12);
+}
+
+iconview.view:selected *,
+iconview:selected *,
+flowboxchild:selected * {
+  color: @gold;
+}
+
+/* Rubberband selection rectangle */
+rubberband {
+  background-color: rgba(179, 139, 77, 0.15);
+  border: 1px solid rgba(179, 139, 77, 0.75);
+}
+
+/* ---------------------------------------------
+   Buttons + menus
+---------------------------------------------- */
+button {
+  background-color: @surface;
+  color: @bone;
+  border: 1.5px solid @iron;
+  border-radius: 10px 2px 10px 2px;
+  background-image: none;
+}
+button:hover {
+  border-color: rgba(166, 227, 161, 0.55);
+  color: @poison;
+}
+button:active {
+  border-color: rgba(179, 139, 77, 0.85);
+  color: @gold;
+}
+
+menu,
+menuitem {
+  background-color: @base00;
+  color: @bone;
+  background-image: none;
+}
+menuitem:hover {
+  background-color: rgba(179, 139, 77, 0.12);
+  color: @gold;
+}
+
+/* ---------------------------------------------
+   Thunar toolbar buttons (back/forward/up/home)
+---------------------------------------------- */
+toolbar toolbutton > button,
+toolbar toolbutton button,
+toolbar button.flat,
+toolbar button.image-button,
+toolbar button {
+  min-height: 0;
+  padding: 2px 8px;
+
+  background-color: rgba(13, 13, 22, 0.55);
+  border: 1px solid rgba(69, 71, 90, 0.55);
+  border-radius: 8px;
+
+  color: rgba(69, 71, 90, 0.95);
+  box-shadow: none;
+  background-image: none;
+}
+
+toolbar toolbutton > button:hover,
+toolbar toolbutton button:hover,
+toolbar button:hover {
+  border-radius: 10px 2px 10px 2px;
+  color: @poison;
+  border-color: rgba(166, 227, 161, 0.35);
+  background-color: rgba(13, 13, 22, 0.7);
+}
+
+toolbar toolbutton > button:checked,
+toolbar toolbutton button:checked {
+  color: @gold;
+  box-shadow: inset 0 -2px 0 0 rgba(179, 139, 77, 0.95);
+  border-color: rgba(179, 139, 77, 0.55);
+}
+
+/* ---------------------------------------------
+   Pane & separator lines (structural chrome)
+---------------------------------------------- */
+
+/* Main pane dividers */
+paned > separator {
+  background-color: @iron;
+  min-width: 1px;
+  min-height: 1px;
+  background-image: none;
+}
+
+/* Generic separators */
+separator {
+  background-color: @iron;
+  background-image: none;
+}
+
+/* Frames around views / sidebars */
+frame,
+.frame {
+  border: 1px solid @iron;
+}
+
+/* Scrolled window outlines (common culprit) */
+scrolledwindow {
+  border: 1px solid @iron;
+}
+
+/* Kill light “undershoot” / “overshoot” glow lines */
+undershoot,
+overshoot {
+  background-image: none;
+  border: none;
+}
+
+/* =============================================
+   Subtle glass / transparency (GTK3)
+============================================= */
+
+/* Make the actual window surface translucent */
+window,
+dialog,
+.background {
+  background-color: rgba(13, 13, 22, 0.86); /* base00 with alpha */
+  background-image: none;
+}
+
+/* Headerbar/toolbar slightly less transparent for legibility */
+headerbar,
+toolbar,
+menubar {
+  background-color: rgba(13, 13, 22, 0.92);
+  background-image: none;
+}
+
+/* Sidebars: keep them more solid so they anchor the layout */
+.sidebar,
+sidebar,
+.navigation-sidebar {
+  background-color: rgba(9, 9, 16, 0.94);
+}
+
+/* Main content area: *slightly* translucent */
+.view,
+iconview,
+treeview,
+list,
+.content-view,
+.standard-view,
+scrolledwindow,
+viewport {
+  background-color: rgba(13, 13, 22, 0.75);
+  background-image: none;
+}
+
+/* Entries should remain mostly opaque so text doesn’t get muddy */
+entry {
+  background-color: rgba(22, 22, 37, 0.96); /* surface */
+}
+
+/* Selection stays readable on top of translucency */
 row:selected,
-.view row:selected {
-  background-image: linear-gradient(
-    to right,
-    rgba(179, 139, 77, 0.26),
-    rgba(179, 139, 77, 0.1)
-  );
-  box-shadow: inset 0 0 0 1px rgba(179, 139, 77, 0.25);
+.view row:selected,
+iconview:selected,
+flowboxchild:selected {
+  background-color: rgba(179, 139, 77, 0.18);
 }
 
-/* TMP FOR DEBUGGING */
-/* Sidebar + main view hover/selection that Thunar definitely uses */
-.sidebar .view,
-.view {
-  background-color: #ffffff;
+/* =========================================================
+   THUNAR GLASS OVERRIDE (put at very end)
+   Goal: nothing in the content stack paints opaque.
+========================================================= */
+
+/* 1) Window gets an RGBA background */
+window,
+dialog,
+.background {
+  background: rgba(13, 13, 22, 0.8) !important;
+  background-image: none !important;
 }
 
-.view:selected,
-.view .cell:selected,
-.view .cell:selected:focus {
-  background-color: #ffffff;
-  box-shadow: inset 0 0 0 1px rgba(179, 139, 77, 0.25);
+/* 2) Kill the usual “opaque canvas” culprits */
+scrolledwindow,
+scrolledwindow > viewport,
+viewport,
+frame,
+.frame,
+paned,
+paned > separator {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
-.view:hover,
-.view .cell:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+/* 3) Thunar’s actual file views (these are the big ones) */
+.view,
+iconview,
+treeview,
+list,
+.content-view,
+.standard-view,
+.thunar-standard-view,
+.thunar-shortcuts-view {
+  background: rgba(13, 13, 22, 0.7) !important;
+  background-image: none !important;
+}
+
+/* 4) Flowbox (icon grids) */
+flowbox,
+flowbox > flowboxchild {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* 5) Sidebar: keep it more solid so it doesn’t get muddy */
+.sidebar,
+sidebar,
+.navigation-sidebar {
+  background: rgba(9, 9, 16, 0.92) !important;
+}
+
+/* 6) Header/toolbar: readable glass */
+headerbar,
+toolbar,
+menubar {
+  background: rgba(13, 13, 22, 0.88) !important;
+  background-image: none !important;
+}
+
+/* 7) Selection stays readable */
+row:selected,
+.view row:selected,
+iconview:selected,
+flowboxchild:selected {
+  background: rgba(179, 139, 77, 0.18) !important;
 }
