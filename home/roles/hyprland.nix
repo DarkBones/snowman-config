@@ -1,5 +1,13 @@
-{ lib, pkgsUnstable, config, ... }:
-let cfg = config.roles.hyprland;
+{ lib, pkgsUnstable, pkgs, config, ... }:
+let
+  cfg = config.roles.hyprland;
+
+  draculaIcons = pkgs.fetchzip {
+    url =
+      "https://github.com/m4thewz/dracula-icons/archive/refs/heads/master.zip";
+    sha256 = "sha256-JUjC6oalD7teSzzdMqLTXn7eJTZQbPP/oDeLBC7bG6E=";
+    stripRoot = true;
+  };
 in {
   options.roles.hyprland.enable =
     lib.mkEnableOption "Hyprland Desktop Environment";
@@ -16,25 +24,29 @@ in {
       wlogout
       wl-clipboard
 
-      # Tools
       grim
       slurp
       nwg-look
       pavucontrol
       baobab
 
-      # Bluetooth
       blueman
       adwaita-icon-theme
       hicolor-icon-theme
       papirus-icon-theme
 
-      # Networking
       networkmanagerapplet
 
-      # Theming
       catppuccin-gtk
       bibata-cursors
     ];
+
+    # Install the icon theme into ~/.icons
+    home.file.".icons/Dracula".source = draculaIcons;
+
+    gtk = {
+      enable = true;
+      iconTheme = { name = "Dracula"; };
+    };
   };
 }
