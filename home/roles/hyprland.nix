@@ -42,8 +42,6 @@ in {
     gtk = {
       enable = true;
 
-      # We use gtkX.extraCss to inject the import. 
-      # Because gtk.enable = true, HM will generate the gtk.css file.
       gtk3.extraCss = ''
         @import url("file://${config.home.homeDirectory}/.config/darkling.css");
       '';
