@@ -1,4 +1,4 @@
-{ lib, pkgsUnstable, pkgs, config, ... }:
+{ lib, config, pkgs, pkgsUnstable, ... }:
 let
   cfg = config.roles.hyprland;
 
@@ -9,8 +9,7 @@ let
     stripRoot = true;
   };
 in {
-  options.roles.hyprland.enable =
-    lib.mkEnableOption "Hyprland Desktop Environment";
+  options.roles.hyprland.enable = lib.mkEnableOption "Hyprland role";
 
   config = lib.mkIf cfg.enable {
     home.packages = with pkgsUnstable; [
@@ -39,13 +38,17 @@ in {
 
     home.file.".icons/Dracula".source = draculaIcons;
 
-    xdg.configFile."darkling.css".source = ./../gtk/darkling.css;
+    xdg.configFile."darkling.css".source = ../gtk/darkling.css;
+    xdg.configFile."gtk-3.0/gtk.css" = {
+      force = true;
+      text = ''
+        @import url("file://${config.home.homeDirectory}/.config/darkling.css");'';
+    };
 
-    gtk = {
-      enable = true;
-
-      gtk3.extraCss = builtins.readFile ./../gtk/darkling.css;
-      gtk4.extraCss = builtins.readFile ./../gtk/darkling.css;
+    xdg.configFile."gtk-4.0/gtk.css" = {
+      force = true;
+      text = ''
+        @import url("file://${config.home.homeDirectory}/.config/darkling.css");'';
     };
   };
 }

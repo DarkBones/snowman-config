@@ -4,9 +4,8 @@
     polarity = "dark";
 
     base16Scheme = {
-      scheme = "Efteling Waybar Dark";
-      author = "bas";
-
+      scheme = "Darkling";
+      author = "DarkBones";
       base00 = "0d0d16";
       base01 = "11111b";
       base02 = "1e1e2e";
@@ -47,7 +46,7 @@
     };
 
     targets = {
-      gtk.enable = true;
+      gtk.enable = false;
       qt.enable = true;
     };
 
