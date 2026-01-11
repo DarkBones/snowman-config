@@ -1,6 +1,13 @@
 { pkgs, ... }: {
   programs.hyprland.enable = true;
 
+  environment.systemPackages = with pkgs; [
+    papirus-icon-theme
+    tela-icon-theme
+    colloid-icon-theme
+    xfce.xfce4-settings
+  ];
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -36,6 +43,6 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     font-awesome
-#    ttf-crimson-text
+    #    ttf-crimson-text
   ];
 }

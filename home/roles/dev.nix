@@ -15,6 +15,7 @@ in {
       gcc
       lazydocker
       lazygit
+      nodejs_24
       pkgs.git
       pnpm
       tokei
