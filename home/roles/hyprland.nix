@@ -39,16 +39,19 @@ in {
     home.file.".icons/Dracula".source = draculaIcons;
 
     xdg.configFile."darkling.css".source = ../gtk/darkling.css;
-    xdg.configFile."gtk-3.0/gtk.css" = {
-      force = true;
-      text = ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");'';
+    gtk = {
+      enable = true;
+
+      # We use gtkX.extraCss to inject the import. 
+      # Because gtk.enable = true, HM will generate the gtk.css file.
+      gtk3.extraCss = ''
+        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
+      '';
+      gtk4.extraCss = ''
+        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
+      '';
     };
 
-    xdg.configFile."gtk-4.0/gtk.css" = {
-      force = true;
-      text = ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");'';
-    };
+    stylix.targets.gtk.enable = lib.mkForce false;
   };
 }
