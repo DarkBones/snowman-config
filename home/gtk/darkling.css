@@ -7,6 +7,16 @@
 @define-color poison  #a6e3a1;
 @define-color ghost   #cba6f7;
 
+/* --- InfoBar palette overrides (Adwaita-like defaults are beige) --- */
+@define-color info_bg_color    rgba(13, 13, 22, 0.92);
+@define-color info_fg_color    @bone;
+@define-color warning_bg_color rgba(13, 13, 22, 0.92);
+@define-color warning_fg_color @bone;
+@define-color error_bg_color   rgba(13, 13, 22, 0.92);
+@define-color error_fg_color   @bone;
+@define-color success_bg_color rgba(13, 13, 22, 0.92);
+@define-color success_fg_color @bone;
+
 /* GTK “theme” hints (some widgets respect these) */
 @define-color theme_bg_color            @base00;
 @define-color theme_base_color          @base00;
@@ -26,6 +36,26 @@
 
 label,
 text {
+  color: @bone;
+}
+
+/* Force readable foreground in views (Thunar is picky) */
+/* * { */
+/*   color: @bone; */
+/* } */
+
+.view,
+.view *,
+treeview,
+treeview *,
+iconview,
+iconview *,
+list,
+list *,
+cellview,
+cellview *,
+row,
+row * {
   color: @bone;
 }
 
@@ -65,10 +95,10 @@ iconview,
 treeview,
 list,
 .content-view,
-.standard-view {
-  background-color: rgba(13, 13, 22, 0.94);
-  /* background-color: @base00; */
-  color: @bone;
+.standard-view,
+scrolledwindow,
+viewport {
+  background-color: rgba(13, 13, 22, 0.55);
   background-image: none;
 }
 
@@ -203,6 +233,54 @@ rubberband {
   border: 1px solid rgba(179, 139, 77, 0.75);
 }
 
+/* Treeview text (details view) */
+treeview.view {
+  color: @bone;
+}
+
+/* Thin hover indicator (no fill, just a line) */
+treeview.view row:hover,
+.view row:hover,
+row:hover,
+iconview.view child:hover,
+flowboxchild:hover {
+  box-shadow: inset 0 -1px 0 rgba(179, 139, 77, 0.75);
+}
+
+/* ---------------------------------------------
+   HOVER (TreeView / details view)
+   TreeView rows aren't real widgets, so row:hover often doesn't match.
+   Use :prelight on the treeview + apply a subtle "cursor row" highlight.
+---------------------------------------------- */
+
+/* This affects the row under the pointer in GTK3 treeviews */
+treeview.view {
+  -gtktreeview-row-separator-height: 0;
+  -gtktreeview-horizontal-separator: 0;
+  -gtktreeview-vertical-separator: 0;
+}
+
+/* Hovered row background (GTK3 uses :prelight for "hover") */
+treeview.view:prelight,
+treeview.view row:prelight {
+  background-color: rgba(179, 139, 77, 0.08);
+}
+
+/* Make sure hover doesn't fight selection */
+treeview.view row:selected:prelight,
+treeview.view row:selected {
+  background-color: rgba(179, 139, 77, 0.18);
+}
+
+/* Keep text readable on hover */
+treeview.view row:hover *,
+.view row:hover *,
+row:hover *,
+iconview.view child:hover *,
+flowboxchild:hover * {
+  color: @bone;
+}
+
 /* ---------------------------------------------
    Buttons + menus
 ---------------------------------------------- */
@@ -329,7 +407,7 @@ menubar {
 .sidebar,
 sidebar,
 .navigation-sidebar {
-  background-color: rgba(9, 9, 16, 0.94);
+  background-color: rgba(9, 9, 16, 0.88);
 }
 
 /* Main content area: *slightly* translucent */
@@ -368,19 +446,6 @@ window,
 dialog,
 .background {
   background: rgba(13, 13, 22, 0.8) !important;
-  background-image: none !important;
-}
-
-/* 2) Kill the usual “opaque canvas” culprits */
-scrolledwindow,
-scrolledwindow > viewport,
-viewport,
-frame,
-.frame,
-paned,
-paned > separator {
-  background: transparent !important;
-  background-color: transparent !important;
   background-image: none !important;
 }
 
@@ -425,4 +490,233 @@ row:selected,
 iconview:selected,
 flowboxchild:selected {
   background: rgba(179, 139, 77, 0.18) !important;
+}
+
+/* =========================================================
+   INFOBARS / STATUSBARS (Blueman + friends)
+   Put at very end so it overrides app/theme defaults
+========================================================= */
+
+/* InfoBar (the inline error banner) */
+infobar,
+.infobar {
+  background-color: rgba(13, 13, 22, 0.92) !important;
+  background-image: none !important;
+  color: @bone !important;
+
+  border-top: 1px solid rgba(69, 71, 90, 0.55) !important;
+  border-bottom: 1px solid rgba(69, 71, 90, 0.55) !important;
+}
+
+/* Make *everything* inside the infobar readable */
+infobar *,
+.infobar * {
+  color: @bone !important;
+  text-shadow: none !important;
+}
+
+/* GTK uses style classes on InfoBar: info / warning / question / error */
+infobar.error,
+.infobar.error {
+  border-left: 4px solid rgba(166, 227, 161, 0.85) !important; /* poison accent */
+}
+
+infobar.warning,
+.infobar.warning {
+  border-left: 4px solid rgba(179, 139, 77, 0.95) !important; /* gold accent */
+}
+
+infobar.info,
+.infobar.info {
+  border-left: 4px solid rgba(203, 166, 247, 0.85) !important; /* ghost accent */
+}
+
+/* Buttons inside infobars (e.g. Close / Retry) */
+infobar button,
+.infobar button {
+  background-color: rgba(22, 22, 37, 0.92) !important;
+  border: 1px solid rgba(69, 71, 90, 0.7) !important;
+  color: @bone !important;
+}
+
+/* Statusbar (the bottom strip like “Failed …”) */
+statusbar,
+.statusbar {
+  background-color: rgba(13, 13, 22, 0.92) !important;
+  background-image: none !important;
+  color: @bone !important;
+
+  border-top: 1px solid rgba(69, 71, 90, 0.55) !important;
+}
+
+statusbar *,
+.statusbar * {
+  color: @bone !important;
+}
+
+/* If an app uses “selected” or “dim-label” styling inside bars, neutralize it */
+.dim-label,
+label.dim-label {
+  color: rgba(245, 224, 220, 0.92) !important;
+}
+
+/* =========================================================
+   BLUEMAN / GTK INFOBARS — make the bottom error bar readable
+   (Blueman often styles the *child box*, not infobar itself)
+========================================================= */
+
+/* Hit every likely container that paints the beige */
+infobar,
+infobar > box,
+infobar > revealer > box,
+infobar > revealer > box > box,
+infobar > revealer > box > grid,
+infobar .background,
+infobar .message-area,
+.infobar,
+.infobar > box,
+.infobar > revealer > box,
+.infobar .background,
+.infobar .message-area {
+  background-color: rgba(13, 13, 22, 0.92) !important;
+  background-image: none !important;
+  color: @bone !important;
+  border-top: 1px solid rgba(69, 71, 90, 0.55) !important;
+}
+
+/* Force text/icon contrast inside the bar */
+infobar label,
+infobar image,
+infobar * {
+  color: @bone !important;
+  text-shadow: none !important;
+  -gtk-icon-effect: none !important;
+}
+
+/* Keep “dim” text from becoming invisible */
+infobar .dim-label,
+infobar label.dim-label,
+infobar label:disabled,
+infobar *:disabled {
+  color: rgba(245, 224, 220, 0.92) !important;
+}
+
+/* Accent stripe by type (optional but nice) */
+infobar.error,
+infobar.error > box,
+infobar.error > revealer > box,
+.infobar.error,
+.infobar.error > box,
+.infobar.error > revealer > box {
+  border-left: 4px solid rgba(255, 120, 120, 0.95) !important;
+}
+
+infobar.warning,
+infobar.warning > box,
+infobar.warning > revealer > box {
+  border-left: 4px solid rgba(179, 139, 77, 0.95) !important;
+}
+
+infobar.info,
+infobar.info > box,
+infobar.info > revealer > box {
+  border-left: 4px solid rgba(203, 166, 247, 0.85) !important;
+}
+
+/* Buttons in the bar */
+infobar button,
+.infobar button {
+  background-color: rgba(22, 22, 37, 0.92) !important;
+  border: 1px solid rgba(69, 71, 90, 0.7) !important;
+  color: @bone !important;
+}
+
+/* =========================================================
+   BLUEMAN BOTTOM BAR (Statusbar / Actionbar / Message area)
+   This is what’s beige in your screenshot.
+   Put LAST.
+========================================================= */
+
+@define-color darkling_bar_bg rgba(13, 13, 22, 0.92);
+@define-color darkling_bar_fg @bone;
+
+/* Hit the bar widgets themselves */
+statusbar,
+.statusbar,
+actionbar,
+.action-bar,
+.actionbar,
+.message-area,
+.message,
+.toast,
+.notification {
+  background-color: @darkling_bar_bg !important;
+  background-image: none !important;
+  color: @darkling_bar_fg !important;
+  border-top: 1px solid rgba(69, 71, 90, 0.55) !important;
+}
+
+/* Hit the containers that usually paint the actual beige */
+statusbar > box,
+statusbar > box > box,
+statusbar > frame,
+statusbar frame,
+statusbar .background,
+.statusbar > box,
+.statusbar > box > box,
+.statusbar > frame,
+.statusbar frame,
+.statusbar .background,
+actionbar > box,
+actionbar > box > box,
+actionbar .background,
+.action-bar > box,
+.action-bar > box > box,
+.action-bar .background,
+.actionbar > box,
+.actionbar > box > box,
+actionbar > revealer > box,
+actionbar > revealer > box > box,
+actionbar > revealer > box > grid,
+actionbar > revealer > box > frame {
+  background-color: @darkling_bar_bg !important;
+  background-image: none !important;
+  color: @darkling_bar_fg !important;
+}
+
+/* Force readable text/icons inside the bar */
+statusbar *,
+.statusbar *,
+actionbar *,
+.action-bar *,
+actionbar *,
+.message-area *,
+.message *,
+.toast *,
+.notification * {
+  color: @darkling_bar_fg !important;
+  text-shadow: none !important;
+  -gtk-icon-effect: none !important;
+}
+
+/* If something inside is "dimmed", keep it readable */
+statusbar .dim-label,
+statusbar label.dim-label,
+.statusbar .dim-label,
+.statusbar label.dim-label,
+actionbar .dim-label,
+actionbar label.dim-label,
+.action-bar .dim-label,
+.action-bar label.dim-label {
+  color: rgba(245, 224, 220, 0.92) !important;
+}
+
+/* Buttons inside bottom bars */
+statusbar button,
+.statusbar button,
+actionbar button,
+.action-bar button {
+  background-color: rgba(22, 22, 37, 0.92) !important;
+  border: 1px solid rgba(69, 71, 90, 0.7) !important;
+  color: @darkling_bar_fg !important;
 }
