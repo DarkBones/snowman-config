@@ -11,7 +11,97 @@ let
 
   # Reuse this string for GTK3 + GTK4
   eftelingGtkCss = ''
-    /* --- global-ish surfaces --- */
+    /* ============================================================
+       Efteling-ish GTK polish: depth, gilded focus, softer surfaces
+       ============================================================ */
+
+    @define-color base00 #0d0d16;
+    @define-color iron   #45475a;
+    @define-color bone   #f5e0dc;
+    @define-color gold   #b38b4d;
+
+    /* --- Global text vibe --- */
+    * {
+      font-weight: 600;
+    }
+
+    /* --- Main window background: add depth (very subtle) --- */
+    window, dialog, .background {
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(179, 139, 77, 0.08), rgba(13, 13, 22, 0) 40%),
+        radial-gradient(circle at 85% 25%, rgba(203, 166, 247, 0.06), rgba(13, 13, 22, 0) 45%),
+        linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.00) 18%, rgba(0,0,0,0.10));
+      background-color: @base00;
+    }
+
+    /* --- Headerbar: Waybar-like gradient + “ink line” --- */
+    headerbar,
+    .titlebar,
+    .header-bar {
+      background-image: linear-gradient(
+        to bottom,
+        rgba(179, 139, 77, 0.22),
+        rgba(13, 13, 22, 0) 55%
+      );
+      background-color: @base00;
+
+      border-bottom: 1px solid rgba(69, 71, 90, 0.65);
+      box-shadow:
+        inset 0 -1px 0 rgba(179, 139, 77, 0.12),
+        inset 0  1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    headerbar title, headerbar label {
+      color: @bone;
+      text-shadow: 0 0 3px rgba(179, 139, 77, 0.18);
+    }
+
+    /* --- Buttons: give them “island” affordance --- */
+    button {
+      border-radius: 12px;
+      border: 1px solid rgba(69, 71, 90, 0.65);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.05),
+        rgba(0,0,0,0.08)
+      );
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 1px 0 rgba(0,0,0,0.25);
+    }
+
+    button:hover {
+      border-color: rgba(179, 139, 77, 0.55);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 0 10px rgba(179, 139, 77, 0.12);
+    }
+
+    button:active {
+      background-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.18),
+        rgba(255,255,255,0.03)
+      );
+      box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.35);
+    }
+
+    /* --- Focus ring: gilded instead of neon --- */
+    *:focus-visible {
+      outline: 2px solid rgba(179, 139, 77, 0.55);
+      outline-offset: 2px;
+    }
+
+    /* --- Selection highlight: muted gold parchment instead of blue --- */
+    selection,
+    text selection,
+    entry selection {
+      background-color: rgba(179, 139, 77, 0.28);
+      color: @bone;
+    }
+
+    /* --- Tooltips / popovers: your “parchment island” --- */
     tooltip,
     .tooltip,
     popover {
@@ -21,39 +111,38 @@ let
         rgba(13, 13, 22, 0) 55%
       );
       background-color: rgba(13, 13, 22, 0.92);
-
-      border: 1.5px solid rgba(69, 71, 90, 0.9);
+      border: 1.5px solid rgba(69, 71, 90, 0.85);
       border-radius: 14px;
       box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.45),
-        0 0 10px rgba(179, 139, 77, 0.12);
+        0 10px 26px rgba(0, 0, 0, 0.55),
+        0 0 12px rgba(179, 139, 77, 0.14);
     }
 
     tooltip label,
     .tooltip label {
-      color: #f5e0dc;
-      text-shadow: 0 0 3px rgba(179, 139, 77, 0.25);
+      color: @bone;
+      text-shadow: 0 0 3px rgba(179, 139, 77, 0.22);
       font-weight: 700;
     }
 
-    /* --- top bars / headerbars --- */
-    headerbar,
-    .titlebar,
-    .header-bar {
-      background-image: linear-gradient(
-        to bottom,
-        rgba(179, 139, 77, 0.22),
-        rgba(13, 13, 22, 0) 45%
-      );
-      background-color: #0d0d16;
-
-      border-bottom: 1px solid rgba(69, 71, 90, 0.65);
-      box-shadow: inset 0 -1px 0 rgba(179, 139, 77, 0.10);
+    /* --- Sidebars (like Thunar places): add separation line --- */
+    .sidebar, sidebar {
+      border-right: 1px solid rgba(69, 71, 90, 0.55);
+      box-shadow: inset -1px 0 0 rgba(255,255,255,0.02);
     }
 
-    headerbar button:hover,
-    .titlebar button:hover {
-      box-shadow: 0 0 8px rgba(179, 139, 77, 0.12);
+    /* --- Lists / rows: gentle hover and selection --- */
+    row:hover, .view row:hover {
+      background-color: rgba(255,255,255,0.03);
+    }
+
+    row:selected, .view row:selected {
+      background-image: linear-gradient(
+        to right,
+        rgba(179, 139, 77, 0.26),
+        rgba(179, 139, 77, 0.10)
+      );
+      box-shadow: inset 0 0 0 1px rgba(179, 139, 77, 0.25);
     }
   '';
 in {
