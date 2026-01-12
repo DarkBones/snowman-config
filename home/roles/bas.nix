@@ -12,6 +12,7 @@ in {
       btop
       eza
       fzf
+      glib
       jq
       less
       fastfetch
