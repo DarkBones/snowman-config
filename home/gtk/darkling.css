@@ -276,9 +276,10 @@ treeview.view row:selected {
 treeview.view row:hover *,
 .view row:hover *,
 row:hover *,
-iconview.view child:hover *,
-flowboxchild:hover * {
-  color: @bone;
+iconview.view:hover,
+flowboxchild:hover {
+  background-color: rgba(179, 139, 77, 0.08);
+  box-shadow: inset 0 -1px 0 rgba(179, 139, 77, 0.75);
 }
 
 /* ---------------------------------------------
