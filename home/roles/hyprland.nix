@@ -38,18 +38,6 @@ in {
 
     home.file.".icons/Dracula".source = draculaIcons;
 
-    xdg.configFile."darkling.css".source = ../gtk/darkling.css;
-    gtk = {
-      enable = true;
-
-      gtk3.extraCss = ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
-      '';
-      gtk4.extraCss = ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
-      '';
-    };
-
     stylix.targets.gtk.enable = lib.mkForce false;
   };
 }
