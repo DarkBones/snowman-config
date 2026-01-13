@@ -41,7 +41,7 @@
   };
 
   outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
-    , ... }@inputs:
+    , stylix, ... }@inputs:
     let
       lib = nixpkgs.lib;
 
@@ -83,7 +83,7 @@
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
           modules = [
-            inputs.stylix.nixosModules.stylix
+            stylix.nixosModules.stylix
             ./modules/stylix.nix
 
             snowman.nixosModules.default

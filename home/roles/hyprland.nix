@@ -37,7 +37,5 @@ in {
     ];
 
     home.file.".icons/Dracula".source = draculaIcons;
-
-    stylix.targets.gtk.enable = lib.mkForce false;
   };
 }
