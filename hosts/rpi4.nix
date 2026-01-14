@@ -42,4 +42,25 @@
     enable = true;
     powerOnBoot = true;
   };
+
+nixpkgs.overlays = [
+    (final: prev: {
+      # Fix timing-sensitive python packages that fail on Pi 4 hardware
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (python-final: python-prev: {
+          
+          pyrate-limiter = python-prev.pyrate-limiter.overridePythonAttrs (oldAttrs: {
+            # Skip tests that depend on high-precision timing/latency
+            doCheck = false; 
+          });
+
+          psycopg = python-prev.psycopg.overridePythonAttrs (oldAttrs: {
+            # Skip tests because the temporary Postgres DB fails to start in time
+            doCheck = false;
+          });
+
+        })
+      ];
+    })
+  ];
 }
