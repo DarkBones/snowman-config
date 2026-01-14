@@ -1,5 +1,9 @@
-{ pkgs, lib, ... }: {
-  imports = [ ./rpi4-hardware-configuration.nix ../modules/home-assistant.nix ];
+{ pkgs, lib, ... }:
+{
+  imports = [
+    ./rpi4-hardware-configuration.nix
+    ../modules/home-assistant.nix
+  ];
 
   boot = {
     loader = {
@@ -14,14 +18,20 @@
   networking = {
     enableIPv6 = false;
 
-    nameservers = [ "1.1.1.1" "8.8.8.8" ]; # TODO: Quad 9
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ]; # TODO: Quad 9
 
     firewall = {
       enable = true;
       allowPing = true;
 
       # LAN access: SSH + Home Assistant
-      allowedTCPPorts = [ 22 8123 ];
+      allowedTCPPorts = [
+        22
+        8123
+      ];
 
       # LAN discovery
       allowedUDPPorts = [ 5353 ];
@@ -29,7 +39,10 @@
       checkReversePath = "loose";
 
       # Trust LAN + Tailscale interfaces
-      trustedInterfaces = [ "wlan0" "tailscale0" ];
+      trustedInterfaces = [
+        "wlan0"
+        "tailscale0"
+      ];
     };
   };
 
@@ -43,15 +56,15 @@
     powerOnBoot = true;
   };
 
-nixpkgs.overlays = [
+  nixpkgs.overlays = [
     (final: prev: {
       # Fix timing-sensitive python packages that fail on Pi 4 hardware
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (python-final: python-prev: {
-          
+
           pyrate-limiter = python-prev.pyrate-limiter.overridePythonAttrs (oldAttrs: {
             # Skip tests that depend on high-precision timing/latency
-            doCheck = false; 
+            doCheck = false;
           });
 
           psycopg = python-prev.psycopg.overridePythonAttrs (oldAttrs: {
