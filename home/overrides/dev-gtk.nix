@@ -1,6 +1,7 @@
-{ lib, config, ... }:
+{ lib, config, hostRoles ? [ ], ... }:
 let
   cfg = config.roles.dotfiles or { };
+  hasDesktopHost = lib.elem "desktop" hostRoles;
 
   mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
   isDev = mode == "dev";
@@ -12,6 +13,15 @@ let
   darklingCss = "${repoDir}/gtk/.config/darkling.css";
 
 in {
+  imports = lib.optionals hasDesktopHost [
+    ({ lib, config, ... }: {
+      config = lib.mkIf (cfg.enable or false) {
+        # Disable Stylix GTK management so it doesn't fight us
+        stylix.targets.gtk.enable = lib.mkForce false;
+      };
+    })
+  ];
+
   config = lib.mkIf (cfg.enable or false) {
 
     gtk = {
@@ -34,7 +44,5 @@ in {
         "";
     };
 
-    # Disable Stylix GTK management so it doesn't fight us
-    stylix.targets.gtk.enable = lib.mkForce false;
   };
 }

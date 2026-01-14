@@ -2,7 +2,7 @@
   stylix = {
     enable = true;
     polarity = "dark";
-    
+
     # Stylix still requires an image to initialize its internal engine, 
     # even if you override every color manually.
     image = ../assets/patterns/grain.png;
@@ -36,7 +36,7 @@
       qt.enable = true;
       gnome.enable = false;
     };
-    
+
     # Scaling back the font size from the 80pt test
     fonts.sizes = {
       applications = 12;

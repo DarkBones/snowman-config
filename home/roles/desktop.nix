@@ -1,13 +1,19 @@
-{ lib, pkgsUnstable, config, inputs, ... }:
-let cfg = config.roles.desktop;
+{ lib, pkgsUnstable, config, inputs, hostRoles ? [ ], ... }:
+let hasDesktopHost = lib.elem "desktop" hostRoles;
 in {
   options.roles.desktop.enable = lib.mkEnableOption "Desktop role";
 
-  imports = [ inputs.zen-browser.homeModules.twilight ];
+  imports = lib.optionals hasDesktopHost [
+    inputs.stylix.homeModules.stylix
+    inputs.zen-browser.homeModules.twilight
+    ({ lib, config, ... }: {
+      config = lib.mkIf (config.roles.desktop.enable or false) {
+        programs.zen-browser.enable = true;
+      };
+    })
+  ];
 
-  config = lib.mkIf cfg.enable {
-    programs.zen-browser.enable = true;
-
+  config = lib.mkIf (hasDesktopHost && (config.roles.desktop.enable or false)) {
     home.packages = with pkgsUnstable; [ ghostty playerctl spotify ];
 
     # If you manage Hyprland config via Home Manager, add an exec-once:

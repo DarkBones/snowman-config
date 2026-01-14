@@ -8,6 +8,4 @@ let
     != "default.nix") (builtins.attrNames entries);
 
   modules = map (name: here + "/${name}") nixFiles;
-in {
-  imports = modules;
-}
+in { imports = modules; }

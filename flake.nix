@@ -64,7 +64,7 @@
         };
 
       mkNixosSpecialArgs = name: attrs: {
-        inherit home-manager inv sops-nix dotfilesSources disko;
+        inherit inputs home-manager inv sops-nix dotfilesSources disko;
         pkgsUnstable = makePkgsUnstable attrs.system;
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
@@ -74,21 +74,28 @@
       };
 
       mkHost = name: attrs:
-        { strictHw ? true }:
+        { strictHw ? true, }:
         let
           host = inv.hosts.${name};
           hostName = host.hostname or name;
           hwFile = ./hosts/${hostName}-hardware-configuration.nix;
+          hostRoles = host.availableRoles or [ ];
+          hasRole = role: lib.elem role hostRoles;
         in lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
-          modules = [
-            stylix.nixosModules.stylix
+          modules = (lib.optionals (hasRole "desktop") [
+            inputs.stylix.nixosModules.stylix
             ./modules/stylix.nix
-
+          ]) ++ [
             snowman.nixosModules.default
             home-manager.nixosModules.home-manager
-            ({ ... }: { home-manager.extraSpecialArgs = { inherit inputs; }; })
+            ({ currentHost, inv, ... }: {
+              home-manager.extraSpecialArgs = {
+                inherit inputs inv currentHost;
+                hostRoles = inv.hosts.${currentHost}.availableRoles or [ ];
+              };
+            })
 
             ./modules/snowman-dotfiles.nix
 
@@ -144,7 +151,19 @@
       homeConfigurations = lib.listToAttrs (lib.concatMap (hostName:
         let host = inv.hosts.${hostName};
         in lib.concatMap (user:
-          let cfgName = "${user}@${hostName}";
+          let
+            cfgName = "${user}@${hostName}";
+            userCfg = inv.users.${user};
+            userRoles = userCfg.roles or { };
+            enabledUserRoles =
+              lib.filterAttrs (_: roleCfg: roleCfg ? enable && roleCfg.enable)
+              userRoles;
+            hostRoleFilter = host.availableRoles or null;
+            finalRoles = if hostRoleFilter == null then
+              enabledUserRoles
+            else
+              lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
+              enabledUserRoles;
           in [{
             name = cfgName;
             value = inputs.home-manager.lib.homeManagerConfiguration {
@@ -152,6 +171,8 @@
 
               extraSpecialArgs = {
                 inherit inputs inv sops-nix dotfilesSources disko;
+                name = user;
+                hostRoles = host.availableRoles or [ ];
                 pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
                 currentHost = hostName;
                 sopsConfigPath = ./.sops.yaml;
@@ -159,27 +180,7 @@
               };
 
               modules = [
-                ({ lib, config, currentHost, ... }:
-                  let
-                    username =
-                      config.home.username; # <- must be set somewhere in ./home
-                    hostCfg = inv.hosts.${currentHost};
-                    userCfg = inv.users.${username};
-
-                    userRoles = userCfg.roles or { };
-                    enabledUserRoles = lib.filterAttrs
-                      (_: roleCfg: roleCfg ? enable && roleCfg.enable)
-                      userRoles;
-
-                    hostRoleFilter = hostCfg.availableRoles or null;
-
-                    finalRoles = if hostRoleFilter == null then
-                      enabledUserRoles
-                    else
-                      lib.filterAttrs
-                      (roleName: _: lib.elem roleName hostRoleFilter)
-                      enabledUserRoles;
-                  in { roles = finalRoles; })
+                ({ ... }: { roles = finalRoles; })
 
                 inputs.snowman.homeModules.default
                 ./home
