@@ -77,6 +77,7 @@ rec {
         ./users/keys/bas-arch.pub
         ./users/keys/papershift-laptop.pub
         ./users/keys/bas-mbp.pub
+        ./users/keys/bas-dorkbones.pub
       ];
 
       # initialPassword = "snowman";
