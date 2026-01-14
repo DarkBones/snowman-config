@@ -78,6 +78,7 @@ rec {
         ./users/keys/papershift-laptop.pub
         ./users/keys/bas-mbp.pub
         ./users/keys/bas-dorkbones.pub
+        ./users/keys/home-assistant-pi.pub
       ];
 
       # initialPassword = "snowman";
