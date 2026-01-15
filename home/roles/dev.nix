@@ -15,6 +15,7 @@ in {
       gcc
       lazydocker
       lazygit
+      nmap
       nodejs_24
       pkgs.git
       pnpm

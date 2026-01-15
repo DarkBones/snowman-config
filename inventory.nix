@@ -79,6 +79,7 @@ rec {
         ./users/keys/bas-mbp.pub
         ./users/keys/bas-dorkbones.pub
         ./users/keys/home-assistant-pi.pub
+        ./users/keys/ha-rpi.pub
       ];
 
       # initialPassword = "snowman";
