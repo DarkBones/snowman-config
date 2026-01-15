@@ -1,7 +1,7 @@
 { lib, config, hostRoles ? [ ], ... }:
 let
   cfg = config.roles.dotfiles or { };
-  hasDesktopHost = lib.elem "desktop" hostRoles;
+  hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
 
   mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
   isDev = mode == "dev";

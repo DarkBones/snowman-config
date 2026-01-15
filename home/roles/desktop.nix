@@ -1,10 +1,9 @@
 { lib, pkgsUnstable, config, inputs, hostRoles ? [ ], ... }:
-let hasDesktopHost = lib.elem "desktop" hostRoles;
+let hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
 in {
   options.roles.desktop.enable = lib.mkEnableOption "Desktop role";
 
   imports = lib.optionals hasDesktopHost [
-    inputs.stylix.homeModules.stylix
     inputs.zen-browser.homeModules.twilight
     ({ lib, config, ... }: {
       config = lib.mkIf (config.roles.desktop.enable or false) {

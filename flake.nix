@@ -79,8 +79,10 @@
           host = inv.hosts.${name};
           hostName = host.hostname or name;
           hwFile = ./hosts/${hostName}-hardware-configuration.nix;
-          hostRoles = host.availableRoles or [ ];
-          hasRole = role: lib.elem role hostRoles;
+          hostRoles =
+            if host ? availableRoles then host.availableRoles else null;
+
+          hasRole = role: hostRoles == null || lib.elem role hostRoles;
         in lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
@@ -93,7 +95,10 @@
             ({ currentHost, inv, ... }: {
               home-manager.extraSpecialArgs = {
                 inherit inputs inv currentHost;
-                hostRoles = inv.hosts.${currentHost}.availableRoles or [ ];
+                hostRoles = if inv.hosts.${currentHost} ? availableRoles then
+                  inv.hosts.${currentHost}.availableRoles
+                else
+                  null;
               };
             })
 
@@ -172,7 +177,8 @@
               extraSpecialArgs = {
                 inherit inputs inv sops-nix dotfilesSources disko;
                 name = user;
-                hostRoles = host.availableRoles or [ ];
+                hostRoles =
+                  if host ? availableRoles then host.availableRoles else null;
                 pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
                 currentHost = hostName;
                 sopsConfigPath = ./.sops.yaml;

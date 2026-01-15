@@ -43,6 +43,9 @@
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     font-awesome
-    #    ttf-crimson-text
+    crimson-pro
+    inter
+    nerd-fonts.jetbrains-mono
+    # ttf-crimson-text
   ];
 }

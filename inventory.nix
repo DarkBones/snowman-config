@@ -112,6 +112,7 @@ rec {
             ".gitconfig" = "git/.gitconfig";
             # ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
+            ".config/swaync" = "swaync/.config/swaync";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
             ".config/starship.toml" = "starship/.config/starship.toml";
