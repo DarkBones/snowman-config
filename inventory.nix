@@ -22,7 +22,7 @@ rec {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" ];
+      users = [ "bas" "ha" ];
       hardware.boot.firmware = "efi";
 
       extraModules = [
@@ -132,6 +132,15 @@ rec {
           };
         };
       };
+    };
+
+    ha = {
+      uid = 1100;
+      groups = [ ];
+      shell = "bash";
+
+      sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
+      roles = { };
     };
   };
 }

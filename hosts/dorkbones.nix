@@ -15,7 +15,38 @@ in {
     systemPackages = with pkgs; [ gparted bibata-cursors ];
   };
 
-  security.polkit.enable = true;
+  security = {
+    polkit.enable = true;
+
+    sudo = {
+      extraConfig = ''
+        Defaults: ha !requiretty
+      '';
+      extraRules = [{
+        users = [ "ha" ];
+        commands = [
+          {
+            command = "/run/current-system/sw/bin/systemctl suspend";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/systemctl hibernate";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/systemctl lock-session";
+            options = [ "NOPASSWD" ];
+          }
+
+          {
+            command =
+              "/run/current-system/sw/bin/systemctl restart sunshine.service";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }];
+    };
+  };
 
   systemd.user.services.polkit-gnome-agent = {
     description = "Polkit GNOME Authentication Agent";
