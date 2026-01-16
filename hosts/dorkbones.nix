@@ -15,6 +15,8 @@ in {
     systemPackages = with pkgs; [ gparted bibata-cursors ];
   };
 
+  programs.kdeconnect.enable = true;
+
   security = {
     polkit.enable = true;
 
@@ -68,6 +70,7 @@ in {
 
     extraHosts = ''
       127.0.0.1 ai
+      192.168.178.66 ha
     '';
 
     firewall = {
@@ -118,10 +121,26 @@ in {
       recommendedGzipSettings = true;
       recommendedOptimisation = true;
 
-      virtualHosts."ai" = {
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:4080";
-          proxyWebsockets = true;
+      virtualHosts = {
+        "ai" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:4080";
+            proxyWebsockets = true;
+          };
+        };
+        "ha" = {
+          serverName = "ha";
+
+          locations."/" = {
+            proxyPass = "http://192.168.178.66:8123";
+            proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Host $host;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header X-Forwarded-Host $host;
+            '';
+          };
         };
       };
     };
