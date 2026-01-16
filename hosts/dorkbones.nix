@@ -66,12 +66,16 @@ in {
 
     nameservers = [ "1.1.1.1" "8.8.8.8" ]; # TODO: Quad 9
 
+    extraHosts = ''
+      127.0.0.1 ai
+    '';
+
     firewall = {
       enable = true;
       allowPing = true;
 
       # LAN access: SSH
-      allowedTCPPorts = [ 22 ];
+      allowedTCPPorts = [ 22 80 ];
 
       # LAN discovery
       allowedUDPPorts = [ 5353 ];
@@ -106,6 +110,20 @@ in {
     displayManager.sddm = {
       enable = true;
       theme = "breeze";
+    };
+
+    nginx = {
+      enable = true;
+      recommendedProxySettings = true;
+      recommendedGzipSettings = true;
+      recommendedOptimisation = true;
+
+      virtualHosts."ai" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:4080";
+          proxyWebsockets = true;
+        };
+      };
     };
   };
 }

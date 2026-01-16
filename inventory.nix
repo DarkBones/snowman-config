@@ -31,6 +31,7 @@ rec {
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
         ./modules/gaming.nix
+        ./modules/openwebui.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
