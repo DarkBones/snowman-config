@@ -10,9 +10,7 @@ let
   darklingCssDev = "${repoDir}/gtk/.config/darkling.css";
   darklingCssProd = "${config.home.homeDirectory}/.config/darkling.css";
 
-  importLine = path: ''@import url("file://${path}");'';
-  darklingImport =
-    importLine (if isDev then darklingCssDev else darklingCssProd);
+  darklingCssPath = if isDev then darklingCssDev else darklingCssProd;
 
   gtkExtraCfg = {
     gtk-theme-name = config.gtk.theme.name;
@@ -24,21 +22,12 @@ in {
   config = lib.mkIf (hasDesktopHost && (cfg.enable or false)) {
     gtk = {
       enable = true;
-
       theme = {
         package = lib.mkForce pkgsUnstable.catppuccin-gtk;
         name = lib.mkForce "catppuccin-frappe-blue-standard";
       };
-
-      gtk3 = {
-        extraConfig = gtkExtraCfg;
-        extraCss = darklingImport;
-      };
-
-      gtk4 = {
-        extraConfig = gtkExtraCfg;
-        extraCss = darklingImport;
-      };
+      gtk3.extraConfig = gtkExtraCfg;
+      gtk4.extraConfig = gtkExtraCfg;
     };
 
     dconf = {
@@ -50,5 +39,21 @@ in {
         cursor-size = 24;
       };
     };
+
+    xdg.configFile."gtk-3.0/darkling.css".source =
+      config.lib.file.mkOutOfStoreSymlink darklingCssPath;
+
+    xdg.configFile."gtk-4.0/darkling.css".source =
+      config.lib.file.mkOutOfStoreSymlink darklingCssPath;
+
+    stylix.targets.gtk.enable = lib.mkForce false;
+
+    xdg.configFile."gtk-3.0/gtk.css".text = lib.mkForce ''
+      @import url("darkling.css");
+    '';
+
+    xdg.configFile."gtk-4.0/gtk.css".text = lib.mkForce ''
+      @import url("darkling.css");
+    '';
   };
 }
