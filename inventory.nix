@@ -32,7 +32,6 @@ rec {
         ./modules/nvidia.nix
         ./modules/gaming.nix
         ./modules/openwebui.nix
-        ./modules/stylix.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
