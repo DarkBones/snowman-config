@@ -70,6 +70,7 @@
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
+        # extraHomeImports = [ ./home/roles ./home/overrides ];
         extraHomeImports = [ ./home/roles ./home/overrides ];
       };
 

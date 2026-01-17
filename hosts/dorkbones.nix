@@ -61,7 +61,13 @@ in {
     };
   };
 
-  home-manager.users.bas.imports = [ ../home/roles ../home/overrides ];
+  # home-manager.users.bas.imports = [ ../home/roles ../home/overrides ];
+  # home-manager.users.bas.imports = [ ../home ];
+  home-manager.users.bas = {
+    home.username = "bas";
+    home.homeDirectory = "/home/bas";
+    imports = [ ../home ];
+  };
 
   networking = {
     enableIPv6 = false;

@@ -35,7 +35,17 @@ in {
       networkmanagerapplet
       catppuccin-gtk
       bibata-cursors
+      xsettingsd
     ];
+
+    services.xsettingsd.enable = true;
+
+    services.xsettingsd.settings = {
+      "Net/ThemeName" = config.gtk.theme.name;
+      "Net/IconThemeName" = config.gtk.iconTheme.name or "Papirus-Dark";
+      "Gtk/CursorThemeName" = "Bibata-Modern-Classic";
+      "Gtk/CursorThemeSize" = 24;
+    };
 
     home.file.".icons/Dracula".source = draculaIcons;
   };
