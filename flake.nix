@@ -86,10 +86,7 @@
         in lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
-          modules = (lib.optionals (hasRole "desktop") [
-            inputs.stylix.nixosModules.stylix
-            ./modules/stylix.nix
-          ]) ++ [
+          modules = [
             snowman.nixosModules.default
             home-manager.nixosModules.home-manager
             ({ currentHost, inv, ... }: {
