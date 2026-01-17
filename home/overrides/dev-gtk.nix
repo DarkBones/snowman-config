@@ -1,48 +1,38 @@
-{ lib, config, hostRoles ? [ ], ... }:
+{ lib, config, pkgsUnstable, hostRoles ? [ ], ... }:
 let
   cfg = config.roles.dotfiles or { };
   hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
 
+  # Path to dotfiles repo
   mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
   isDev = mode == "dev";
 
-  # Path to your dotfiles repo
   repoDir = "${config.home.homeDirectory}/${cfg.dir}";
 
-  # GTK CSS file in your dotfiles
-  darklingCss = "${repoDir}/gtk/.config/darkling.css";
+  # In prod, prefer the HM-linked dotfile location (store-backed if dotfiles role is pinned)
+  darklingCssDev = "${repoDir}/gtk/.config/darkling.css";
+  darklingCssProd = "${config.home.homeDirectory}/.config/darkling.css";
 
+  importLine = path: ''@import url("file://${path}");'';
+  darklingImport =
+    importLine (if isDev then darklingCssDev else darklingCssProd);
 in {
-  imports = lib.optionals hasDesktopHost [
-    ({ lib, config, ... }: {
-      config = lib.mkIf (cfg.enable or false) {
-        # Disable Stylix GTK management so it doesn't fight us
-        stylix.targets.gtk.enable = lib.mkForce false;
-      };
-    })
-  ];
-
-  config = lib.mkIf (cfg.enable or false) {
+  config = lib.mkIf (hasDesktopHost && (cfg.enable or false)) {
+    # Let Stylix manage GTK (base theme generation)
+    stylix.targets.gtk.enable = lib.mkForce false;
 
     gtk = {
       enable = true;
 
-      # In dev mode: import from your live dotfiles
-      # In prod mode: import from Nix store (via dotfiles flake input)
-      gtk3.extraCss = if isDev then ''
-        @import url("file://${darklingCss}");
-      '' else if (cfg.sourceKey or null) != null then ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
-      '' else
-        "";
+      theme = {
+        package = pkgsUnstable.catppuccin-gtk;
+        name = "Catppuccin-Mocha-Standard-Lavender-Dark";
+      };
 
-      gtk4.extraCss = if isDev then ''
-        @import url("file://${darklingCss}");
-      '' else if (cfg.sourceKey or null) != null then ''
-        @import url("file://${config.home.homeDirectory}/.config/darkling.css");
-      '' else
-        "";
+      gtk3.extraCss = darklingImport;
+      gtk4.extraCss = darklingImport;
     };
-
+    xdg.dataFile."themes/Catppuccin".source =
+      "${pkgsUnstable.catppuccin-gtk}/share/themes";
   };
 }
