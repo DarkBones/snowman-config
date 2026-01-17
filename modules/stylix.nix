@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }: {
+{ lib, ... }: {
   stylix = {
     enable = true;
     polarity = "dark";
