@@ -10,6 +10,7 @@ in {
       lua-language-server
       stylua
       nil
+      alejandra
       nixfmt-rfc-style
 
       go
@@ -24,6 +25,8 @@ in {
       prettierd
       shellcheck
       shfmt
+
+      vscode-langservers-extracted
     ];
   };
 }

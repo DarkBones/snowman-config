@@ -20,6 +20,7 @@ in {
       ripgrep
       tmux
       tmuxinator
+      unzip
       wget
       zoxide
     ]) ++ [ neovim ];
