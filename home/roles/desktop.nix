@@ -13,7 +13,7 @@ in {
   ];
 
   config = lib.mkIf (hasDesktopHost && (config.roles.desktop.enable or false)) {
-    home.packages = with pkgsUnstable; [ ghostty playerctl spotify ];
+    home.packages = with pkgsUnstable; [ ghostty playerctl spotify inkscape ];
 
     # If you manage Hyprland config via Home Manager, add an exec-once:
     wayland.windowManager.hyprland.settings.exec-once = [
