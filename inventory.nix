@@ -24,6 +24,7 @@ rec {
       mutableUsers = false;
       users = [ "bas" "ha" ];
       hardware.boot.firmware = "efi";
+      compatibility = true;
 
       extraModules = [
         ./hosts/dorkbones.nix
