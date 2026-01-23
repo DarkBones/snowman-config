@@ -17,6 +17,8 @@ in {
       lazygit
       nmap
       nodejs_24
+      meson
+      ninja
       pkgs.git
       pnpm
       tokei
