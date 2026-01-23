@@ -127,6 +127,7 @@ rec {
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
             "wallpapers" = "wallpapers/wallpapers";
             "darkling" = "darkling/darkling";
+            "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
 
