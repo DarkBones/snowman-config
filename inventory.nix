@@ -75,6 +75,7 @@ rec {
       homeManaged = true;
       groups = [ "wheel" ];
       shell = "zsh";
+      face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
         ./users/keys/bas-arch.pub
         ./users/keys/papershift-laptop.pub
@@ -142,6 +143,7 @@ rec {
       uid = 1100;
       groups = [ ];
       shell = "bash";
+      isSystemUser = true;
 
       sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
       roles = { };
