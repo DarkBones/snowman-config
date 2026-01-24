@@ -45,6 +45,5 @@
     crimson-pro
     inter
     nerd-fonts.jetbrains-mono
-    # ttf-crimson-text
   ];
 }

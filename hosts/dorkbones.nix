@@ -61,12 +61,11 @@ in {
     };
   };
 
-  # home-manager.users.bas.imports = [ ../home/roles ../home/overrides ];
-  # home-manager.users.bas.imports = [ ../home ];
   home-manager.users.bas = {
     home.username = "bas";
     home.homeDirectory = "/home/bas";
     imports = [ ../home ];
+    systemd.user.startServices = lib.mkForce true;
   };
 
   networking = {

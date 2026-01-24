@@ -33,6 +33,7 @@ rec {
         ./modules/nvidia.nix
         ./modules/gaming.nix
         ./modules/openwebui.nix
+        ./modules/login-hyprlock.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 

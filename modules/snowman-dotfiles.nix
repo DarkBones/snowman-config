@@ -16,7 +16,7 @@ let
 
     FLAKE_REF="''${SNOWMAN_FLAKE:-''${DEFAULT_FLAKE:-${defaultFlakePath}}}"
 
-    # If HM gave you a literal "$HOME/..." string, expand it manually.
+    # If HM gave a literal "$HOME/..." string, expand it manually.
     if [[ "$FLAKE_REF" == "\$HOME/"* ]]; then
       FLAKE_REF="$HOME/''${FLAKE_REF#\$HOME/}"
     fi
