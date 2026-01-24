@@ -131,9 +131,6 @@ rec {
             "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
-
-            # GTK
-            # ".config/darkling.css" = "gtk/.config/darkling.css";
           };
         };
       };
