@@ -32,7 +32,6 @@ in {
       blueman
       adwaita-icon-theme
       hicolor-icon-theme
-      papirus-icon-theme
       networkmanagerapplet
       catppuccin-gtk
       bibata-cursors

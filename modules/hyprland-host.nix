@@ -3,7 +3,6 @@
 
   environment.systemPackages = with pkgs; [
     papirus-icon-theme
-    tela-icon-theme
     colloid-icon-theme
     xfce.xfce4-settings
   ];

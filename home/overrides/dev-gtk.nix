@@ -47,8 +47,8 @@ in {
         };
 
         iconTheme = lib.mkForce {
-          package = pkgsUnstable.papirus-icon-theme;
-          name = "Papirus-Dark";
+          package = pkgsUnstable.tela-icon-theme;
+          name = "Tela-black";
         };
 
         cursorTheme = lib.mkForce {
