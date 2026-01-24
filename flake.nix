@@ -30,7 +30,7 @@
     };
 
     bas-dotfiles = {
-      url = "github:DarkBones/dotfiles/waybar-rice";
+      url = "github:DarkBones/dotfiles";
       flake = false;
     };
 
