@@ -14,7 +14,8 @@
   in {
     EDITOR = "nvim";
     LANG = "en_US.UTF-8";
-    FLAKE = "~/Developer/snowman";
+    FLAKE = "${osConfig.users.users.bas.home}/Developer/snowman";
+    SNOWMAN_FLAKE = "${osConfig.users.users.bas.home}/snowman-config";
 
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";

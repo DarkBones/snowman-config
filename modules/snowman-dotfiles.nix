@@ -1,123 +1,85 @@
 { pkgs, currentHost, ... }:
 let
-  mode =
-    if builtins.getEnv "SNOWMAN_DOTFILES_MODE" == "dev" then "dev" else "prod";
-in {
-  environment.etc."snowman/dotfiles-mode".text = mode + "\n";
+  defaultFlakePath = "/home/bas/snowman-config";
 
-  environment.systemPackages = [
-    (pkgs.writeShellScriptBin "snowman-dotfiles" ''
-      set -euo pipefail
+  snowmanDotfiles = pkgs.writeShellScriptBin "snowman-dotfiles" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
 
-      MODE_FILE="/etc/snowman/dotfiles-mode"
-      ANCHOR="$HOME/.snowman-dotfiles-root"
+    MODE_FILE="/etc/snowman/dotfiles-mode"
+    ANCHOR="$HOME/.snowman-dotfiles-root"
+    DEFAULT_FLAKE_FILE="/etc/snowman/flake"
 
-      show_help() {
-          echo "Usage: snowman-dotfiles [dev|prod|status]"
-          echo ""
-          echo "  dev     - Enable dev mode (mutable symlinks managed by HM)"
-          echo "  prod    - Enable prod mode (immutable store links managed by HM)"
-          echo "  status  - Show declared + effective mode (via anchor link)"
-          exit 0
-      }
+    die() { echo "error: $*" >&2; exit 1; }
 
-      effective_mode() {
-          if [ ! -L "$ANCHOR" ]; then
-              echo "UNKNOWN ($ANCHOR missing)"
-              return 0
-          fi
+    DEFAULT_FLAKE="$(cat "$DEFAULT_FLAKE_FILE" 2>/dev/null || true)"
 
-          local target
-          target="$(readlink -f "$ANCHOR" 2>/dev/null || true)"
+    FLAKE_REF="''${SNOWMAN_FLAKE:-''${DEFAULT_FLAKE:-${defaultFlakePath}}}"
 
-          case "$target" in
-              "$HOME"/*)
-                  echo "DEV ($ANCHOR → $target)"
-                  ;;
-              /nix/store/*)
-                  echo "PROD ($ANCHOR → $target)"
-                  ;;
-              "")
-                  echo "UNKNOWN ($ANCHOR broken)"
-                  ;;
-              *)
-                  echo "UNKNOWN ($ANCHOR → $target)"
-                  ;;
-          esac
-      }
+    # If HM gave you a literal "$HOME/..." string, expand it manually.
+    if [[ "$FLAKE_REF" == "\$HOME/"* ]]; then
+      FLAKE_REF="$HOME/''${FLAKE_REF#\$HOME/}"
+    fi
 
-      status() {
-          local declared="UNKNOWN"
-          local effective=""
-          local target=""
+    # Expand "~/" too
+    if [[ "$FLAKE_REF" == "~/"* ]]; then
+      FLAKE_REF="$HOME/''${FLAKE_REF#~/}"
+    fi
 
-          # Read declared state (fallback)
-          if [ -r "$MODE_FILE" ]; then
-              declared="$(cat "$MODE_FILE" 2>/dev/null || true)"
-          fi
+    # Canonicalize local absolute paths
+    if [[ "$FLAKE_REF" == /* ]]; then
+      FLAKE_REF="$(readlink -f "$FLAKE_REF")"
+      [[ -e "$FLAKE_REF" ]] || die "flake path not found: $FLAKE_REF"
+    fi
 
-          # Try effective state via anchor
-          if [ -L "$ANCHOR" ]; then
-              target="$(readlink -f "$ANCHOR" 2>/dev/null || true)"
-              case "$target" in
-                  "$HOME"/*)
-                      echo "dotfiles: DEV ($ANCHOR → $target)"
-                      return 0
-                      ;;
-                  /nix/store/*)
-                      echo "dotfiles: PROD ($ANCHOR → $target)"
-                      return 0
-                      ;;
-                  "")
-                      echo "dotfiles: UNKNOWN ($ANCHOR broken)"
-                      return 0
-                      ;;
-                  *)
-                      echo "dotfiles: UNKNOWN ($ANCHOR → $target)"
-                      return 0
-                      ;;
-              esac
-          fi
+    status() {
+      if [ -L "$ANCHOR" ]; then
+        local target
+        target="$(readlink -f "$ANCHOR" 2>/dev/null || true)"
+        case "$target" in
+          "$HOME"/*)    echo "dotfiles: DEV ($ANCHOR → $target)"; return 0 ;;
+          /nix/store/*) echo "dotfiles: PROD ($ANCHOR → $target)"; return 0 ;;
+          "")           echo "dotfiles: UNKNOWN ($ANCHOR broken)"; return 0 ;;
+          *)            echo "dotfiles: UNKNOWN ($ANCHOR → $target)"; return 0 ;;
+        esac
+      fi
 
-          # No anchor → fall back to declared state
-          case "$declared" in
-              dev)
-                  echo "dotfiles: DEV (declared; anchor missing)"
-                  ;;
-              prod)
-                  echo "dotfiles: PROD (declared; anchor missing)"
-                  ;;
-              *)
-                  echo "dotfiles: UNKNOWN (no anchor, no declared state)"
-                  ;;
-          esac
-      }
-
-      if [ "$#" -eq 0 ]; then show_help; fi
-
-      MODE="$1"
-
-      case "$MODE" in
-          status)
-              status
-              exit 0
-              ;;
-          dev)
-              echo "➜ Enabling dotfiles DEV mode (SNOWMAN_DOTFILES_MODE=dev)"
-              export SNOWMAN_DOTFILES_MODE=dev
-              echo "➜ Rebuilding NixOS for host ${currentHost}..."
-              sudo -H -E nixos-rebuild switch --impure --flake ".#${currentHost}"
-              ;;
-          prod | production)
-              echo "➜ Enabling dotfiles PROD mode (unsetting SNOWMAN_DOTFILES_MODE)"
-              unset SNOWMAN_DOTFILES_MODE
-              echo "➜ Rebuilding NixOS for host ${currentHost}..."
-              sudo -H nixos-rebuild switch --flake ".#${currentHost}"
-              ;;
-          *)
-              show_help
-              ;;
+      local declared="UNKNOWN"
+      [ -r "$MODE_FILE" ] && declared="$(cat "$MODE_FILE" 2>/dev/null || true)"
+      case "$declared" in
+        dev)  echo "dotfiles: DEV (declared; anchor missing)" ;;
+        prod) echo "dotfiles: PROD (declared; anchor missing)" ;;
+        *)    echo "dotfiles: UNKNOWN (no anchor, no declared state)" ;;
       esac
-    '')
-  ];
+    }
+
+    rebuild_dev() {
+      echo "➜ Enabling dotfiles DEV mode (SNOWMAN_DOTFILES_MODE=dev)"
+      export SNOWMAN_DOTFILES_MODE=dev
+      echo "➜ Rebuilding NixOS for host ${currentHost} using flake: $FLAKE_REF"
+      sudo -H -E nixos-rebuild switch --impure --flake "$FLAKE_REF#${currentHost}"
+    }
+
+    rebuild_prod() {
+      echo "➜ Enabling dotfiles PROD mode (unsetting SNOWMAN_DOTFILES_MODE)"
+      unset SNOWMAN_DOTFILES_MODE
+      echo "➜ Rebuilding NixOS for host ${currentHost} using flake: $FLAKE_REF"
+      sudo -H nixos-rebuild switch --flake "$FLAKE_REF#${currentHost}"
+    }
+
+    case "''${1:-}" in
+      status) status ;;
+      dev) rebuild_dev ;;
+      prod|production) rebuild_prod ;;
+      ""|-h|--help)
+        echo "Usage: snowman-dotfiles [dev|prod|status]"
+        echo "Env override: SNOWMAN_FLAKE=/path/or/ref"
+        echo "Default file: $DEFAULT_FLAKE_FILE"
+        ;;
+      *) die "unknown command: $1" ;;
+    esac
+  '';
+in {
+  environment.etc."snowman/flake".text = defaultFlakePath + "\n";
+  environment.systemPackages = [ snowmanDotfiles ];
 }
