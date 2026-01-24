@@ -3,16 +3,15 @@
     "bas-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1769187932,
-        "narHash": "sha256-7d+j8qlDdCARHFDtk5r/MKodxR7KNVS7saUGFgSgA94=",
+        "lastModified": 1769278950,
+        "narHash": "sha256-AjMruP+4qvx5X+6ZtKvBp5oisX9w6x7ieNnTLJIL8KM=",
         "owner": "DarkBones",
         "repo": "dotfiles",
-        "rev": "8cff8b5205ea9f90e52079fc17e2a667ed522b4e",
+        "rev": "09dba4672b6b6a632f0850d8d0df46d9b4e05c7d",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "waybar-rice",
         "repo": "dotfiles",
         "type": "github"
       }
