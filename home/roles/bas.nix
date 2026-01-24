@@ -12,12 +12,24 @@ in {
       btop
       eza
       fzf
+      glib
+      jq
       less
-      neofetch
+      fastfetch
       networkmanager
       ripgrep
       tmux
+      tmuxinator
+      unzip
+      wget
       zoxide
     ]) ++ [ neovim ];
+
+    home.file.".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
+      owner = "tmux-plugins";
+      repo = "tpm";
+      rev = "v3.1.0";
+      sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
+    };
   };
 }

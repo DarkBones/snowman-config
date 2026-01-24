@@ -22,16 +22,29 @@ rec {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" ];
+      users = [ "bas" "ha" ];
+      hardware.boot.firmware = "efi";
+      compatibility = true;
+
+      extraModules = [
+        ./hosts/dorkbones.nix
+        ./hosts/dorkbones/boot.nix
+        ./modules/hyprland-host.nix
+        ./modules/nvidia.nix
+        ./modules/gaming.nix
+        ./modules/openwebui.nix
+        ./modules/login-hyprlock.nix
+        ({ ... }: { roles.gaming.enable = true; })
+      ];
 
       wifi = {
-        mode = "static-wifi";
+        mode = "roaming";
         networks = [ "home" ];
       };
 
       bootstrap.usb = {
         enable = true;
-        label = "SNOWMANKEY";
+        label = "SNOWMAN_KEY";
         path = "/mnt/snowman";
         keyFile = "snowman.key";
         fsType = "vfat";
@@ -46,7 +59,7 @@ rec {
       compatibility = true;
 
       wifi = {
-        mode = "static-wifi";
+        mode = "roaming";
         networks = [ "home" ];
       };
 
@@ -63,10 +76,15 @@ rec {
       homeManaged = true;
       groups = [ "wheel" ];
       shell = "zsh";
+      face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
         ./users/keys/bas-arch.pub
         ./users/keys/papershift-laptop.pub
-      ]; # TODO: Add macbook's public key
+        ./users/keys/bas-mbp.pub
+        ./users/keys/bas-dorkbones.pub
+        ./users/keys/home-assistant-pi.pub
+        ./users/keys/ha-rpi.pub
+      ];
 
       # initialPassword = "snowman";
       secrets = {
@@ -79,10 +97,14 @@ rec {
 
       roles = {
         bas.enable = true;
+        desktop.enable = true;
         dev.enable = true;
-        dev-heavy.enable = false;
-        ssh.enable = true;
+        dev-heavy.enable = true;
+        gaming.enable = true;
+        hyprland.enable = true;
+        lsp.enable = true;
         secrets.enable = true;
+        ssh.enable = true;
 
         dotfiles = {
           enable = true;
@@ -93,22 +115,36 @@ rec {
             ".fzf" = "fzf/.fzf";
             ".config/ghostty" = "ghostty/.config/ghostty";
             ".gitconfig" = "git/.gitconfig";
-            ".config/autostart" = "hyprland/.config/autostart";
+            # ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
+            ".config/swaync" = "swaync/.config/swaync";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
             ".config/starship.toml" = "starship/.config/starship.toml";
+            ".zshrc" = "zsh/.zshrc";
+            ".zsh" = "zsh/.zsh";
             # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
             ".tmux.conf" = "tmux/.tmux.conf";
             "tmux" = "tmux/tmux";
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
             "wallpapers" = "wallpapers/wallpapers";
+            "darkling" = "darkling/darkling";
+            "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
-            # TODO: zen
           };
         };
       };
+    };
+
+    ha = {
+      uid = 1100;
+      groups = [ ];
+      shell = "bash";
+      isSystemUser = true;
+
+      sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
+      roles = { };
     };
   };
 }

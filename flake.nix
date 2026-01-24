@@ -1,5 +1,5 @@
 {
-  description = "A new Snowman user configuration";
+  description = "DarkBones' Snowman Body";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -10,6 +10,14 @@
 
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs = {
+        nixpkgs.follows = "nixpkgs-unstable";
+        home-manager.follows = "home-manager";
+      };
+    };
 
     sops-nix = {
       url = "github:mic92/sops-nix";
@@ -22,13 +30,18 @@
     };
 
     bas-dotfiles = {
-      url = "github:DarkBones/dotfiles";
+      url = "github:DarkBones/dotfiles/waybar-rice";
       flake = false;
+    };
+
+    stylix = {
+      url = "github:nix-community/stylix/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs =
-    { self, nixpkgs, home-manager, sops-nix, snowman, disko, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
+    , stylix, ... }@inputs:
     let
       lib = nixpkgs.lib;
 
@@ -51,54 +64,64 @@
         };
 
       mkNixosSpecialArgs = name: attrs: {
-        inherit home-manager inv sops-nix dotfilesSources disko;
+        inherit inputs home-manager inv sops-nix dotfilesSources disko;
         pkgsUnstable = makePkgsUnstable attrs.system;
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
-
+        # extraHomeImports = [ ./home/roles ./home/overrides ];
         extraHomeImports = [ ./home/roles ./home/overrides ];
       };
 
       mkHost = name: attrs:
-        let hwFile = ./hosts/${name}-hardware-configuration.nix;
+        { strictHw ? true, }:
+        let
+          host = inv.hosts.${name};
+          hostName = host.hostname or name;
+          hwFile = ./hosts/${hostName}-hardware-configuration.nix;
+          hostRoles =
+            if host ? availableRoles then host.availableRoles else null;
+
+          hasRole = role: hostRoles == null || lib.elem role hostRoles;
         in lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
-          modules = [
-            # Snowman engine
+          modules = (lib.optionals (hasRole "desktop") [
+            inputs.stylix.nixosModules.stylix
+            ./modules/stylix.nix
+          ]) ++ [
             snowman.nixosModules.default
-
-            # Home Manager integration
             home-manager.nixosModules.home-manager
+            ({ currentHost, inv, ... }: {
+              home-manager.extraSpecialArgs = {
+                inherit inputs inv currentHost;
+                hostRoles = if inv.hosts.${currentHost} ? availableRoles then
+                  inv.hosts.${currentHost}.availableRoles
+                else
+                  null;
+              };
+            })
 
-            # Dotfiles dev/prod toggle
             ./modules/snowman-dotfiles.nix
 
-            # Per-host wrapper that:
-            #  - imports the hardware config
-            #  - asserts that it exists
             ({ lib, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
-
               home-manager.backupFileExtension = "backup";
 
-              assertions = [{
+              assertions = lib.optionals strictHw [{
                 assertion = builtins.pathExists hwFile;
                 message = ''
-                  ❌ Snowman: Hardware configuration missing for host "${name}".
+                  ❌ Snowman: Hardware configuration missing for host "${name}"
+                     (hostname "${hostName}").
 
                   Expected file:
-                    hosts/${name}-hardware-configuration.nix
+                    hosts/${hostName}-hardware-configuration.nix
 
                   Fix:
                     On the machine this NixOS install is running on, execute:
 
                       ./bin/snowman-import-hardware ${name}
-
-                    This will copy /etc/nixos/hardware-configuration.nix
-                    into the correct location in your Snowman config repo.
 
                     Then re-run:
 
@@ -108,5 +131,71 @@
             })
           ] ++ (attrs.extraModules or [ ]);
         };
-    in { nixosConfigurations = lib.mapAttrs mkHost inv.hosts; };
+
+      hostHwFile = name:
+        let
+          host = inv.hosts.${name};
+          hostName = host.hostname or name;
+        in ./hosts/${hostName}-hardware-configuration.nix;
+
+      # Only hosts that already have a committed hardware configuration.
+      # This keeps `nix flake check` from failing on machines that aren't NixOS
+      # (or on hosts you haven't imported hardware for yet).
+      hostsWithHw =
+        lib.filterAttrs (name: _: builtins.pathExists (hostHwFile name))
+        inv.hosts;
+
+    in {
+      nixosConfigurations =
+        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = false; })
+        hostsWithHw;
+
+      nixosConfigurationsAll =
+        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = true; })
+        inv.hosts;
+
+      homeConfigurations = lib.listToAttrs (lib.concatMap (hostName:
+        let host = inv.hosts.${hostName};
+        in lib.concatMap (user:
+          let
+            cfgName = "${user}@${hostName}";
+            userCfg = inv.users.${user};
+            userRoles = userCfg.roles or { };
+            enabledUserRoles =
+              lib.filterAttrs (_: roleCfg: roleCfg ? enable && roleCfg.enable)
+              userRoles;
+            hostRoleFilter = host.availableRoles or null;
+            finalRoles = if hostRoleFilter == null then
+              enabledUserRoles
+            else
+              lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
+              enabledUserRoles;
+          in [{
+            name = cfgName;
+            value = inputs.home-manager.lib.homeManagerConfiguration {
+              pkgs = makePkgs host.system or "x86_64-linux";
+
+              extraSpecialArgs = {
+                inherit inputs inv sops-nix dotfilesSources disko;
+                name = user;
+                hostRoles =
+                  if host ? availableRoles then host.availableRoles else null;
+                pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
+                currentHost = hostName;
+                sopsConfigPath = ./.sops.yaml;
+                networkSecretsPath = ./networks/secrets.yml;
+              };
+
+              modules = [
+                ({ ... }: { roles = finalRoles; })
+
+                inputs.snowman.homeModules.default
+                ./home
+                ./home/roles
+                ./home/overrides
+              ];
+            };
+          }]) (host.users or (builtins.attrNames inv.users)))
+        (builtins.attrNames inv.hosts));
+    };
 }

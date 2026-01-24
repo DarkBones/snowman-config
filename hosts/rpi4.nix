@@ -1,7 +1,8 @@
-{ pkgs, lib, ... }: {
-  imports = [ 
-    ./rpi4-hardware-configuration.nix 
-    ../modules/home-assistant.nix 
+{ pkgs, lib, ... }:
+{
+  imports = [
+    ./rpi4-hardware-configuration.nix
+    ../modules/home-assistant.nix
   ];
 
   boot = {
@@ -9,36 +10,70 @@
       grub.enable = false;
       generic-extlinux-compatible.enable = true;
     };
-    # Fixes IPv6 socket crashes
     kernelParams = [ "ipv6.disable=1" ];
   };
 
-  # Fixes Google/SSL Token Expiry issues
   time.timeZone = "Europe/Berlin";
 
   networking = {
     enableIPv6 = false;
 
-    # Fixes "Could not contact DNS servers"
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ]; # TODO: Quad 9
 
     firewall = {
       enable = true;
       allowPing = true;
-      
-      # Open HA Dashboard (8123) and SSH (22)
-      allowedTCPPorts = [ 22 8123 ];
-      
-      # Open mDNS/Cast discovery
+
+      # LAN access: SSH + Home Assistant
+      allowedTCPPorts = [
+        22
+        8123
+      ];
+
+      # LAN discovery
       allowedUDPPorts = [ 5353 ];
-      
+
       checkReversePath = "loose";
-      trustedInterfaces = [ "wlan0" ];
+
+      # Trust LAN + Tailscale interfaces
+      trustedInterfaces = [
+        "wlan0"
+        "tailscale0"
+      ];
     };
+  };
+
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
   };
 
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      # Fix timing-sensitive python packages that fail on Pi 4 hardware
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (python-final: python-prev: {
+
+          pyrate-limiter = python-prev.pyrate-limiter.overridePythonAttrs (oldAttrs: {
+            # Skip tests that depend on high-precision timing/latency
+            doCheck = false;
+          });
+
+          psycopg = python-prev.psycopg.overridePythonAttrs (oldAttrs: {
+            # Skip tests because the temporary Postgres DB fails to start in time
+            doCheck = false;
+          });
+
+        })
+      ];
+    })
+  ];
 }
