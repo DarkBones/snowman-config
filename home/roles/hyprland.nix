@@ -1,4 +1,4 @@
-{ lib, config, pkgs, pkgsUnstable, ... }:
+{ lib, config, pkgs, pkgsUnstable, inputs, ... }:
 let
   cfg = config.roles.hyprland;
 
@@ -8,35 +8,37 @@ let
     sha256 = "sha256-JUjC6oalD7teSzzdMqLTXn7eJTZQbPP/oDeLBC7bG6E=";
     stripRoot = true;
   };
+
+  awww = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
 in {
   options.roles.hyprland.enable = lib.mkEnableOption "Hyprland role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgsUnstable; [
-      waybar
-      libnotify
-      swaynotificationcenter
-      wofi
-      dunst
-      hyprpaper
-      hyprlock
-      hypridle
-      hyprshot
-      wlogout
-      wl-clipboard
-      grim
-      slurp
-      nwg-look
-      pavucontrol
-      baobab
-      blueman
-      adwaita-icon-theme
-      hicolor-icon-theme
-      networkmanagerapplet
-      catppuccin-gtk
-      bibata-cursors
-      xsettingsd
-    ];
+    home.packages = with pkgsUnstable;
+      [
+        waybar
+        libnotify
+        swaynotificationcenter
+        wofi
+        dunst
+        hyprlock
+        hypridle
+        hyprshot
+        wlogout
+        wl-clipboard
+        grim
+        slurp
+        nwg-look
+        pavucontrol
+        baobab
+        blueman
+        adwaita-icon-theme
+        hicolor-icon-theme
+        networkmanagerapplet
+        catppuccin-gtk
+        bibata-cursors
+        xsettingsd
+      ] ++ [ awww ];
 
     services.xsettingsd.enable = true;
 
