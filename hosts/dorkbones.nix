@@ -12,7 +12,7 @@ in {
       XCURSOR_THEME = "Bibata-Modern-Classic";
       XCURSOR_SIZE = lib.mkDefault 24;
     };
-    systemPackages = with pkgs; [ gparted bibata-cursors ];
+    systemPackages = with pkgs; [ parted bibata-cursors efibootmgr ];
   };
 
   programs.kdeconnect.enable = true;
