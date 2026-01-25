@@ -38,6 +38,7 @@ in {
         catppuccin-gtk
         bibata-cursors
         xsettingsd
+        file-roller
       ] ++ [ awww ];
 
     services.xsettingsd.enable = true;

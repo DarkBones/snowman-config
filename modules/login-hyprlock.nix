@@ -9,9 +9,6 @@
   services.greetd = {
     enable = true;
 
-    # greetd defaults to vt1, but being explicit makes debugging easier
-    vt = 1;
-
     settings = {
       initial_session = {
         command = "${pkgs.hyprland}/bin/Hyprland";
@@ -19,13 +16,13 @@
       };
 
       default_session = {
-        command = "${pkgs.greetd.regreet}/bin/regreet";
+        command = "${pkgs.regreet}/bin/regreet";
         user = "greeter";
       };
     };
   };
 
-  environment.systemPackages = [ pkgs.greetd.regreet ];
+  environment.systemPackages = [ pkgs.regreet ];
   programs.hyprland.enable = true;
 
   boot.kernelParams = [ "quiet" "loglevel=3" ];
