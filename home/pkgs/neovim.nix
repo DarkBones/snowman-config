@@ -9,7 +9,7 @@ in pkgs.symlinkJoin {
     wrapProgram "$out/bin/nvim" \
       --prefix PATH : ${
         pkgs.lib.makeBinPath
-        (codeiumTools ++ [ pkgs.python3 pkgs.nodejs_22 pkgs.unzip ])
+        (codeiumTools ++ [ pkgs.python3 pkgsUnstable.nodejs_24 pkgs.unzip ])
       }
   '';
 }
