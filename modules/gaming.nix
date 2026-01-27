@@ -6,7 +6,7 @@ in {
   config = lib.mkIf cfg.enable {
     programs.steam = {
       enable = true;
-      gamescopeSession.enable = true;
+      gamescopeSession.enable = false;
     };
 
     hardware.graphics = {
