@@ -22,6 +22,7 @@ in {
       tmuxinator
       unzip
       wget
+      xclip
       zoxide
     ]) ++ [ neovim ];
 
