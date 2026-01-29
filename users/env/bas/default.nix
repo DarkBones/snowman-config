@@ -3,6 +3,8 @@
     "$HOME/.local/state/nix/profiles/home-manager/bin"
     "$HOME/.nix-profile/bin"
     "$HOME/.npm-global/bin"
+    "$HOME/bin"
+    "$HOME/.local/bin"
   ];
 
   home.sessionVariables = let
