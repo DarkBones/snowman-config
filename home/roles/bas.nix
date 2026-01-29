@@ -18,6 +18,7 @@ in {
       fastfetch
       networkmanager
       ripgrep
+      taskwarrior2
       tmux
       tmuxinator
       unzip

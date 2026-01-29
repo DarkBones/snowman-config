@@ -103,6 +103,7 @@ rec {
         gaming.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
+        notes.enable = true;
         secrets.enable = true;
         ssh.enable = true;
 
@@ -132,6 +133,7 @@ rec {
             "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
+            ".taskrc" = "taskwarrior/.taskrc";
           };
         };
       };
