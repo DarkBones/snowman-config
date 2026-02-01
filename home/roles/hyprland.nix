@@ -41,6 +41,7 @@ in {
         bibata-cursors
         xsettingsd
         file-roller
+        imv
       ] ++ [ awww ];
 
     services.xsettingsd.enable = true;
