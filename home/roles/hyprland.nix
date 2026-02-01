@@ -24,6 +24,8 @@ in {
         hyprlock
         hypridle
         hyprshot
+        hyprpicker
+        swappy
         wlogout
         wl-clipboard
         grim
