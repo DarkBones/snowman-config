@@ -21,5 +21,6 @@
 
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";
+    MAIN_KEY_SECRET_PATH = maybe "darkbones_dev_key";
   };
 }

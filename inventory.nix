@@ -89,7 +89,7 @@ rec {
       # initialPassword = "snowman";
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [ "password_hash" "openai_api_key" "gemini_api_key" ];
+        keys = [ "password_hash" "openai_api_key" "gemini_api_key" "darkbones_dev_key" ];
         userPasswordHashKey = "password_hash";
       };
 
