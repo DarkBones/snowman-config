@@ -77,6 +77,7 @@ in {
       127.0.0.1 ai
       127.0.0.1 sonarr
       127.0.0.1 radarr
+      127.0.0.1 nzb
       192.168.178.66 ha
     '';
 
@@ -158,6 +159,12 @@ in {
         "radarr" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:7878";
+            proxyWebsockets = true;
+          };
+        };
+        "nzb" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:8091";
             proxyWebsockets = true;
           };
         };
