@@ -19,10 +19,6 @@ in {
   users.users.sabnzbd.extraGroups = [ "media" ];
 
   systemd.tmpfiles.rules = [
-    "d /srv/media 2775 bas media -"
-    "d /srv/media/Series 2775 bas media -"
-    "d /srv/media/Movies 2775 bas media -"
-
     "z /srv/media 2775 bas media -"
     "z /srv/media/Series 2775 bas media -"
     "z /srv/media/Movies 2775 bas media -"
@@ -31,6 +27,10 @@ in {
     "d /var/lib/sabnzbd/logs 0750 sabnzbd sabnzbd -"
 
     "C /var/lib/sabnzbd/sabnzbd.ini 0640 sabnzbd sabnzbd - ${sabConfig}"
+
+    "d /srv/downloads 2775 sabnzbd media -"
+    "d /srv/downloads/incomplete 2775 sabnzbd media -"
+    "d /srv/downloads/complete 2775 sabnzbd media -"
   ];
 
   system.activationScripts.sabnzbdConfig = lib.stringAfter [ "var" ] ''
@@ -54,6 +54,11 @@ in {
       enable = true;
       openFirewall = false;
       configFile = "/var/lib/sabnzbd/sabnzbd.ini";
+    };
+
+    prowlarr = {
+      enable = true;
+      openFirewall = false;
     };
   };
 }
