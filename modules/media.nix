@@ -12,8 +12,6 @@ let
     complete_dir = /srv/downloads/complete
 
     umask = 002
-    permissions = 664
-    folder_permissions = 775
   '';
 in {
   users.groups.media = { };
@@ -33,27 +31,55 @@ in {
     "d /var/lib/sabnzbd 0750 sabnzbd sabnzbd -"
     "d /var/lib/sabnzbd/logs 0750 sabnzbd sabnzbd -"
 
-    # sab config (copied from store, replacing if different)
-    "C /var/lib/sabnzbd/sabnzbd.ini 0640 sabnzbd sabnzbd - ${sabConfig}"
-
-    # downloads (NOTE: use z so it also fixes perms on rebuild)
+    # downloads
     "z /srv/downloads 2775 sabnzbd media -"
     "z /srv/downloads/incomplete 2775 sabnzbd media -"
     "z /srv/downloads/complete 2775 sabnzbd media -"
   ];
 
+  system.activationScripts.fixDownloadPerms = lib.stringAfter [ "var" ] ''
+    set -euo pipefail
+
+    # Ensure base dirs are correct
+    install -d -m 2775 -o sabnzbd -g media /srv/downloads
+    install -d -m 2775 -o sabnzbd -g media /srv/downloads/incomplete
+    install -d -m 2775 -o sabnzbd -g media /srv/downloads/complete
+
+    # Repair whatever SAB created earlier with restrictive perms/ownership
+    chown -R sabnzbd:media /srv/downloads
+    chmod -R u+rwX,g+rwX,o-rwx /srv/downloads
+    find /srv/downloads -type d -exec chmod 2775 {} +
+  '';
+
   services.sabnzbd = {
     enable = true;
     openFirewall = false;
     configFile = "/var/lib/sabnzbd/sabnzbd.ini";
-
-    # Key bit: run with the shared group
-    group = "media";
     user = "sabnzbd";
+    group = "media";
   };
 
-  # Key bit: force a sane umask no matter what SAB thinks it wants
-  systemd.services.sabnzbd.serviceConfig.UMask = "0002";
+  systemd.services.sabnzbd = {
+    serviceConfig = {
+      UMask = "0002";
+      SupplementaryGroups = [ "media" ];
+    };
+
+    preStart = ''
+      set -euo pipefail
+
+      # Ensure dirs exist with correct ownership/perms
+      install -d -m 0750 -o sabnzbd -g media /var/lib/sabnzbd
+      install -d -m 0750 -o sabnzbd -g media /var/lib/sabnzbd/logs
+
+      install -d -m 2775 -o sabnzbd -g media /srv/downloads
+      install -d -m 2775 -o sabnzbd -g media /srv/downloads/incomplete
+      install -d -m 2775 -o sabnzbd -g media /srv/downloads/complete
+
+      # Always enforce canonical config at startup
+      install -m 0640 -o sabnzbd -g media ${sabConfig} /var/lib/sabnzbd/sabnzbd.ini
+    '';
+  };
 
   services.sonarr = {
     enable = true;

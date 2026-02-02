@@ -13,9 +13,15 @@ in {
   ];
 
   config = lib.mkIf (hasDesktopHost && (config.roles.desktop.enable or false)) {
-    home.packages = with pkgsUnstable; [ ghostty gnome-calculator inkscape playerctl spotify ];
+    home.packages = with pkgsUnstable; [
+      ghostty
+      gnome-calculator
+      inkscape
+      playerctl
+      spotify
+      vlc
+    ];
 
-    # If you manage Hyprland config via Home Manager, add an exec-once:
     wayland.windowManager.hyprland.settings.exec-once = [
       "${pkgsUnstable.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
     ];
