@@ -24,6 +24,8 @@ in {
         hyprlock
         hypridle
         hyprshot
+        hyprpicker
+        swappy
         wlogout
         wl-clipboard
         grim
@@ -39,6 +41,7 @@ in {
         bibata-cursors
         xsettingsd
         file-roller
+        imv
       ] ++ [ awww ];
 
     services.xsettingsd.enable = true;
@@ -51,5 +54,11 @@ in {
     };
 
     home.file.".icons/Dracula".source = draculaIcons;
+    home.activation.ensureScreenshotDir =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p "$HOME/Pictures/Screenshots"
+      '';
+    home.sessionVariables.HYPRSHOT_DIR = "$HOME/Pictures/Screenshots";
   };
+
 }
