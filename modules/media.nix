@@ -1,6 +1,8 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
-  sabConfig = pkgs.writeText "sabnzbd.ini" ''
+  sabSeedConfig = pkgs.writeText "sabnzbd.ini" ''
+    __encoding__ = utf-8
+    __version__ = 19
     [misc]
     host = 127.0.0.1
     port = 8091
@@ -12,6 +14,8 @@ let
     complete_dir = /srv/downloads/complete
 
     umask = 002
+    permissions = 664
+    folder_permissions = 775
   '';
 in {
   users.groups.media = { };
@@ -21,35 +25,25 @@ in {
   users.users.radarr.extraGroups = [ "media" ];
   users.users.sabnzbd.extraGroups = [ "media" ];
 
+  # Base directories
   systemd.tmpfiles.rules = [
     # media library
-    "z /srv/media 2775 bas media -"
-    "z /srv/media/Series 2775 bas media -"
-    "z /srv/media/Movies 2775 bas media -"
+    "d /srv/media 2775 bas media -"
+    "d /srv/media/Series 2775 bas media -"
+    "d /srv/media/Movies 2775 bas media -"
 
-    # sabnzbd state/logs
-    "d /var/lib/sabnzbd 0750 sabnzbd sabnzbd -"
-    "d /var/lib/sabnzbd/logs 0750 sabnzbd sabnzbd -"
+    # sab state/logs
+    "d /var/lib/sabnzbd 0750 sabnzbd media -"
+    "d /var/lib/sabnzbd/logs 0750 sabnzbd media -"
+
+    # seed config ONCE if missing (do not overwrite, avoids reconfigure wizard)
+    "C /var/lib/sabnzbd/sabnzbd.ini 0640 sabnzbd media - ${sabSeedConfig}"
 
     # downloads
-    "z /srv/downloads 2775 sabnzbd media -"
-    "z /srv/downloads/incomplete 2775 sabnzbd media -"
-    "z /srv/downloads/complete 2775 sabnzbd media -"
+    "d /srv/downloads 2775 sabnzbd media -"
+    "d /srv/downloads/incomplete 2775 sabnzbd media -"
+    "d /srv/downloads/complete 2775 sabnzbd media -"
   ];
-
-  system.activationScripts.fixDownloadPerms = lib.stringAfter [ "var" ] ''
-    set -euo pipefail
-
-    # Ensure base dirs are correct
-    install -d -m 2775 -o sabnzbd -g media /srv/downloads
-    install -d -m 2775 -o sabnzbd -g media /srv/downloads/incomplete
-    install -d -m 2775 -o sabnzbd -g media /srv/downloads/complete
-
-    # Repair whatever SAB created earlier with restrictive perms/ownership
-    chown -R sabnzbd:media /srv/downloads
-    chmod -R u+rwX,g+rwX,o-rwx /srv/downloads
-    find /srv/downloads -type d -exec chmod 2775 {} +
-  '';
 
   services.sabnzbd = {
     enable = true;
@@ -59,40 +53,70 @@ in {
     group = "media";
   };
 
-  systemd.services.sabnzbd = {
-    serviceConfig = {
-      UMask = "0002";
-      SupplementaryGroups = [ "media" ];
-    };
+  # Make systemd default umask sane (even if SAB tries something weird)
+  systemd.services.sabnzbd.serviceConfig = {
+    UMask = "0002";
+    SupplementaryGroups = [ "media" ];
+  };
 
-    preStart = ''
+  # One-shot permission repair service
+  systemd.services.sabnzbd-fixperms = {
+    description = "Repair SABnzbd download permissions for Sonarr/Radarr";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+    script = ''
       set -euo pipefail
 
-      # Ensure dirs exist with correct ownership/perms
-      install -d -m 0750 -o sabnzbd -g media /var/lib/sabnzbd
-      install -d -m 0750 -o sabnzbd -g media /var/lib/sabnzbd/logs
+      # Ownership
+      chown -R sabnzbd:media /srv/downloads
 
-      install -d -m 2775 -o sabnzbd -g media /srv/downloads
-      install -d -m 2775 -o sabnzbd -g media /srv/downloads/incomplete
-      install -d -m 2775 -o sabnzbd -g media /srv/downloads/complete
+      # rwX for user+group, nothing for others
+      chmod -R u+rwX,g+rwX,o-rwx /srv/downloads
 
-      # Always enforce canonical config at startup
-      install -m 0640 -o sabnzbd -g media ${sabConfig} /var/lib/sabnzbd/sabnzbd.ini
+      # Ensure setgid on directories so new files inherit group=media
+      find /srv/downloads -type d -exec chmod 2775 {} +
     '';
   };
+
+  # Trigger the fixer whenever SAB writes into these dirs
+  systemd.paths.sabnzbd-fixperms = {
+    description = "Watch SABnzbd folders and trigger permission repair";
+    wantedBy = [ "multi-user.target" ];
+    pathConfig = {
+      PathChanged = [ "/srv/downloads/incomplete" "/srv/downloads/complete" ];
+    };
+  };
+
+  # Associate the path unit with the service it should start
+  systemd.paths.sabnzbd-fixperms.unitConfig.Unit = "sabnzbd-fixperms.service";
 
   services.sonarr = {
     enable = true;
     openFirewall = false;
     dataDir = "/var/lib/sonarr";
   };
+
   services.radarr = {
     enable = true;
     openFirewall = false;
     dataDir = "/var/lib/radarr";
   };
+
   services.prowlarr = {
     enable = true;
     openFirewall = false;
   };
+
+  assertions = [
+    {
+      assertion = config.services.sabnzbd.user == "sabnzbd";
+      message = "SAB must run as user sabnzbd (permission model assumes this).";
+    }
+    {
+      assertion = config.services.sabnzbd.group == "media";
+      message = "SAB must run with group=media (shared access).";
+    }
+  ];
 }
