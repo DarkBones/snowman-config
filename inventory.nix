@@ -103,7 +103,6 @@ rec {
         gaming.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
-        notes.enable = true;
         secrets.enable = true;
         ssh.enable = true;
 
