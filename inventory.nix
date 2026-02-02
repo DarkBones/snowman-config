@@ -34,8 +34,7 @@ rec {
         ./modules/gaming.nix
         ./modules/openwebui.nix
         ./modules/login-hyprlock.nix
-        ./modules/radarr.nix
-        ./modules/sonarr.nix
+        ./modules/media.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
