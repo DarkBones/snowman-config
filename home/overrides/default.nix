@@ -7,5 +7,6 @@ let
     type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix")
     entries;
 
-  modules = map (name: here + "/${name}") (lib.attrNames nixFiles);
+  modules = map (name: here + "/${name}")
+    (lib.sort (a: b: a < b) (lib.attrNames nixFiles));
 in { imports = modules; }
