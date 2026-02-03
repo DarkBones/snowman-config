@@ -75,7 +75,7 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [ "wheel" ];
+      groups = [ "wheel" "media" ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
@@ -90,7 +90,13 @@ rec {
       # initialPassword = "snowman";
       secrets = {
         sopsFile = ./users/secrets/bas_secrets.yml;
-        keys = [ "password_hash" "openai_api_key" "gemini_api_key" "nzb_geek_username" "nzb_geek_key" ];
+        keys = [
+          "password_hash"
+          "openai_api_key"
+          "gemini_api_key"
+          "nzb_geek_username"
+          "nzb_geek_key"
+        ];
         userPasswordHashKey = "password_hash";
       };
 

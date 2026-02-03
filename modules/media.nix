@@ -28,21 +28,21 @@ in {
   # Base directories
   systemd.tmpfiles.rules = [
     # media library
-    "d /srv/media 2775 bas media -"
-    "d /srv/media/Series 2775 bas media -"
-    "d /srv/media/Movies 2775 bas media -"
+    "z /srv/media 2775 bas media -"
+    "z /srv/media/Series 2775 bas media -"
+    "z /srv/media/Movies 2775 bas media -"
 
     # sab state/logs
     "d /var/lib/sabnzbd 0750 sabnzbd media -"
     "d /var/lib/sabnzbd/logs 0750 sabnzbd media -"
 
-    # seed config ONCE if missing (do not overwrite, avoids reconfigure wizard)
+    # seed config ONCE if missing
     "C /var/lib/sabnzbd/sabnzbd.ini 0640 sabnzbd media - ${sabSeedConfig}"
 
     # downloads
-    "d /srv/downloads 2775 sabnzbd media -"
-    "d /srv/downloads/incomplete 2775 sabnzbd media -"
-    "d /srv/downloads/complete 2775 sabnzbd media -"
+    "z /srv/downloads 2775 sabnzbd media -"
+    "z /srv/downloads/incomplete 2775 sabnzbd media -"
+    "z /srv/downloads/complete 2775 sabnzbd media -"
   ];
 
   services.sabnzbd = {
@@ -77,6 +77,26 @@ in {
 
       # Ensure setgid on directories so new files inherit group=media
       find /srv/downloads -type d -exec chmod 2775 {} +
+    '';
+  };
+
+  systemd.services.media-acl = {
+    description = "Set default ACLs on /srv/media and /srv/downloads";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "local-fs.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+    script = ''
+      set -euo pipefail
+
+      # Directories: allow traversal + read; files: allow read
+      ${pkgs.acl}/bin/setfacl -R -m g:media:rwx /srv/media /srv/downloads
+      ${pkgs.acl}/bin/setfacl -R -d -m g:media:rwx /srv/media /srv/downloads
+
+      # make sure "other" stays locked down
+      ${pkgs.acl}/bin/setfacl -R -m o::--- /srv/downloads || true
     '';
   };
 
