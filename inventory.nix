@@ -35,6 +35,7 @@ rec {
         ./modules/openwebui.nix
         ./modules/login-hyprlock.nix
         ./modules/media.nix
+        ./modules/plex.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 

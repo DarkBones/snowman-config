@@ -78,6 +78,7 @@ in {
       127.0.0.1 sonarr
       127.0.0.1 radarr
       127.0.0.1 nzb
+      127.0.0.1 plex
       192.168.178.66 ha
     '';
 
@@ -165,6 +166,12 @@ in {
         "nzb" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:8091";
+            proxyWebsockets = true;
+          };
+        };
+        "plex" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:32400";
             proxyWebsockets = true;
           };
         };
