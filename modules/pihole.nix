@@ -3,6 +3,11 @@
 
   networking.nameservers = [ "127.0.0.1" "1.1.1.1" ];
 
+  environment.etc."pihole/hosts/99-local.conf".text = ''
+    192.168.178.63 pihole
+    192.168.178.63 ha
+  '';
+
   services.pihole-ftl = {
     enable = true;
     openFirewallDNS = true;
