@@ -15,7 +15,11 @@
       };
 
       # Optional: local host overrides
-      hosts = [ "192.168.178.63 ha" "192.168.178.63 pihole" ];
+      # hosts = [ "192.168.178.63 ha" "192.168.178.63 pihole" ];
+      services.pihole-ftl.settings.hosts = {
+        ha = "192.168.178.63";
+        pihole = "192.168.178.63";
+      };
     };
 
     lists = [{
