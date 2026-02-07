@@ -14,18 +14,8 @@
         interface = "end0";
       };
 
-      services.pihole-ftl.settings = {
-        dns = {
-          upstreams = [ "1.1.1.1" "1.0.0.1" ];
-          listeningMode = "LOCAL";
-          interface = "end0";
-        };
-
-        hosts = {
-          pihole = "192.168.178.63";
-          ha = "192.168.178.63";
-        };
-      };
+      # Local DNS entries
+      hosts = [ "192.168.178.63 pihole" "192.168.178.63 ha" ];
     };
 
     lists = [{
@@ -34,7 +24,7 @@
       type = "block";
       enabled = true;
       description = "HaGeZi pro";
-    }]; # TODO: Find more lists
+    }];
   };
 
   services.pihole-web = {
