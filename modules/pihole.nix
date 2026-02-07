@@ -11,7 +11,7 @@
       dns = {
         upstreams = [ "1.1.1.1" "1.0.0.1" ];
         listeningMode = "LOCAL";
-        interface = "eth0";
+        interface = "end0";
       };
 
       # Optional: local host overrides
