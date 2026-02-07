@@ -1,5 +1,4 @@
-{ lib, config, ... }: {
-  # Pi-hole wants port 53. systemd-resolved can grab it, so don’t let it.
+{ lib, ... }: {
   services.resolved.enable = lib.mkForce false;
 
   networking.nameservers = [ "127.0.0.1" "1.1.1.1" ];
@@ -9,15 +8,14 @@
     openFirewallDNS = true;
 
     settings = {
-      dns.upstreams = [ "1.1.1.1" "1.0.0.1" ];
-
-      dns.listeningMode = "BIND";
+      dns = {
+        upstreams = [ "1.1.1.1" "1.0.0.1" ];
+        listeningMode = "LOCAL";
+        interface = "eth0";
+      };
 
       # Optional: local host overrides
-      hosts = [
-        "192.168.178.66 ha"
-        # TODO: Add pihole host?
-      ];
+      hosts = [ "192.168.178.63 ha" "192.168.178.63 pihole" ];
     };
 
     lists = [{
