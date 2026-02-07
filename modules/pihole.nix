@@ -14,11 +14,17 @@
         interface = "end0";
       };
 
-      # Optional: local host overrides
-      # hosts = [ "192.168.178.63 ha" "192.168.178.63 pihole" ];
-      services.pihole-ftl.settings.hosts = {
-        ha = "192.168.178.63";
-        pihole = "192.168.178.63";
+      services.pihole-ftl.settings = {
+        dns = {
+          upstreams = [ "1.1.1.1" "1.0.0.1" ];
+          listeningMode = "LOCAL";
+          interface = "end0";
+        };
+
+        hosts = {
+          pihole = "192.168.178.63";
+          ha = "192.168.178.63";
+        };
       };
     };
 
