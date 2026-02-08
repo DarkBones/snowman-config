@@ -36,6 +36,7 @@ rec {
         ./modules/login-hyprlock.nix
         ./modules/media.nix
         ./modules/plex.nix
+        ./modules/audiobookshelf.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
