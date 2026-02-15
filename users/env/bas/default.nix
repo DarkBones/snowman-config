@@ -21,5 +21,5 @@ let
 in {
   home.sessionVariables = vars;
 
-  systemd.user.sessionVariables = lib.mkIf pkgs.stdenv.isLinux vars;
+  systemd.user.sessionVariables = vars;
 }

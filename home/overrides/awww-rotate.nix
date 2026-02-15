@@ -1,5 +1,5 @@
 { lib, config, pkgs, inputs, ... }:
-let wallpaperDir = "${config.home.homeDirectory}/wallpapers/";
+let wallpaperDir = "${config.home.homeDirectory}/wallpapers";
 in {
   config =
     lib.mkIf (pkgs.stdenv.isLinux && (config.roles.hyprland.enable or false))
