@@ -1,4 +1,4 @@
-{ osConfig, lib, ... }:
+{ osConfig, lib, pkgs, ... }:
 let
   maybe = name:
     if lib.hasAttr name osConfig.sops.secrets then
@@ -20,6 +20,5 @@ let
   };
 in {
   home.sessionVariables = vars;
-
-  systemd.user.sessionVariables = vars;
+  systemd.user.sessionVariables = lib.mkIf pkgs.stdenv.isLinux vars;
 }
