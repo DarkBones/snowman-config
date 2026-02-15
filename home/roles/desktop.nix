@@ -1,17 +1,19 @@
-{ lib, pkgsUnstable, config, inputs, pkgs, hostRoles ? [ ], ... }:
+{ lib, pkgsUnstable, config, inputs, hostRoles ? [ ], ... }:
 let
   hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
   cfg = config.roles.desktop;
 
+  system = builtins.currentSystem or "";
+  isLinux = lib.hasInfix "linux" system;
+  isDarwin = lib.hasInfix "darwin" system;
+
   commonPkgs = with pkgsUnstable; [ ghostty spotify vlc ];
-
   linuxPkgs = with pkgsUnstable; [ gnome-calculator inkscape playerctl ];
-
   darwinPkgs = with pkgsUnstable; [ wezterm ];
 in {
   options.roles.desktop.enable = lib.mkEnableOption "Desktop role";
 
-  imports = lib.optionals (hasDesktopHost && pkgs.stdenv.isLinux) [
+  imports = lib.optionals (hasDesktopHost && isLinux) [
     inputs.zen-browser.homeModules.twilight
     ({ lib, config, ... }: {
       config = lib.mkIf (config.roles.desktop.enable or false) {
@@ -21,7 +23,7 @@ in {
   ];
 
   config = lib.mkIf (hasDesktopHost && cfg.enable) {
-    home.packages = commonPkgs ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
-      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs;
+    home.packages = commonPkgs ++ lib.optionals isLinux linuxPkgs
+      ++ lib.optionals isDarwin darwinPkgs;
   };
 }

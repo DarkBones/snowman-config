@@ -61,11 +61,15 @@ in {
     };
   };
 
-  home-manager.users.bas = {
-    home.username = "bas";
-    home.homeDirectory = "/home/bas";
-    imports = [ ../home ];
-    systemd.user.startServices = lib.mkForce true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.bas = {
+      home.username = "bas";
+      home.homeDirectory = "/home/bas";
+      imports = [ ../home ];
+      systemd.user.startServices = lib.mkForce true;
+    };
   };
 
   networking = {
