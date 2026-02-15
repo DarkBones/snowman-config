@@ -1,6 +1,12 @@
 { config, lib, pkgs, ... }: {
   home.username = lib.mkDefault "bas";
-  home.homeDirectory = lib.mkDefault "/home/bas";
+
+  # Linux vs macOS default home dir
+  home.homeDirectory = lib.mkDefault (if pkgs.stdenv.isDarwin then
+    "/Users/${config.home.username}"
+  else
+    "/home/${config.home.username}");
+
   home.stateVersion = lib.mkDefault "25.05";
 
   imports = [ ./roles ./overrides ];
