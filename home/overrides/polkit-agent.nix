@@ -1,7 +1,7 @@
 { lib, pkgs, config, ... }:
 let agent = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
 in {
-  config = lib.mkIf (config.roles.desktop.enable or false) {
+  config = lib.mkIf (pkgs.stdenv.isLinux && config.roles.desktop.enable or false) {
     home.packages = [ pkgs.polkit_gnome ];
 
     systemd.user.services.polkit-gnome-agent = {
