@@ -8,7 +8,7 @@ in {
 
       awwwSetRandom = pkgs.writeShellScriptBin "awww-set-random" ''
         set -euo pipefail
-        dir="${wallpaperDir}"
+        dir="${wallpaperDir}/"
         echo "[awww-set-random] dir=$dir" >&2
 
         if [ ! -d "$dir" ]; then
