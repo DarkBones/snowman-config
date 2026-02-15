@@ -15,20 +15,14 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [
-        "bas"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "ssh" ];
     };
 
     dorkbones = {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [
-        "bas"
-        "ha"
-      ];
+      users = [ "bas" "ha" ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -43,12 +37,7 @@ rec {
         ./modules/media.nix
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
-        (
-          { ... }:
-          {
-            roles.gaming.enable = true;
-          }
-        )
+        ({ ... }: { roles.gaming.enable = true; })
       ];
 
       wifi = {
@@ -77,13 +66,7 @@ rec {
         networks = [ "home" ];
       };
 
-      availableRoles = [
-        "bas"
-        "secrets"
-        "dev"
-        "dotfiles"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
 
       extraModules = [
@@ -98,14 +81,7 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles = [
-        "bas"
-        "dev"
-        "dev-heavy"
-        "lsp"
-        "dotfiles"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" ];
     };
   };
 
@@ -113,10 +89,7 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [
-        "wheel"
-        "media"
-      ];
+      groups = [ "wheel" "media" ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
