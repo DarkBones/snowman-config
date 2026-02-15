@@ -2,14 +2,16 @@
 .keys:
   snowmankey_usb: &snowmankey_usb age1h3y9z9qx9jpkr8qgvptjlmpy9m5yx5vv0crhfwhjug50q20smc2qzncecg
   bas_dorkbones: &bas_dorkbones age1hhn93yt6fctv0t6a8wmtyrpznvtnc0hdg9z80m4dc5wtpad9kfwsqyc9le
+  bas_rpi4: &bas_rpi4 age1ng290vq2490n59nfevejcdsn0xqv5azeuyctsp0rpncaskqfv59sckp52l
 
   dorkbones: &dorkbones age1dv57l6fqyps0sdygr4c5qyt4rznycq29e3q8nrja69tzt49gwdgsvyey2x
-  rpi4: &rpi4 age1gq9v2s559taw698zz502ugf707ceszy24usgqp26jqvwhsp35f8snnzgl3
+  rpi4: &rpi4 age1kkxkn9qwd3gwpfjv5ju36yk0ufvnpedqf5rnlqswvfg9hwzwwfqsljyst5
 
 # Groups
 .user_keys: &user_keys
   - *snowmankey_usb
   - *bas_dorkbones
+  - *bas_rpi4
 
 .host_keys: &host_keys
   - *dorkbones

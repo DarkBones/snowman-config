@@ -36,6 +36,7 @@ rec {
         ./modules/login-hyprlock.nix
         ./modules/media.nix
         ./modules/plex.nix
+        ./modules/audiobookshelf.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
@@ -68,7 +69,8 @@ rec {
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
 
-      extraModules = [ ./hosts/rpi4.nix ./modules/home-assistant.nix ];
+      extraModules =
+        [ ./hosts/rpi4.nix ./modules/home-assistant.nix ./modules/pihole.nix ];
     };
   };
 

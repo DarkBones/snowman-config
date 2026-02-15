@@ -77,9 +77,11 @@ in {
       127.0.0.1 ai
       127.0.0.1 sonarr
       127.0.0.1 radarr
+      127.0.0.1 shelf
       127.0.0.1 nzb
       127.0.0.1 plex
-      192.168.178.66 ha
+      192.168.178.63 ha
+      192.168.178.63 pihole
     '';
 
     firewall = {
@@ -87,7 +89,7 @@ in {
       allowPing = true;
 
       # LAN access: SSH
-      allowedTCPPorts = [ 22 80 ];
+      allowedTCPPorts = [ 22 80 13378 ];
 
       # LAN discovery
       allowedUDPPorts = [ 5353 ];
@@ -141,7 +143,7 @@ in {
           serverName = "ha";
 
           locations."/" = {
-            proxyPass = "http://192.168.178.66:8123";
+            proxyPass = "http://192.168.178.63:8123";
             proxyWebsockets = true;
             extraConfig = ''
               proxy_set_header Host $host;
@@ -149,6 +151,14 @@ in {
               proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header X-Forwarded-Host $host;
             '';
+          };
+        };
+        "pihole" = {
+          serverName = "pihole";
+
+          locations."/" = {
+            proxyPass = "http://192.168.178.63";
+            proxyWebsockets = true;
           };
         };
         "sonarr" = {
@@ -160,6 +170,12 @@ in {
         "radarr" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:7878";
+            proxyWebsockets = true;
+          };
+        };
+        "shelf" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:13378";
             proxyWebsockets = true;
           };
         };

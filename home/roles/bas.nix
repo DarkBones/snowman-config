@@ -11,6 +11,7 @@ in {
       bat
       btop
       eza
+      dnsutils
       fzf
       glib
       jq
