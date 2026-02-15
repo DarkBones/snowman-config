@@ -1,10 +1,4 @@
-{
-  lib,
-  pkgs,
-  pkgsUnstable,
-  config,
-  ...
-}:
+{ lib, pkgs, pkgsUnstable, config, ... }:
 let
   cfg = config.roles.bas;
 
@@ -26,24 +20,15 @@ let
     zoxide
   ];
 
-  linuxPkgs = with pkgsUnstable; [
-    dnsutils
-    networkmanager
-    xclip
-  ];
+  linuxPkgs = with pkgsUnstable; [ dnsutils networkmanager xclip ];
 
-  darwinPkgs = with pkgsUnstable; [
-  ];
-in
-{
+  darwinPkgs = with pkgsUnstable; [ ];
+in {
   options.roles.bas.enable = lib.mkEnableOption "Bas role";
 
   config = lib.mkIf cfg.enable {
-    home.packages =
-      commonPkgs
-      ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
-      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
-      ++ [ neovim ];
+    home.packages = commonPkgs ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
+      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs ++ [ neovim ];
 
     home.file.".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";

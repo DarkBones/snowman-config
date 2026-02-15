@@ -1,10 +1,4 @@
-{
-  lib,
-  pkgs,
-  pkgsUnstable,
-  config,
-  ...
-}:
+{ lib, pkgs, pkgsUnstable, config, ... }:
 let
   cfg = config.roles.dev;
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
@@ -26,20 +20,14 @@ let
     tokei
   ];
 
-  linuxPkgs = with pkgsUnstable; [
-    gcc
-  ];
+  linuxPkgs = with pkgsUnstable; [ gcc ];
 
   darwinPkgs = with pkgsUnstable; [ ];
-in
-{
+in {
   options.roles.dev.enable = lib.mkEnableOption "Dev role";
 
   config = lib.mkIf cfg.enable {
-    home.packages =
-      commonPkgs
-      ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
-      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
-      ++ [ neovim ];
+    home.packages = commonPkgs ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
+      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs ++ [ neovim ];
   };
 }

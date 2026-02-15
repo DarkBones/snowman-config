@@ -1,9 +1,9 @@
 { lib, config, pkgs, inputs, ... }:
-let
-  wallpaperDir = "${config.home.homeDirectory}/wallpapers/";
+let wallpaperDir = "${config.home.homeDirectory}/wallpapers/";
 in {
-  config = lib.mkIf (pkgs.stdenv.isLinux && (config.roles.hyprland.enable or false)) (
-    let
+  config =
+    lib.mkIf (pkgs.stdenv.isLinux && (config.roles.hyprland.enable or false))
+    (let
       awww = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
 
       awwwSetRandom = pkgs.writeShellScriptBin "awww-set-random" ''
@@ -60,6 +60,5 @@ in {
         };
         Install.WantedBy = [ "timers.target" ];
       };
-    }
-  );
+    });
 }
