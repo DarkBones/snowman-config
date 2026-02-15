@@ -5,8 +5,6 @@
 
   imports = [ ./roles ./overrides ];
 
-  roles.desktop.enable = lib.mkDefault true;
-  roles.hyprland.enable = lib.mkDefault true;
   roles.dotfiles.enable = lib.mkDefault true;
 
   programs.home-manager.enable = true;

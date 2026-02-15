@@ -1,6 +1,10 @@
 { pkgs, pkgsUnstable }:
-let codeiumTools = with pkgs; [ curl gzip util-linux coreutils ];
-in pkgs.symlinkJoin {
+let
+  codeiumTools = with pkgs;
+    [ curl gzip coreutils ]
+    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ util-linux ];
+in
+pkgs.symlinkJoin {
   name = "neovim";
   paths = [ pkgsUnstable.neovim ];
   buildInputs = [ pkgs.makeWrapper ];
