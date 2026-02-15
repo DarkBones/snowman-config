@@ -17,6 +17,47 @@ let
     permissions = 664
     folder_permissions = 775
   '';
+
+  moveCompleted = name: src: dst: {
+    description = "Move SAB completed ${name} into media library";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+    script = ''
+      set -euo pipefail
+
+      SRC="${src}"
+      DST="${dst}"
+
+      [ -d "$SRC" ] || exit 0
+      mkdir -p "$DST"
+
+      shopt -s nullglob
+
+      for item in "$SRC"/*; do
+        base="$(basename "$item")"
+
+        # Skip if destination already exists (idempotent, safe)
+        if [ -e "$DST/$base" ]; then
+          echo "[media-move:${name}] skip existing: $base"
+          continue
+        fi
+
+        echo "[media-move:${name}] move: $base"
+        mv "$item" "$DST/"
+
+        # Normalize ownership + perms to match your shared-media model
+        chown -R bas:media "$DST/$base" || true
+
+        # Ensure directories are setgid so group=media inherits
+        if [ -d "$DST/$base" ]; then
+          find "$DST/$base" -type d -exec chmod 2775 {} + || true
+          find "$DST/$base" -type f -exec chmod 664 {} + || true
+        fi
+      done
+    '';
+  };
 in {
   users.groups.media = { };
 
@@ -99,6 +140,30 @@ in {
       ${pkgs.acl}/bin/setfacl -R -m o::--- /srv/downloads || true
     '';
   };
+
+  # --- Move completed Audiobooks into /srv/media/Audiobooks ---
+  systemd.services.media-move-audiobooks =
+    moveCompleted "audiobooks" "/srv/downloads/complete/audiobooks"
+    "/srv/media/Audiobooks";
+
+  systemd.paths.media-move-audiobooks = {
+    description = "Watch SAB completed audiobooks folder";
+    wantedBy = [ "multi-user.target" ];
+    pathConfig = { PathChanged = "/srv/downloads/complete/audiobooks"; };
+  };
+  systemd.paths.media-move-audiobooks.unitConfig.Unit =
+    "media-move-audiobooks.service";
+
+  # --- Move completed Ebooks into /srv/media/Ebooks ---
+  systemd.services.media-move-ebooks =
+    moveCompleted "ebooks" "/srv/downloads/complete/ebooks" "/srv/media/Ebooks";
+
+  systemd.paths.media-move-ebooks = {
+    description = "Watch SAB completed ebooks folder";
+    wantedBy = [ "multi-user.target" ];
+    pathConfig = { PathChanged = "/srv/downloads/complete/ebooks"; };
+  };
+  systemd.paths.media-move-ebooks.unitConfig.Unit = "media-move-ebooks.service";
 
   # Trigger the fixer whenever SAB writes into these dirs
   systemd.paths.sabnzbd-fixperms = {

@@ -89,7 +89,7 @@ in {
       allowPing = true;
 
       # LAN access: SSH
-      allowedTCPPorts = [ 22 80 ];
+      allowedTCPPorts = [ 22 80 13378 ];
 
       # LAN discovery
       allowedUDPPorts = [ 5353 ];
