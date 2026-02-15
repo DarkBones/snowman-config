@@ -1,9 +1,9 @@
-{ lib, pkgsUnstable, config, ... }:
+{ lib, pkgsUnstable, pkgs, config, ... }:
 let cfg = config.roles.gaming;
 in {
   options.roles.gaming.enable = lib.mkEnableOption "Gaming (home)";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     home.packages = with pkgsUnstable; [
       mangohud
       lutris

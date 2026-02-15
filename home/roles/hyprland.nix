@@ -13,7 +13,7 @@ let
 in {
   options.roles.hyprland.enable = lib.mkEnableOption "Hyprland role";
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     home.packages = with pkgsUnstable;
       [
         waybar
