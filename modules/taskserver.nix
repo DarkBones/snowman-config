@@ -1,22 +1,29 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
-  taskdWrapped = pkgs.writeShellScriptBin "taskd" ''
-    set -euo pipefail
-    if [ "$#" -lt 1 ]; then
-      exec ${pkgs.taskserver}/bin/taskd --help
-    fi
-    cmd="$1"
-    shift
-    exec ${pkgs.taskserver}/bin/taskd "$cmd" --data /var/lib/taskserver "$@"
-  '';
+  dataDir = "/var/lib/taskserver";
 in {
   services.taskserver = {
     enable = true;
-    dataDir = "/var/lib/taskserver";
-    config = { "server.listen" = "0.0.0.0:53589"; };
+    dataDir = dataDir;
   };
 
-  environment.systemPackages = [ taskdWrapped ];
+  systemd.services.taskserver.serviceConfig.ExecStartPre = lib.mkForce [ ];
+
+  environment.systemPackages = [ pkgs.taskserver ];
+
+  systemd.services.taskserver.serviceConfig.ExecStart = lib.mkForce [
+    ''
+      ${pkgs.taskserver}/bin/taskd server \
+        --ca.cert=${dataDir}/keys/ca.cert \
+        --server.cert=${dataDir}/keys/server.cert \
+        --server.key=${dataDir}/keys/server.key \
+        --server.crl=${dataDir}/keys/server.crl \
+        --log=- \
+        --daemon=false \
+        --trust=strict \
+        --server=0.0.0.0:53589
+    ''
+  ];
 
   networking.firewall.allowedTCPPorts = [ 53589 ];
 }

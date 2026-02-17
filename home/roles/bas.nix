@@ -26,6 +26,7 @@ in {
       wget
       xclip
       zoxide
+      gnutls.bin
     ]) ++ [ neovim ];
 
     home.file.".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
