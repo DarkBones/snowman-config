@@ -69,8 +69,12 @@ rec {
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
 
-      extraModules =
-        [ ./hosts/rpi4.nix ./modules/home-assistant.nix ./modules/pihole.nix ];
+      extraModules = [
+        ./hosts/rpi4.nix
+        ./modules/home-assistant.nix
+        ./modules/pihole.nix
+        ./modules/taskserver.nix
+      ];
     };
   };
 
