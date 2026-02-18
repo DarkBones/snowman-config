@@ -147,6 +147,7 @@ rec {
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
             ".taskrc" = "taskwarrior/.taskrc";
+            ".task" = "taskwarrior/.task";
           };
         };
       };
