@@ -124,6 +124,7 @@ rec {
         gaming.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
+        macos-wm.enable = true;
         secrets.enable = true;
         ssh.enable = true;
 
