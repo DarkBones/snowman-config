@@ -132,29 +132,30 @@ rec {
           dir = "Developer/dotfiles";
 
           linkMap = {
-            "bin" = "bin/bin";
-            ".fzf" = "fzf/.fzf";
             ".config/ghostty" = "ghostty/.config/ghostty";
-            ".gitconfig" = "git/.gitconfig";
-            # ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
-            ".config/swaync" = "swaync/.config/swaync";
+            ".config/karabiner" = "karabiner/.config/karabiner";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
+            ".config/raycast" = "raycast/.config/raycast";
             ".config/starship.toml" = "starship/.config/starship.toml";
-            ".zshrc" = "zsh/.zshrc";
-            ".zsh" = "zsh/.zsh";
-            # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
-            ".tmux.conf" = "tmux/.tmux.conf";
-            "tmux" = "tmux/tmux";
+            ".config/swaync" = "swaync/.config/swaync";
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
-            "wallpapers" = "wallpapers/wallpapers";
-            "darkling" = "darkling/darkling";
-            "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
+            ".fzf" = "fzf/.fzf";
+            ".gitconfig" = "git/.gitconfig";
             ".taskrc" = "taskwarrior/.taskrc";
-            ".task" = "taskwarrior/.task";
+            ".tmux.conf" = "tmux/.tmux.conf";
+            ".zsh" = "zsh/.zsh";
+            ".zshrc" = "zsh/.zshrc";
+            "bin" = "bin/bin";
+            "darkling" = "darkling/darkling";
+            "lockscreens" = "lockscreens/lockscreens";
+            "tmux" = "tmux/tmux";
+            "wallpapers" = "wallpapers/wallpapers";
+            # ".config/autostart" = "hyprland/.config/autostart";
+            # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
           };
         };
       };
