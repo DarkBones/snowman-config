@@ -31,7 +31,7 @@
     };
 
     bas-dotfiles = {
-      url = "github:DarkBones/dotfiles";
+      url = "github:DarkBones/dotfiles/move-files-from-papershift-laptop";
       flake = false;
     };
 
