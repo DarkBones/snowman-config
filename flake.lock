@@ -23,15 +23,16 @@
     "bas-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1770027886,
-        "narHash": "sha256-jJ3asalR01Yniel0EtAidFX7ejdgMBZU50kTkG2KIeA=",
+        "lastModified": 1771669808,
+        "narHash": "sha256-w1SHJ7QXoX0L/UD6Dg7Iy5DqeFIXPqjxOVyqUnZuRyg=",
         "owner": "DarkBones",
         "repo": "dotfiles",
-        "rev": "2724e479c6ffca614611f47d562f41d395b179d6",
+        "rev": "713af11401e231cfa92a575816ee06a21fac18b9",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
+        "ref": "move-files-from-papershift-laptop",
         "repo": "dotfiles",
         "type": "github"
       }
