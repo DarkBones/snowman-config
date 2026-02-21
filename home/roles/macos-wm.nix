@@ -33,6 +33,12 @@ in {
         ProgramArguments = [ "${pkgsUnstable.skhd}/bin/skhd" "-c" skhdRc ];
         RunAtLoad = true;
         KeepAlive = true;
+
+        EnvironmentVariables = {
+          PATH =
+            "/Users/${config.home.username}/.nix-profile/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+        };
+
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/skhd.log";
         StandardErrorPath =
           "${config.home.homeDirectory}/Library/Logs/skhd.err.log";
