@@ -139,6 +139,7 @@ rec {
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
             ".config/raycast" = "raycast/.config/raycast";
+            ".config/skhd" = "skhd/.config/skhd";
             ".config/starship.toml" = "starship/.config/starship.toml";
             ".config/swaync" = "swaync/.config/swaync";
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
