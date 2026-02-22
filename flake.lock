@@ -32,7 +32,6 @@
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "move-files-from-papershift-laptop",
         "repo": "dotfiles",
         "type": "github"
       }
