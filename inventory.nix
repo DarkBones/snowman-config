@@ -76,6 +76,14 @@ rec {
         ./modules/taskserver.nix
       ];
     };
+    mbp = {
+      hostname = "mbp";
+      system = "aarch64-darwin";
+      users = [ "bas" ];
+
+      availableRoles =
+        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+    };
   };
 
   users = {
@@ -117,6 +125,7 @@ rec {
         gaming.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
+        macos-wm.enable = true;
         secrets.enable = true;
         ssh.enable = true;
 
@@ -125,29 +134,31 @@ rec {
           dir = "Developer/dotfiles";
 
           linkMap = {
-            "bin" = "bin/bin";
-            ".fzf" = "fzf/.fzf";
             ".config/ghostty" = "ghostty/.config/ghostty";
-            ".gitconfig" = "git/.gitconfig";
-            # ".config/autostart" = "hyprland/.config/autostart";
             ".config/hypr" = "hyprland/.config/hypr";
-            ".config/swaync" = "swaync/.config/swaync";
+            ".config/karabiner" = "karabiner/.config/karabiner";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
+            ".config/raycast" = "raycast/.config/raycast";
+            ".config/skhd" = "skhd/.config/skhd";
             ".config/starship.toml" = "starship/.config/starship.toml";
-            ".zshrc" = "zsh/.zshrc";
-            ".zsh" = "zsh/.zsh";
-            # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
-            ".tmux.conf" = "tmux/.tmux.conf";
-            "tmux" = "tmux/tmux";
+            ".config/swaync" = "swaync/.config/swaync";
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
-            "wallpapers" = "wallpapers/wallpapers";
-            "darkling" = "darkling/darkling";
-            "lockscreens" = "lockscreens/lockscreens";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
+            ".fzf" = "fzf/.fzf";
+            ".gitconfig" = "git/.gitconfig";
             ".taskrc" = "taskwarrior/.taskrc";
-            ".task" = "taskwarrior/.task";
+            ".tmux.conf" = "tmux/.tmux.conf";
+            ".zsh" = "zsh/.zsh";
+            ".zshrc" = "zsh/.zshrc";
+            "bin" = "bin/bin";
+            "darkling" = "darkling/darkling";
+            "lockscreens" = "lockscreens/lockscreens";
+            "tmux" = "tmux/tmux";
+            "wallpapers" = "wallpapers/wallpapers";
+            # ".config/autostart" = "hyprland/.config/autostart";
+            # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
           };
         };
       };

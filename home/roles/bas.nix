@@ -3,31 +3,39 @@ let
   cfg = config.roles.bas;
 
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
+
+  commonPkgs = with pkgsUnstable; [
+    bat
+    btop
+    eza
+    fzf
+    jq
+    less
+    fastfetch
+    ripgrep
+    taskwarrior2
+    tmux
+    tmuxinator
+    unzip
+    wget
+    zoxide
+  ];
+
+  linuxPkgs = with pkgsUnstable; [
+    dnsutils
+    glib
+    networkmanager
+    xclip
+    gnutls.bin
+  ];
+
+  darwinPkgs = with pkgsUnstable; [ ];
 in {
   options.roles.bas.enable = lib.mkEnableOption "Bas role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = (with pkgsUnstable; [
-      bat
-      btop
-      eza
-      dnsutils
-      fzf
-      glib
-      jq
-      less
-      fastfetch
-      networkmanager
-      ripgrep
-      taskwarrior2
-      tmux
-      tmuxinator
-      unzip
-      wget
-      xclip
-      zoxide
-      gnutls.bin
-    ]) ++ [ neovim ];
+    home.packages = commonPkgs ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
+      ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs ++ [ neovim ];
 
     home.file.".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";

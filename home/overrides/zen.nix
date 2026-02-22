@@ -1,7 +1,9 @@
-# TODO: This is experimental. This should let zen read and write its dotfiles
-{ config, lib, ... }:
-let dotfilesDev = "${config.home.homeDirectory}/Developer/dotfiles";
+{ lib, pkgs, config, ... }:
+let dotfilesEnabled = (config.roles.dotfiles.enable or false);
 in {
-  xdg.configFile."gtk/darkling.css".source = config.lib.file.mkOutOfStoreSymlink
-    "${config.dotfiles.root}/gtk/.config/gtk/darkling.css";
+  config = lib.mkIf (pkgs.stdenv.isLinux && dotfilesEnabled) {
+    xdg.configFile."gtk/darkling.css".source =
+      config.lib.file.mkOutOfStoreSymlink
+      "${config.dotfiles.root}/gtk/.config/gtk/darkling.css";
+  };
 }
