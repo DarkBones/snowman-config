@@ -81,7 +81,8 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles = [ "bas" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+      availableRoles =
+        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
     };
   };
 
