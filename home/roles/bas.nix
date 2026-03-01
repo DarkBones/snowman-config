@@ -9,6 +9,7 @@ let
     btop
     eza
     fzf
+    htop
     jq
     less
     fastfetch
