@@ -37,6 +37,7 @@ rec {
         ./modules/media.nix
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
+        ./modules/vpn.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
