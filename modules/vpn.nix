@@ -1,6 +1,9 @@
 { lib, pkgs, config, networkSecretsPath ? null, ... }:
 let
   vpnConn = "pia-de-frankfurt";
+  piaUserSecret = "pia-username";
+  piaPassSecret = "pia-password";
+  piaOvpnSecret = "pia-ovpn";
 
   nmcli = "${pkgs.networkmanager}/bin/nmcli";
   grep = "${pkgs.gnugrep}/bin/grep";
@@ -16,9 +19,9 @@ let
     set -euo pipefail
     conn="${vpnConn}"
 
-    ovpn_path="${config.sops.secrets."pia/ovpn".path}"
-    user_path="${config.sops.secrets."pia/username".path}"
-    pass_path="${config.sops.secrets."pia/password".path}"
+    ovpn_path="${config.sops.secrets.${piaOvpnSecret}.path}"
+    user_path="${config.sops.secrets.${piaUserSecret}.path}"
+    pass_path="${config.sops.secrets.${piaPassSecret}.path}"
 
     if ! test -s "$ovpn_path" || ! test -s "$user_path" || ! test -s "$pass_path"; then
       echo "[vpn] secrets missing/empty; skipping VPN setup" >&2
@@ -49,32 +52,14 @@ let
     ${nmcli} connection modify "$conn" vpn.user-name "$user"
     ${nmcli} connection modify "$conn" vpn.secrets "password=$pass"
 
-    # Patch password-flags in vpn.data without destroying the rest
-    data="$(${nmcli} -g vpn.data connection show "$conn" || true)"
-    data="$(printf '%s' "$data" | tr '\n' ' ')"
+    # Ensure NM stores the password instead of prompting for an agent.
+    ${nmcli} connection modify "$conn" +vpn.data "password-flags=0"
+    # Prevent MTU blackholes that stall TCP on some PIA endpoints.
+    ${nmcli} connection modify "$conn" +vpn.data "mssfix=1360"
 
-    new_data="$(printf '%s' "$data" | ${sed} -E \
-      's/(^|,)[[:space:]]*password-flags[[:space:]]*=[[:space:]]*[0-9]+/\1password-flags=0/g')"
-
-    case "$new_data" in
-      *password-flags*)
-        ;;
-      "")
-        new_data="password-flags=0"
-        ;;
-      *)
-        new_data="''${new_data},password-flags=0"
-        ;;
-    esac
-
-    ${nmcli} connection modify "$conn" vpn.data "$new_data"
-
-    # Autoconnect
-    ${nmcli} connection modify "$conn" connection.autoconnect yes
-    ${nmcli} connection modify "$conn" connection.autoconnect-retries -1
-
-    # Attempt connection (do not fail boot)
-    ${nmcli} connection up "$conn" || true
+    # Keep it off by default; manual bring-up avoids clobbering base networking.
+    ${nmcli} connection modify "$conn" connection.autoconnect no
+    ${nmcli} connection modify "$conn" connection.autoconnect-retries 0
 
     echo "[vpn] ensured profile + credentials for '$conn'"
   '';
@@ -97,15 +82,26 @@ in {
     '';
   }];
 
-  sops.secrets."pia/username" = { sopsFile = secretsFile; };
-  sops.secrets."pia/password" = { sopsFile = secretsFile; };
-  sops.secrets."pia/ovpn" = { sopsFile = secretsFile; };
+  sops.secrets.${piaUserSecret} = {
+    sopsFile = secretsFile;
+    key = "pia/username";
+  };
+  sops.secrets.${piaPassSecret} = {
+    sopsFile = secretsFile;
+    key = "pia/password";
+  };
+  sops.secrets.${piaOvpnSecret} = {
+    sopsFile = secretsFile;
+    key = "pia/ovpn";
+  };
 
   systemd.services.vpn-ensure-nm-openvpn = {
     description = "Ensure NetworkManager OpenVPN profile from SOPS";
     wantedBy = [ "multi-user.target" ];
-    after = [ "NetworkManager.service" "network-online.target" ];
-    wants = [ "NetworkManager.service" "network-online.target" ];
+    after =
+      [ "NetworkManager.service" "network-online.target" "sops-nix.service" ];
+    wants =
+      [ "NetworkManager.service" "network-online.target" "sops-nix.service" ];
 
     serviceConfig = {
       Type = "oneshot";
