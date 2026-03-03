@@ -57,9 +57,14 @@ let
     # Prevent MTU blackholes that stall TCP on some PIA endpoints.
     ${nmcli} connection modify "$conn" +vpn.data "mssfix=1360"
 
-    # Keep it off by default; manual bring-up avoids clobbering base networking.
-    ${nmcli} connection modify "$conn" connection.autoconnect no
-    ${nmcli} connection modify "$conn" connection.autoconnect-retries 0
+    # Autoconnect by default when NetworkManager is up.
+    ${nmcli} connection modify "$conn" connection.autoconnect yes
+    ${nmcli} connection modify "$conn" connection.autoconnect-retries -1
+
+    # Bring the VPN up now if it's not already active.
+    if ! ${nmcli} -t -f NAME connection show --active | ${grep} -qx "$conn"; then
+      ${nmcli} connection up "$conn" || true
+    fi
 
     echo "[vpn] ensured profile + credentials for '$conn'"
   '';
