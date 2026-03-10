@@ -33,6 +33,7 @@ rec {
         ./modules/nvidia.nix
         ./modules/gaming.nix
         ./modules/openwebui.nix
+        ./modules/ollama.nix
         ./modules/login-hyprlock.nix
         ./modules/media.nix
         ./modules/plex.nix
