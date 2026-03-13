@@ -387,6 +387,23 @@
         "type": "github"
       }
     },
+    "ollama-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772757024,
+        "narHash": "sha256-cAqc38NHvUo5gphq1csTyosTcpUjFcs0dzB0wreEGjs=",
+        "owner": "ollama",
+        "repo": "ollama",
+        "rev": "9b0c7cc7b90562b370ce6a30efdc667326799223",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ollama",
+        "ref": "v0.17.7",
+        "repo": "ollama",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "awww": "awww",
@@ -396,6 +413,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "ollama-src": "ollama-src",
         "snowman": "snowman",
         "sops-nix": "sops-nix_2",
         "stylix": "stylix",
