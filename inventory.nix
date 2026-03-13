@@ -125,6 +125,7 @@ rec {
         dev.enable = true;
         dev-heavy.enable = true;
         gaming.enable = true;
+        gaming-mods.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
         macos-wm.enable = true;
