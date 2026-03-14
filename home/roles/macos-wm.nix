@@ -9,6 +9,7 @@ let
 
   yabaiRc = "${config.home.homeDirectory}/.config/yabai/yabairc";
   skhdRc = "${config.home.homeDirectory}/.config/skhd/skhdrc";
+  sketchybarRc = "${config.home.homeDirectory}/.config/sketchybar/sketchybarrc";
 in
 {
   options.roles.macos-wm.enable = lib.mkEnableOption "macOS WM stack (yabai/skhd/karabiner)";
@@ -22,23 +23,21 @@ in
       nerd-fonts.jetbrains-mono
     ];
 
-    home.activation.installNerdFonts =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        fonts_dir="$HOME/Library/Fonts"
-        fonts_src="${pkgsUnstable.nerd-fonts.jetbrains-mono}/share/fonts"
+    home.activation.installNerdFonts = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      fonts_dir="$HOME/Library/Fonts"
+      fonts_src="${pkgsUnstable.nerd-fonts.jetbrains-mono}/share/fonts"
 
-        mkdir -p "$fonts_dir"
-        if [ -d "$fonts_src" ]; then
+      mkdir -p "$fonts_dir"
+      if [ -d "$fonts_src" ]; then
         find "$fonts_src" -type f -name '*.ttf' -print0 | while IFS= read -r -d $'\\0' font; do
-            target="$fonts_dir/$(basename "$font")"
-            if [ ! -e "$target" ]; then
-              cp "$font" "$target"
-            fi
-          done
-        fi
-      '';
+          target="$fonts_dir/$(basename "$font")"
+          if [ ! -e "$target" ]; then
+            cp "$font" "$target"
+          fi
+        done
+      fi
+    '';
 
-    # Launch agents
     launchd.agents.yabai = {
       enable = true;
       config = {
@@ -69,13 +68,30 @@ in
         ];
         RunAtLoad = true;
         KeepAlive = true;
-
         EnvironmentVariables = {
           PATH = "/Users/${config.home.username}/.nix-profile/bin:/usr/bin:/bin:/usr/sbin:/sbin";
         };
-
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/skhd.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/skhd.err.log";
+      };
+    };
+
+    launchd.agents.sketchybar = {
+      enable = true;
+      config = {
+        Label = "org.nix.sketchybar";
+        ProgramArguments = [
+          "${pkgsUnstable.sketchybar}/bin/sketchybar"
+          "--config"
+          sketchybarRc
+        ];
+        RunAtLoad = true;
+        KeepAlive = true;
+        EnvironmentVariables = {
+          PATH = "/Users/${config.home.username}/.nix-profile/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+        };
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/sketchybar.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/sketchybar.err.log";
       };
     };
   };
