@@ -15,14 +15,20 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [ "bas" "ssh" ];
+      availableRoles = [
+        "bas"
+        "ssh"
+      ];
     };
 
     dorkbones = {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" "ha" ];
+      users = [
+        "bas"
+        "ha"
+      ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -39,7 +45,12 @@ rec {
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
-        ({ ... }: { roles.gaming.enable = true; })
+        (
+          { ... }:
+          {
+            roles.gaming.enable = true;
+          }
+        )
       ];
 
       wifi = {
@@ -68,7 +79,13 @@ rec {
         networks = [ "home" ];
       };
 
-      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
+      availableRoles = [
+        "bas"
+        "secrets"
+        "dev"
+        "dotfiles"
+        "ssh"
+      ];
       users = [ "bas" ];
 
       extraModules = [
@@ -83,8 +100,16 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles =
-        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+      availableRoles = [
+        "bas"
+        "desktop"
+        "dev"
+        "dev-heavy"
+        "lsp"
+        "dotfiles"
+        "ssh"
+        "macos-wm"
+      ];
     };
   };
 
@@ -92,7 +117,10 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [ "wheel" "media" ];
+      groups = [
+        "wheel"
+        "media"
+      ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
@@ -149,6 +177,7 @@ rec {
             ".config/tmuxinator" = "tmuxinator/.config/tmuxinator";
             ".config/waybar" = "waybar/.config/waybar";
             ".config/wofi" = "wofi/.config/wofi";
+            ".config/yabai" = "yabai/.config/yabai";
             ".fzf" = "fzf/.fzf";
             ".gitconfig" = "git/.gitconfig";
             ".taskrc" = "taskwarrior/.taskrc";

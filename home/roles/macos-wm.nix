@@ -20,6 +20,10 @@ in {
           [ "${pkgsUnstable.yabai}/bin/yabai" "--config" yabaiRc ];
         RunAtLoad = true;
         KeepAlive = true;
+        EnvironmentVariables = {
+          PATH =
+            "/Users/${config.home.username}/.nix-profile/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+        };
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/yabai.log";
         StandardErrorPath =
           "${config.home.homeDirectory}/Library/Logs/yabai.err.log";
