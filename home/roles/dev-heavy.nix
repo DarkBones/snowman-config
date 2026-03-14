@@ -4,6 +4,6 @@ in {
   options.roles.dev-heavy.enable = lib.mkEnableOption "Dev-heavy role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgsUnstable; [ starship aichat ];
+    home.packages = with pkgsUnstable; [ starship aichat codex ];
   };
 }
