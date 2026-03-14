@@ -11,6 +11,10 @@
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     awww.url = "git+https://codeberg.org/LGFae/awww";
+    ollama-src = {
+      url = "github:ollama/ollama/v0.17.7";
+      flake = false;
+    };
 
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";

@@ -14,6 +14,11 @@ in {
       enable32Bit = true;
     };
 
-    environment.systemPackages = with pkgs; [ gamescope ];
+    environment.systemPackages = with pkgs; [
+      gamescope
+      lutris
+      wineWowPackages.stable
+      winetricks
+    ];
   };
 }

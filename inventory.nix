@@ -33,10 +33,12 @@ rec {
         ./modules/nvidia.nix
         ./modules/gaming.nix
         ./modules/openwebui.nix
+        ./modules/ollama.nix
         ./modules/login-hyprlock.nix
         ./modules/media.nix
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
+        ./modules/vpn.nix
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
@@ -123,6 +125,7 @@ rec {
         dev.enable = true;
         dev-heavy.enable = true;
         gaming.enable = true;
+        gaming-mods.enable = true;
         hyprland.enable = true;
         lsp.enable = true;
         macos-wm.enable = true;
