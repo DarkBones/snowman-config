@@ -6,22 +6,22 @@
       echo "Applying macOS defaults"
 
       # Dock behavior
-      defaults write com.apple.dock autohide -bool true
-      defaults write com.apple.dock launchanim -bool false
-      defaults write com.apple.dock mineffect -string scale
-      defaults write com.apple.dock show-process-indicators -bool true
-      defaults write com.apple.dock show-recents -bool false
-      defaults write com.apple.dock tilesize -int 37
+      /usr/bin/defaults write com.apple.dock autohide -bool true
+      /usr/bin/defaults write com.apple.dock launchanim -bool false
+      /usr/bin/defaults write com.apple.dock mineffect -string scale
+      /usr/bin/defaults write com.apple.dock show-process-indicators -bool true
+      /usr/bin/defaults write com.apple.dock show-recents -bool false
+      /usr/bin/defaults write com.apple.dock tilesize -int 37
 
       # Finder
-      defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"
-      defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-      defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-      defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-      defaults write com.apple.finder FXRemoveOldTrashItems -bool true
-      defaults write com.apple.finder NewWindowTarget -string "PfAF"
-      defaults write com.apple.finder WarnOnEmptyTrash -bool false
-      defaults write com.apple.finder _FXSortFoldersFirst -bool true
+      /usr/bin/defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"
+      /usr/bin/defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+      /usr/bin/defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+      /usr/bin/defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+      /usr/bin/defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+      /usr/bin/defaults write com.apple.finder NewWindowTarget -string "PfAF"
+      /usr/bin/defaults write com.apple.finder WarnOnEmptyTrash -bool false
+      /usr/bin/defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
       # Symbolic hotkeys
       plist="$HOME/Library/Preferences/com.apple.symbolichotkeys.plist"
@@ -157,9 +157,9 @@
         /usr/libexec/PlistBuddy -c "Add :AppleSymbolicHotKeys:$key:value:parameters:2 integer $p2" "$plist"
       done
 
-      killall cfprefsd || true
-      killall Dock || true
-      killall Finder || true
+      /usr/bin/killall cfprefsd || true
+      /usr/bin/killall Dock || true
+      /usr/bin/killall Finder || true
       /System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer >/dev/null 2>&1 &
     '';
   };
