@@ -157,10 +157,21 @@
         /usr/libexec/PlistBuddy -c "Add :AppleSymbolicHotKeys:$key:value:parameters:2 integer $p2" "$plist"
       done
 
+      # Mouse
+      /usr/bin/defaults write NSGlobalDomain com.apple.mouse.scaling -float 2
+      /usr/bin/defaults write NSGlobalDomain com.apple.scrollwheel.scaling -float 0.5
+      /usr/bin/defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+      /usr/bin/defaults write NSGlobalDomain com.apple.mouse.doubleClickThreshold -float 0.2
+
+      # Menu bar
+      /usr/bin/defaults write NSGlobalDomain _HIHideMenuBar -bool true
+      /usr/bin/defaults write NSGlobalDomain SLSMenuBarUseBlurredAppearance -bool true
+
       /usr/bin/killall cfprefsd || true
+      /usr/bin/killall SystemUIServer || true
+      /usr/bin/killall ControlCenter || true
       /usr/bin/killall Dock || true
       /usr/bin/killall Finder || true
-      /System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer >/dev/null 2>&1 &
     '';
   };
 }
