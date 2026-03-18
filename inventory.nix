@@ -15,20 +15,14 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [
-        "bas"
-        "ssh"
-      ];
+      availableRoles = [ "bas" "ssh" ];
     };
 
     dorkbones = {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [
-        "bas"
-        "ha"
-      ];
+      users = [ "bas" "ha" ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -45,12 +39,7 @@ rec {
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
-        (
-          { ... }:
-          {
-            roles.gaming.enable = true;
-          }
-        )
+        ({ ... }: { roles.gaming.enable = true; })
       ];
 
       wifi = {
@@ -89,16 +78,8 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles = [
-        "bas"
-        "desktop"
-        "dev"
-        "dev-heavy"
-        "lsp"
-        "dotfiles"
-        "ssh"
-        "macos-wm"
-      ];
+      availableRoles =
+        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
     };
   };
 
@@ -106,10 +87,7 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [
-        "wheel"
-        "media"
-      ];
+      groups = [ "wheel" "media" ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
@@ -181,6 +159,12 @@ rec {
             "wallpapers" = "wallpapers/wallpapers";
             # ".config/autostart" = "hyprland/.config/autostart";
             # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
+            ".zen/profiles.ini" = "zen/profiles.ini";
+            ".zen/bas/user.js" = "zen/bas/user.js";
+            ".zen/bas/chrome" = "zen/bas/chrome";
+            ".zen/bas/zen-keyboard-shortcuts.json" =
+              "zen/bas/zen-keyboard-shortcuts.json";
+            ".zen/bas/zen-themes.json" = "zen/bas/zen-themes.json";
           };
         };
       };
