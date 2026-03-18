@@ -167,6 +167,10 @@
       /usr/bin/defaults write NSGlobalDomain _HIHideMenuBar -bool true
       /usr/bin/defaults write NSGlobalDomain SLSMenuBarUseBlurredAppearance -bool true
 
+      # Accessibility - Motion
+      /usr/bin/defaults write com.apple.universalaccess reduceMotion -bool true
+      /usr/bin/defaults write com.apple.universalaccess caretBlink -bool false
+
       /usr/bin/killall cfprefsd || true
       /usr/bin/killall SystemUIServer || true
       /usr/bin/killall ControlCenter || true
