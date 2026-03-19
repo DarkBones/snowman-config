@@ -160,11 +160,16 @@ rec {
             # ".config/autostart" = "hyprland/.config/autostart";
             # ".config/systemd" = "systemd/.config/systemd"; <- TODO: Translate services to home-manager configs (the files are owned by root)
             ".zen/profiles.ini" = "zen/profiles.ini";
-            ".zen/bas/user.js" = "zen/bas/user.js";
-            ".zen/bas/chrome" = "zen/bas/chrome";
+            ".zen/bas/user.js" = "zen/shared/user.js";
+            ".zen/bas/chrome" = "zen/shared/chrome";
             ".zen/bas/zen-keyboard-shortcuts.json" =
-              "zen/bas/zen-keyboard-shortcuts.json";
-            ".zen/bas/zen-themes.json" = "zen/bas/zen-themes.json";
+              "zen/shared/zen-keyboard-shortcuts.json";
+            ".zen/bas/zen-themes.json" = "zen/shared/zen-themes.json";
+            ".zen/private/user.js" = "zen/shared/user.js";
+            ".zen/private/chrome" = "zen/shared/chrome";
+            ".zen/private/zen-keyboard-shortcuts.json" =
+              "zen/shared/zen-keyboard-shortcuts.json";
+            ".zen/private/zen-themes.json" = "zen/shared/zen-themes.json";
           };
         };
       };
