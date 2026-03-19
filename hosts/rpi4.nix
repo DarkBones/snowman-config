@@ -13,24 +13,24 @@
   networking = {
     enableIPv6 = true;
 
+    useDHCP = lib.mkForce false;
+    interfaces.end0.useDHCP = true;
+    interfaces.wlan0.useDHCP = false;
+
     nameservers =
       [ "1.1.1.1" "8.8.8.8" "2606:4700:4700::1111" "2606:4700:4700::1001" ];
 
     firewall = {
       enable = true;
       allowPing = true;
-
-      # LAN access: SSH + Home Assistant
       allowedTCPPorts = [ 22 8123 ];
-
-      # LAN discovery
       allowedUDPPorts = [ 5353 ];
-
       checkReversePath = "loose";
 
-      # Trust LAN + Tailscale interfaces
-      trustedInterfaces = [ "wlan0" "tailscale0" ];
+      trustedInterfaces = [ "end0" "tailscale0" ];
     };
+
+    wireless.enable = lib.mkForce false;
   };
 
   services.tailscale = {

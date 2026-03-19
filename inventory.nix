@@ -63,11 +63,6 @@ rec {
       hardware.boot.firmware = "raspberry-pi";
       compatibility = true;
 
-      wifi = {
-        mode = "roaming";
-        networks = [ "home" ];
-      };
-
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
 
