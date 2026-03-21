@@ -1,13 +1,4 @@
 { pkgs, lib, ... }: {
-  imports = [ ./rpi4-hardware-configuration.nix ../modules/home-assistant.nix ];
-
-  boot = {
-    loader = {
-      grub.enable = false;
-      generic-extlinux-compatible.enable = true;
-    };
-  };
-
   time.timeZone = "Europe/Berlin";
 
   networking = {
@@ -26,7 +17,6 @@
       allowedTCPPorts = [ 22 8123 ];
       allowedUDPPorts = [ 5353 ];
       checkReversePath = "loose";
-
       trustedInterfaces = [ "end0" "tailscale0" ];
     };
 
