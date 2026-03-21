@@ -40,6 +40,7 @@ rec {
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
+        ./hosts/papershift-mbp.nix # TODO: REMOVE
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
@@ -74,6 +75,7 @@ rec {
         ./modules/taskserver.nix
       ];
     };
+
     mbp = {
       hostname = "mbp";
       system = "aarch64-darwin";
@@ -81,6 +83,19 @@ rec {
 
       availableRoles =
         [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+
+      extraModules = [ ./hosts/papershift-mbp.nix ]; # TODO: REMOVE
+    };
+
+    papershift-mbp = {
+      hostname = "papershift-mbp";
+      system = "aarch64-darwin";
+      users = [ "bas" ];
+
+      availableRoles =
+        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+
+      extraModules = [ ./hosts/papershift-mbp.nix ];
     };
   };
 
