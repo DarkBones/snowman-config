@@ -52,6 +52,7 @@ let
         redis
         gnumake
         git
+        zsh
       ];
 
       shellHook = "
@@ -67,17 +68,6 @@ let
 
         mkdir -p '${pgSocketDir}' '${redisDir}'
         cd '${backendRoot}'
-
-        echo 'Pulse shell ready at ${backendRoot}'
-        echo \"ruby: $(command -v ruby)\"
-        echo \"bundle: $(command -v bundle)\"
-        echo \"node: $(command -v node)\"
-        echo \"pnpm: $(command -v pnpm)\"
-        echo \"pkg-config: $(command -v pkg-config)\"
-        echo \"pg_config: $(command -v pg_config)\"
-        echo \"PGHOST: $PGHOST\"
-        echo \"PGPORT: $PGPORT\"
-        echo \"REDIS_URL: $REDIS_URL\"
       ";
     }
   '';
@@ -92,45 +82,30 @@ let
 
     mkdir -p "${runtimeDir}" "${pgSocketDir}" "${redisDir}"
 
-    # --- Postgres: initialize once ---
     if [ ! -f "${pgData}/PG_VERSION" ]; then
-      echo "[pulse] initializing postgres cluster at ${pgData}"
+      echo "[pulse] initializing postgres"
       ${pkgs.postgresql}/bin/initdb -D "${pgData}" >/dev/null
     fi
 
-    # --- Postgres: reuse if healthy, else restart ---
-    if ${pkgs.postgresql}/bin/pg_isready -h "${pgSocketDir}" -p "${
+    if ! ${pkgs.postgresql}/bin/pg_isready -h "${pgSocketDir}" -p "${
       toString pgPort
     }" >/dev/null 2>&1; then
-      echo "[pulse] postgres already running"
-    else
-      echo "[pulse] ensuring postgres is running"
-
+      echo "[pulse] starting postgres"
       ${pkgs.postgresql}/bin/pg_ctl -D "${pgData}" stop -m fast >/dev/null 2>&1 || true
       rm -f "${pgSocketDir}/.s.PGSQL.${
         toString pgPort
       }" "${pgSocketDir}/.s.PGSQL.${toString pgPort}.lock"
-
       ${pkgs.postgresql}/bin/pg_ctl \
         -D "${pgData}" \
         -l "${pgLog}" \
         -o "-k ${pgSocketDir} -p ${toString pgPort}" \
         start >/dev/null
-
-      ${pkgs.postgresql}/bin/pg_isready -h "${pgSocketDir}" -p "${
-        toString pgPort
-      }" >/dev/null
-      echo "[pulse] postgres started"
     fi
 
-    # --- Redis: reuse if healthy, else restart ---
-    if ${pkgs.redis}/bin/redis-cli -p ${
+    if ! ${pkgs.redis}/bin/redis-cli -p ${
       toString redisPort
     } ping >/dev/null 2>&1; then
-      echo "[pulse] redis already running"
-    else
-      echo "[pulse] ensuring redis is running"
-
+      echo "[pulse] starting redis"
       if [ -f "${redisPidFile}" ]; then
         kill "$(cat "${redisPidFile}")" >/dev/null 2>&1 || true
         rm -f "${redisPidFile}"
@@ -142,9 +117,6 @@ let
         --dir "${redisDir}" \
         --pidfile "${redisPidFile}" \
         --logfile "${redisLog}"
-
-      ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null
-      echo "[pulse] redis started"
     fi
   '';
 
@@ -166,7 +138,7 @@ in {
     (pkgs.writeShellScriptBin "pulse-shell" ''
       set -euo pipefail
       ${pulseEnsureInfra}/bin/pulse-ensure-infra
-      exec nix-shell "${pulseShellNix}" --command '${pkgs.bashInteractive}/bin/bash -i'
+      exec nix-shell "${pulseShellNix}" --command '${pkgs.zsh}/bin/zsh -i'
     '')
 
     (pkgs.writeShellScriptBin "pulse-pg-stop" ''
