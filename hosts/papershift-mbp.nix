@@ -130,10 +130,91 @@ let
       bin/rails db:prepare
     '
   '';
+
+  frontendRoot = "${pulseRoot}/frontend";
+  pnpmHome = "${homeDir}/.local/share/pnpm";
+  pnpmStoreDir = "${pnpmHome}/store";
+  xdgDataHome = "${homeDir}/.local/share";
+  xdgCacheHome = "${homeDir}/.cache";
+
+  frontendShellNix = pkgs.writeText "pulse-frontend-shell.nix" ''
+    { pkgs ? import ${pkgs.path} {
+        system = "${pkgs.stdenv.hostPlatform.system}";
+        config.allowUnfree = true;
+      }
+    }:
+
+    pkgs.mkShell {
+      packages = with pkgs; [
+        nodejs_22
+        pnpm
+        git
+        zsh
+      ];
+
+      shellHook = "
+        export PULSE_ROOT='${pulseRoot}'
+        export LANG='en_US.UTF-8'
+        cd '${frontendRoot}'
+      ";
+    }
+  '';
+
+  pulseFrontendBootstrap =
+    pkgs.writeShellScriptBin "pulse-frontend-bootstrap" ''
+      set -euo pipefail
+      mkdir -p "${xdgDataHome}" "${xdgCacheHome}" "${pnpmHome}" "${pnpmStoreDir}"
+      exec nix-shell "${frontendShellNix}" --command '
+        cd "${frontendRoot}"
+        exec env \
+          -u PNPM_HOME \
+          XDG_DATA_HOME="${xdgDataHome}" \
+          XDG_CACHE_HOME="${xdgCacheHome}" \
+          PNPM_HOME="${pnpmHome}" \
+          PNPM_STORE_DIR="${pnpmStoreDir}" \
+          NPM_CONFIG_USERCONFIG=/dev/null \
+          pnpm install
+      '
+    '';
+
+  pulseFrontendShell = pkgs.writeShellScriptBin "pulse-frontend-shell" ''
+    set -euo pipefail
+    mkdir -p "${xdgDataHome}" "${xdgCacheHome}" "${pnpmHome}" "${pnpmStoreDir}"
+    exec nix-shell "${frontendShellNix}" --command '
+      cd "${frontendRoot}"
+      exec env \
+        -u PNPM_HOME \
+        XDG_DATA_HOME="${xdgDataHome}" \
+        XDG_CACHE_HOME="${xdgCacheHome}" \
+        PNPM_HOME="${pnpmHome}" \
+        PNPM_STORE_DIR="${pnpmStoreDir}" \
+        NPM_CONFIG_USERCONFIG=/dev/null \
+        ${pkgs.zsh}/bin/zsh -i
+    '
+  '';
+
+  pulseFrontendDev = pkgs.writeShellScriptBin "pulse-frontend-dev" ''
+    set -euo pipefail
+    mkdir -p "${xdgDataHome}" "${xdgCacheHome}" "${pnpmHome}" "${pnpmStoreDir}"
+    exec nix-shell "${frontendShellNix}" --command '
+      cd "${frontendRoot}"
+      exec env \
+        -u PNPM_HOME \
+        XDG_DATA_HOME="${xdgDataHome}" \
+        XDG_CACHE_HOME="${xdgCacheHome}" \
+        PNPM_HOME="${pnpmHome}" \
+        PNPM_STORE_DIR="${pnpmStoreDir}" \
+        NPM_CONFIG_USERCONFIG=/dev/null \
+        pnpm dev
+    '
+  '';
 in {
   home-manager.users.bas.home.packages = [
     pulseEnsureInfra
     pulseBootstrap
+    pulseFrontendBootstrap
+    pulseFrontendShell
+    pulseFrontendDev
 
     (pkgs.writeShellScriptBin "pulse-shell" ''
       set -euo pipefail
