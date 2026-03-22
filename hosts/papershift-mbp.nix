@@ -208,6 +208,15 @@ let
         pnpm dev
     '
   '';
+
+  pulseBackendDev = pkgs.writeShellScriptBin "pulse-backend-dev" ''
+    set -euo pipefail
+    ${pulseEnsureInfra}/bin/pulse-ensure-infra
+    exec nix-shell "${pulseShellNix}" --command '
+      cd "${backendRoot}"
+      bin/rails s
+    '
+  '';
 in {
   home-manager.users.bas.home.packages = [
     pulseEnsureInfra
@@ -215,6 +224,7 @@ in {
     pulseFrontendBootstrap
     pulseFrontendShell
     pulseFrontendDev
+    pulseBackendDev
 
     (pkgs.writeShellScriptBin "pulse-shell" ''
       set -euo pipefail
