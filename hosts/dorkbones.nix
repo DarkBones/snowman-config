@@ -2,6 +2,12 @@
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   boot.initrd.systemd.enable = true;
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
+  systemd.oomd.enable = true;
 
   environment = {
     variables = {
