@@ -130,6 +130,7 @@ rec {
           "home_assistant_long_lived_token"
           "nzb_geek_username"
           "nzb_geek_key"
+          "home_assistant_long_lived_token"
         ];
         userPasswordHashKey = "password_hash";
       };

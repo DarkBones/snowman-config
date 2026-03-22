@@ -24,6 +24,7 @@ let
     HA_TOKEN_SECRET_PATH = maybe "home_assistant_long_lived_token";
     NZB_GEEK_USERNAME_SECRET_PATH = maybe "nzb_geek_username";
     NZB_GEEK_KEY_SECRET_PATH = maybe "nzb_geek_key";
+    HA_TOKEN_SECRET_PATH = maybe "home_assistant_long_lived_token";
   };
 in {
   home.sessionVariables = vars;
