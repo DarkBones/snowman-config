@@ -1,6 +1,6 @@
-{ config, inputs, lib, pkgsUnstable, ... }:
+{ inputs, pkgsUnstable, ... }:
 let
-  ollamaFromGitHub = pkgsUnstable.ollama.overrideAttrs (_: {
+  ollamaFromGitHub = pkgsUnstable.ollama-cuda.overrideAttrs (_: {
     version = "0.17.7";
     src = inputs.ollama-src;
     proxyVendor = true;
@@ -20,14 +20,14 @@ in {
       # Keep Open WebUI from silently pushing very large default contexts.
       OLLAMA_CONTEXT_LENGTH = "4096";
       OLLAMA_KEEP_ALIVE = "10m";
+      OLLAMA_KV_CACHE_TYPE = "q8_0";
       OLLAMA_MAX_LOADED_MODELS = "1";
       OLLAMA_MAX_QUEUE = "2";
       OLLAMA_NUM_PARALLEL = "1";
+      # Reserve VRAM so Ollama doesn't overcommit the 16 GiB card on large models.
+      OLLAMA_GPU_OVERHEAD = "2147483648";
 
-      # Ollama is currently falling back to CPU-only inference on dorkbones.
-      OLLAMA_LLM_LIBRARY = "cuda";
       CUDA_VISIBLE_DEVICES = "0";
-      LD_LIBRARY_PATH = lib.makeLibraryPath [ config.hardware.nvidia.package ];
     };
 
     serviceConfig = {
