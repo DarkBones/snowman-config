@@ -40,6 +40,7 @@ let
         value=''${line#*=}
         key="$(${pkgs.coreutils}/bin/printf '%s' "$key" | ${pkgs.coreutils}/bin/tr -d '[:space:]')"
         value="$(${pkgs.coreutils}/bin/printf '%s' "$value" | ${pkgs.gnused}/bin/sed 's/^[[:space:]]*//')"
+        value="$(${pkgs.coreutils}/bin/printf '%s' "$value" | ${pkgs.gnused}/bin/sed -e "s/^'//" -e "s/'$//" -e 's/^"//' -e 's/"$//')"
 
         if [ -n "$key" ]; then
           export "$key=$value"
