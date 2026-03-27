@@ -153,7 +153,7 @@ let
       ${pkgs.postgresql}/bin/pg_ctl \
         -D "${pgData}" \
         -l "${pgLog}" \
-        -o "-k ${pgSocketDir} -p ${toString pgPort}" \
+        -o "-k ${pgSocketDir} -p ${toString pgPort} -c listen_addresses=" \
         start >/dev/null
     fi
 
@@ -325,8 +325,241 @@ let
       --redis_url "$REDIS_URL" \
       --rpc_host 127.0.0.1:50051
   '';
+
+  # Use a separate pinned nixpkgs for shift_app so it can stay on Ruby 2.7
+  # without constraining Pulse, which uses newer packages from the main flake.
+  corePkgs = import (builtins.fetchTree {
+    type = "github";
+    owner = "NixOS";
+    repo = "nixpkgs";
+    ref = "nixos-23.11";
+  }) {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+    config.permittedInsecurePackages = [ "ruby-2.7.8" "openssl-1.1.1w" ];
+  };
+
+  coreRoot = "${root}/shift_app";
+  coreRuntimeDir = "${homeDir}/.local/state/core";
+
+  corePgData = "${coreRuntimeDir}/postgres";
+  corePgSocketDir = "${coreRuntimeDir}/postgres-socket";
+  corePgLog = "${coreRuntimeDir}/postgres.log";
+  corePgPort = 54329;
+
+  coreRedisDir = "${coreRuntimeDir}/redis";
+  coreRedisLog = "${coreRuntimeDir}/redis.log";
+  coreRedisPidFile = "${coreRuntimeDir}/redis.pid";
+  coreRedisPort = 6381;
+
+  coreEnv = pkgs.writeText "core-env.sh" ''
+    export SHIFT_APP_ROOT="${coreRoot}"
+    export LANG="en_US.UTF-8"
+
+    export PGDATA="${corePgData}"
+    export PGHOST="${corePgSocketDir}"
+    export PGPORT="${toString corePgPort}"
+    export PGUSER="bas"
+    export PGPASS=""
+
+    export POSTGRESQL_DATABASE="shift_app_development"
+    export POSTGRESQL_USERNAME="bas"
+    export POSTGRESQL_PASSWORD=""
+    export POSTGRESQL_HOST="${corePgSocketDir}"
+    export POSTGRESQL_PORT="${toString corePgPort}"
+    export POSTGRESQL_POOL="5"
+
+    export REDISCLOUD_URL="redis://127.0.0.1:${toString coreRedisPort}/0"
+
+    export RAILS_ENV="development"
+    export PORT="3000"
+    export HOST="localhost:3000"
+    export SIDEKIQ_CONCURRENCY="5"
+    export ASSIGNMENTS_SIDEKIQ_CONCURRENCY="1"
+    export SIDEKIQ_USERNAME="sidekiq"
+    export SIDEKIQ_PASSWORD="sidekiq"
+    export ENABLE_BULLET="false"
+    export FREEDESKTOP_MIME_TYPES_PATH="${corePkgs.shared-mime-info}/share/mime/packages/freedesktop.org.xml"
+    export STATION_APP_PUSHER_ID="local-station"
+    export STATION_APP_PUSHER_SECRET="local-station-secret"
+    export PLAN_APP_PUSHER_ID="local-plan"
+    export PLAN_APP_PUSHER_SECRET="local-plan-secret"
+    export SEGMENT_API_KEY="local-segment-key"
+
+    if [ -n "''${RAILSLTS_KEY_DEV:-}" ] && [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
+      export BUNDLE_GEMS__RAILSLTS__COM="$RAILSLTS_KEY_DEV"
+    fi
+  '';
+
+  coreShellNix = pkgs.writeText "core-shell.nix" ''
+    { pkgs ? import ${corePkgs.path} {
+        system = "${corePkgs.stdenv.hostPlatform.system}";
+        config.allowUnfree = true;
+        config.permittedInsecurePackages = [
+          "ruby-2.7.8"
+          "openssl-1.1.1w"
+        ];
+      }
+    }:
+
+    pkgs.mkShell {
+      nativeBuildInputs = with pkgs; [
+        pkg-config
+      ];
+
+      buildInputs = with pkgs; [
+        imagemagick
+        libffi
+        libxml2
+        libxslt
+        libyaml
+        openssl
+        postgresql
+        shared-mime-info
+        zlib
+      ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+        gcc
+      ];
+
+      packages = with pkgs; [
+        ruby_2_7
+        nodejs
+        redis
+        gnumake
+        git
+        zsh
+      ];
+
+      shellHook = "
+        . '${coreEnv}'
+        mkdir -p '${corePgSocketDir}' '${coreRedisDir}'
+        cd '${coreRoot}'
+      ";
+    }
+  '';
+
+  coreEnsureInfra = pkgs.writeShellScriptBin "core-ensure-infra" ''
+    set -euo pipefail
+
+    export PGDATA="${corePgData}"
+    export PGHOST="${corePgSocketDir}"
+    export PGPORT="${toString corePgPort}"
+    export PGUSER="bas"
+
+    mkdir -p "${coreRuntimeDir}" "${corePgSocketDir}" "${coreRedisDir}"
+
+    if [ ! -f "${corePgData}/PG_VERSION" ]; then
+      echo "[core] initializing postgres"
+      ${pkgs.postgresql}/bin/initdb -D "${corePgData}" >/dev/null
+    fi
+
+    if ! ${pkgs.postgresql}/bin/pg_isready -h "${corePgSocketDir}" -p "${
+      toString corePgPort
+    }" >/dev/null 2>&1; then
+      echo "[core] starting postgres"
+      ${pkgs.postgresql}/bin/pg_ctl -D "${corePgData}" stop -m fast >/dev/null 2>&1 || true
+      rm -f "${corePgSocketDir}/.s.PGSQL.${
+        toString corePgPort
+      }" "${corePgSocketDir}/.s.PGSQL.${toString corePgPort}.lock"
+      ${pkgs.postgresql}/bin/pg_ctl \
+        -D "${corePgData}" \
+        -l "${corePgLog}" \
+        -o "-k ${corePgSocketDir} -p ${
+          toString corePgPort
+        } -c listen_addresses=" \
+        start >/dev/null
+    fi
+
+    if ! ${pkgs.redis}/bin/redis-cli -p ${
+      toString coreRedisPort
+    } ping >/dev/null 2>&1; then
+      echo "[core] starting redis"
+      if [ -f "${coreRedisPidFile}" ]; then
+        kill "$(cat "${coreRedisPidFile}")" >/dev/null 2>&1 || true
+        rm -f "${coreRedisPidFile}"
+      fi
+
+      ${pkgs.redis}/bin/redis-server \
+        --daemonize yes \
+        --port ${toString coreRedisPort} \
+        --dir "${coreRedisDir}" \
+        --pidfile "${coreRedisPidFile}" \
+        --logfile "${coreRedisLog}"
+    fi
+  '';
+
+  coreBootstrap = pkgs.writeShellScriptBin "core-bootstrap" ''
+    set -euo pipefail
+    ${coreEnsureInfra}/bin/core-ensure-infra
+    exec nix-shell "${coreShellNix}" --command '
+      . "${coreEnv}"
+      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      cd "${coreRoot}"
+
+      if [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
+        echo "[core] missing RailsLTS auth. Export RAILSLTS_KEY_DEV or BUNDLE_GEMS__RAILSLTS__COM first." >&2
+        exit 1
+      fi
+
+      bundle config set gems.railslts.com "$BUNDLE_GEMS__RAILSLTS__COM"
+      bundle install
+      bundle exec rails db:create
+      bundle exec rails db:migrate
+    '
+  '';
+
+  coreWebDev = pkgs.writeShellScriptBin "core-web-dev" ''
+    set -euo pipefail
+    ${coreEnsureInfra}/bin/core-ensure-infra
+    exec nix-shell "${coreShellNix}" --command '
+      . "${coreEnv}"
+      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      cd "${coreRoot}"
+      exec bundle exec rails server -b 0.0.0.0 -p "$PORT"
+    '
+  '';
+
+  coreSidekiqDev = pkgs.writeShellScriptBin "core-sidekiq-dev" ''
+    set -euo pipefail
+    ${coreEnsureInfra}/bin/core-ensure-infra
+    exec nix-shell "${coreShellNix}" --command '
+      . "${coreEnv}"
+      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      cd "${coreRoot}"
+      exec bundle exec sidekiq -C config/sidekiq_all.yml
+    '
+  '';
+
+  coreSidekiqAssignmentsDev =
+    pkgs.writeShellScriptBin "core-sidekiq-assignments-dev" ''
+      set -euo pipefail
+      ${coreEnsureInfra}/bin/core-ensure-infra
+      exec nix-shell "${coreShellNix}" --command '
+        . "${coreEnv}"
+        export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
+        export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+        export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
+        export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+        export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+        cd "${coreRoot}"
+        exec bundle exec sidekiq -C config/sidekiq_assignments.yml
+      '
+    '';
 in {
   home-manager.users.bas.home.packages = [
+    pkgs.postgresql
     pulseEnsureInfra
     pulseBootstrap
     pulseFrontendBootstrap
@@ -338,6 +571,11 @@ in {
     pulseSidekiqDev
     pulseAgentDev
     pulseWsDev
+    coreEnsureInfra
+    coreBootstrap
+    coreWebDev
+    coreSidekiqDev
+    coreSidekiqAssignmentsDev
 
     (pkgs.writeShellScriptBin "pulse-shell" ''
       set -euo pipefail
@@ -345,14 +583,31 @@ in {
       exec nix-shell "${pulseShellNix}" --command '. "${pulseEnv}"; ${pkgs.zsh}/bin/zsh -i'
     '')
 
+    (pkgs.writeShellScriptBin "core-shell" ''
+      set -euo pipefail
+      ${coreEnsureInfra}/bin/core-ensure-infra
+      exec nix-shell "${coreShellNix}" --command '. "${coreEnv}"; ${pkgs.zsh}/bin/zsh -i'
+    '')
+
     (pkgs.writeShellScriptBin "pulse-pg-stop" ''
       ${pkgs.postgresql}/bin/pg_ctl -D "${pgData}" stop -m fast || true
+    '')
+
+    (pkgs.writeShellScriptBin "core-pg-stop" ''
+      ${pkgs.postgresql}/bin/pg_ctl -D "${corePgData}" stop -m fast || true
     '')
 
     (pkgs.writeShellScriptBin "pulse-redis-stop" ''
       if [ -f "${redisPidFile}" ]; then
         kill "$(cat "${redisPidFile}")" || true
         rm -f "${redisPidFile}"
+      fi
+    '')
+
+    (pkgs.writeShellScriptBin "core-redis-stop" ''
+      if [ -f "${coreRedisPidFile}" ]; then
+        kill "$(cat "${coreRedisPidFile}")" || true
+        rm -f "${coreRedisPidFile}"
       fi
     '')
   ] ++ lib.optionals pkgs.stdenv.isLinux [
@@ -397,6 +652,26 @@ in {
         anycable:
           command: pulse-anycable-dev
       $ws_process
+      EOF
+
+            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+    '')
+
+    (pkgs.writeShellScriptBin "core-dev" ''
+            set -euo pipefail
+
+            config_file="$(mktemp)"
+            trap 'rm -f "$config_file"' EXIT
+
+            ${pkgs.coreutils}/bin/cat > "$config_file" <<EOF
+      version: "0.5"
+      processes:
+        web:
+          command: core-web-dev
+        sidekiq:
+          command: core-sidekiq-dev
+        sidekiq_assignments:
+          command: core-sidekiq-assignments-dev
       EOF
 
             exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
