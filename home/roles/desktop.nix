@@ -8,7 +8,13 @@ let
   isDarwin = lib.hasInfix "darwin" system;
 
   commonPkgs = with pkgsUnstable; [ spotify ];
-  linuxPkgs = with pkgsUnstable; [ ghostty gnome-calculator inkscape playerctl vlc ];
+  linuxPkgs = with pkgsUnstable; [
+    ghostty
+    gnome-calculator
+    inkscape
+    playerctl
+    vlc
+  ];
   darwinPkgs = with pkgsUnstable; [ wezterm ];
 in {
   options.roles.desktop.enable = lib.mkEnableOption "Desktop role";

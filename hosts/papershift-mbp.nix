@@ -493,11 +493,11 @@ let
     ${coreEnsureInfra}/bin/core-ensure-infra
     exec nix-shell "${coreShellNix}" --command '
       . "${coreEnv}"
-      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
-      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
-      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
-      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
-      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      export STATION_APP_PUSHER_ID="''${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="''${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="''${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="''${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="''${SEGMENT_API_KEY:-local-segment-key}"
       cd "${coreRoot}"
 
       if [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
@@ -517,11 +517,11 @@ let
     ${coreEnsureInfra}/bin/core-ensure-infra
     exec nix-shell "${coreShellNix}" --command '
       . "${coreEnv}"
-      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
-      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
-      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
-      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
-      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      export STATION_APP_PUSHER_ID="''${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="''${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="''${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="''${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="''${SEGMENT_API_KEY:-local-segment-key}"
       cd "${coreRoot}"
       exec bundle exec rails server -b 0.0.0.0 -p "$PORT"
     '
@@ -532,11 +532,11 @@ let
     ${coreEnsureInfra}/bin/core-ensure-infra
     exec nix-shell "${coreShellNix}" --command '
       . "${coreEnv}"
-      export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
-      export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
-      export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
-      export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
-      export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+      export STATION_APP_PUSHER_ID="''${STATION_APP_PUSHER_ID:-local-station}"
+      export STATION_APP_PUSHER_SECRET="''${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+      export PLAN_APP_PUSHER_ID="''${PLAN_APP_PUSHER_ID:-local-plan}"
+      export PLAN_APP_PUSHER_SECRET="''${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+      export SEGMENT_API_KEY="''${SEGMENT_API_KEY:-local-segment-key}"
       cd "${coreRoot}"
       exec bundle exec sidekiq -C config/sidekiq_all.yml
     '
@@ -548,11 +548,11 @@ let
       ${coreEnsureInfra}/bin/core-ensure-infra
       exec nix-shell "${coreShellNix}" --command '
         . "${coreEnv}"
-        export STATION_APP_PUSHER_ID="${STATION_APP_PUSHER_ID:-local-station}"
-        export STATION_APP_PUSHER_SECRET="${STATION_APP_PUSHER_SECRET:-local-station-secret}"
-        export PLAN_APP_PUSHER_ID="${PLAN_APP_PUSHER_ID:-local-plan}"
-        export PLAN_APP_PUSHER_SECRET="${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
-        export SEGMENT_API_KEY="${SEGMENT_API_KEY:-local-segment-key}"
+        export STATION_APP_PUSHER_ID="''${STATION_APP_PUSHER_ID:-local-station}"
+        export STATION_APP_PUSHER_SECRET="''${STATION_APP_PUSHER_SECRET:-local-station-secret}"
+        export PLAN_APP_PUSHER_ID="''${PLAN_APP_PUSHER_ID:-local-plan}"
+        export PLAN_APP_PUSHER_SECRET="''${PLAN_APP_PUSHER_SECRET:-local-plan-secret}"
+        export SEGMENT_API_KEY="''${SEGMENT_API_KEY:-local-segment-key}"
         cd "${coreRoot}"
         exec bundle exec sidekiq -C config/sidekiq_assignments.yml
       '
