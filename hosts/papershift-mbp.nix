@@ -558,6 +558,8 @@ let
       '
     '';
 in {
+  home-manager.users.bas.roles.papershift.enable = true;
+
   home-manager.users.bas.home.packages = [
     pkgs.postgresql
     pulseEnsureInfra
@@ -587,6 +589,26 @@ in {
       set -euo pipefail
       ${coreEnsureInfra}/bin/core-ensure-infra
       exec nix-shell "${coreShellNix}" --command '. "${coreEnv}"; ${pkgs.zsh}/bin/zsh -i'
+    '')
+
+    (pkgs.writeShellScriptBin "core-rubocop-format" ''
+      set -euo pipefail
+
+      if [ "$#" -ne 1 ]; then
+        echo "usage: core-rubocop-format <project-relative-file>" >&2
+        exit 2
+      fi
+
+      relpath="$1"
+      tmpfile="$(mktemp)"
+      trap 'rm -f "$tmpfile"' EXIT
+      cat > "$tmpfile"
+
+      exec nix-shell "${coreShellNix}" --command "
+        . '${coreEnv}'
+        cd '${coreRoot}'
+        bundle exec rubocop -A -f quiet --stderr --stdin '$relpath' < '$tmpfile'
+      "
     '')
 
     (pkgs.writeShellScriptBin "pulse-pg-stop" ''
