@@ -14,7 +14,6 @@ in {
         nixfmt-rfc-style
         go
         gopls
-        gotools
         pyright
         black
         isort

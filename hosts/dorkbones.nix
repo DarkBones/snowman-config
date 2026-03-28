@@ -1,6 +1,7 @@
 { pkgs, lib, ... }: {
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
+  systemd.tmpfiles.rules = [ "L+ /bin/bash - - - - ${pkgs.bash}/bin/bash" ];
   boot.initrd.systemd.enable = true;
   zramSwap = {
     enable = true;
@@ -86,10 +87,22 @@
       allowPing = true;
 
       # LAN access: SSH
-      allowedTCPPorts = [ 22 80 13378 ];
+      allowedTCPPorts = [
+        22
+        80
+        13378
+        27036 # Steam link
+        27037 # Steam link
+      ];
 
       # LAN discovery
-      allowedUDPPorts = [ 5353 ];
+      allowedUDPPorts = [
+        5353
+        27031 # Steam link
+        27036 # Steam link
+        10400 # Steam link
+        10401 # Steam link
+      ];
 
       checkReversePath = "loose";
 

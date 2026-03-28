@@ -607,7 +607,9 @@ in {
       exec nix-shell "${coreShellNix}" --command "
         . '${coreEnv}'
         cd '${coreRoot}'
-        bundle exec rubocop -A -f quiet --stderr --stdin '$relpath' < '$tmpfile'
+        bundle exec rubocop -a \
+          --except Style/NegatedIf,Style/IfUnlessModifier,Style/GuardClause \
+          -f quiet --stderr --stdin '$relpath' < '$tmpfile'
       "
     '')
 
