@@ -11,18 +11,21 @@
 
     settings = {
       initial_session = {
-        command = "${pkgs.hyprland}/bin/Hyprland";
+        # Let UWSM own the compositor lifecycle so logging out releases VT1 cleanly.
+        command = "${pkgs.uwsm}/bin/uwsm start -F -- /run/current-system/sw/bin/Hyprland";
         user = "bas";
       };
 
       default_session = {
-        command = "${pkgs.regreet}/bin/regreet";
+        # Keep the post-logout path on a plain TTY so exiting Hyprland
+        # returns to a shell where startx can be launched manually.
+        command =
+          "${pkgs.greetd}/bin/agreety --cmd /run/current-system/sw/bin/zsh -l";
         user = "greeter";
       };
     };
   };
 
-  environment.systemPackages = [ pkgs.regreet ];
   programs.hyprland.enable = true;
 
   boot.kernelParams = [ "quiet" "loglevel=3" ];

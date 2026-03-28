@@ -25,5 +25,20 @@ in {
   config = lib.mkIf (hasDesktopHost && cfg.enable) {
     home.packages = commonPkgs ++ lib.optionals isLinux linuxPkgs
       ++ lib.optionals isDarwin darwinPkgs;
+
+    home.file = lib.mkIf isLinux {
+      ".xinitrc".text = ''
+        unset DISPLAY
+        unset WAYLAND_DISPLAY
+        unset SWAYSOCK
+        unset HYPRLAND_INSTANCE_SIGNATURE
+
+        export XDG_SESSION_TYPE=x11
+        export XDG_CURRENT_DESKTOP=XFCE
+        export DESKTOP_SESSION=xfce
+
+        exec dbus-run-session startxfce4
+      '';
+    };
   };
 }

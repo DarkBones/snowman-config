@@ -1,5 +1,8 @@
 { pkgs, ... }: {
-  programs.hyprland.enable = true;
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
 
   environment.systemPackages = with pkgs; [
     papirus-icon-theme
@@ -10,14 +13,6 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-  };
-
-  services.displayManager = {
-    defaultSession = "hyprland";
-    sddm = {
-      enable = true;
-      wayland.enable = true;
-    };
   };
 
   # --- Audio (Pipewire) ---

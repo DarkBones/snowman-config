@@ -1,8 +1,4 @@
-{ pkgs, lib, ... }:
-let
-  polkitAgent =
-    "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-in {
+{ pkgs, lib, ... }: {
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   boot.initrd.systemd.enable = true;
@@ -47,17 +43,6 @@ in {
           }
         ];
       }];
-    };
-  };
-
-  systemd.user.services.polkit-gnome-agent = {
-    description = "Polkit GNOME Authentication Agent";
-    wantedBy = [ "default.target" ];
-    after = [ "graphical-session-pre.target" "dbus.service" ];
-    serviceConfig = {
-      ExecStart = polkitAgent;
-      Restart = "on-failure";
-      RestartSec = 1;
     };
   };
 
