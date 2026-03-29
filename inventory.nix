@@ -89,6 +89,7 @@ rec {
         "lsp"
         "dotfiles"
         "searxng"
+        "snowman"
         "ssh"
         "macos-wm"
       ];
@@ -109,6 +110,7 @@ rec {
         "lsp"
         "dotfiles"
         "searxng"
+        "snowman"
         "ssh"
         "macos-wm"
       ];
@@ -168,6 +170,7 @@ rec {
         openclaw.enable = true;
         secrets.enable = true;
         searxng.enable = true;
+        snowman.enable = true;
         ssh.enable = true;
 
         dotfiles = {

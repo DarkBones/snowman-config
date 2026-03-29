@@ -557,6 +557,7 @@
       },
       "original": {
         "owner": "DarkBones",
+        "ref": "rename-script",
         "repo": "snowman",
         "type": "github"
       }
