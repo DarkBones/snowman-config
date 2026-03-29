@@ -81,8 +81,17 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles =
-        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+      availableRoles = [
+        "bas"
+        "desktop"
+        "dev"
+        "dev-heavy"
+        "lsp"
+        "dotfiles"
+        "searxng"
+        "ssh"
+        "macos-wm"
+      ];
 
       extraModules = [ ./hosts/papershift-mbp.nix ]; # TODO: REMOVE
     };
@@ -92,8 +101,17 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
-      availableRoles =
-        [ "bas" "desktop" "dev" "dev-heavy" "lsp" "dotfiles" "ssh" "macos-wm" ];
+      availableRoles = [
+        "bas"
+        "desktop"
+        "dev"
+        "dev-heavy"
+        "lsp"
+        "dotfiles"
+        "searxng"
+        "ssh"
+        "macos-wm"
+      ];
 
       extraModules = [ ./hosts/papershift-mbp.nix ];
     };
@@ -149,6 +167,7 @@ rec {
         macos-wm.enable = true;
         openclaw.enable = true;
         secrets.enable = true;
+        searxng.enable = true;
         ssh.enable = true;
 
         dotfiles = {
