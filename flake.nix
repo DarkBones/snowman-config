@@ -30,7 +30,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman";
+      url = "github:DarkBones/snowman/rename-script";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
