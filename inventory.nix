@@ -32,6 +32,7 @@ rec {
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
         ./modules/gaming.nix
+        ./modules/alvr.nix
         ./modules/openwebui.nix
         ./modules/searxng.nix
         ./modules/ollama.nix
@@ -41,7 +42,7 @@ rec {
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
         ./hosts/papershift-mbp.nix # TODO: REMOVE
-        ({ ... }: { roles.gaming.enable = true; })
+        ({ ... }: { roles.gaming.enable = true; roles.alvr.enable = true; })
       ];
 
       # wifi = {
@@ -123,7 +124,7 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [ "wheel" "media" ];
+      groups = [ "wheel" "media" "adbusers" ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [

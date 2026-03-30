@@ -13,6 +13,7 @@ in {
       dualsensectl
       piper
       openrgb
+      alvr
     ];
   };
 }
