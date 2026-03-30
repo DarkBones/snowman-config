@@ -1,30 +1,18 @@
-{ lib, pkgs, ... }: {
+{ lib, ... }: {
   # Kill SDDM
   services.displayManager.sddm.enable = lib.mkForce false;
 
   # Make sure we aren't autologging in via getty anymore
   services.getty.autologinUser = lib.mkForce null;
 
-  # Wayland login manager
-  services.greetd = {
-    enable = true;
+  # Keep greetd in greeter-first mode so logout returns to a real login
+  # manager and X11 sessions can be launched from a seat-owned greeter.
+  services.greetd.enable = true;
+  programs.regreet.enable = true;
 
-    settings = {
-      initial_session = {
-        # Let UWSM own the compositor lifecycle so logging out releases VT1 cleanly.
-        command = "${pkgs.uwsm}/bin/uwsm start -F -- /run/current-system/sw/bin/Hyprland";
-        user = "bas";
-      };
-
-      default_session = {
-        # Keep the post-logout path on a plain TTY so exiting Hyprland
-        # returns to a shell where startx can be launched manually.
-        command =
-          "${pkgs.greetd}/bin/agreety --cmd /run/current-system/sw/bin/zsh -l";
-        user = "greeter";
-      };
-    };
-  };
+  # Make Hyprland the default pick while still exposing XFCE as a fallback
+  # session in ReGreet for SteamVR / ALVR testing.
+  services.displayManager.defaultSession = "hyprland-uwsm";
 
   programs.hyprland.enable = true;
 

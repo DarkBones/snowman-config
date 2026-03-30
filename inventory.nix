@@ -42,10 +42,10 @@ rec {
         ({ ... }: { roles.gaming.enable = true; })
       ];
 
-      wifi = {
-        mode = "roaming";
-        networks = [ "home" ];
-      };
+      # wifi = {
+      #   mode = "roaming";
+      #   networks = [ "home" ];
+      # };
 
       bootstrap.usb = {
         enable = true;
