@@ -1,21 +1,7 @@
 { lib, pkgsUnstable, pkgs, config, ... }:
 let
   cfg = config.roles.gaming;
-  alvrPkg = pkgsUnstable.alvr.overrideAttrs (old: {
-    postInstall = (old.postInstall or "") + ''
-      mv $out/libexec/alvr/vrcompositor-wrapper $out/libexec/alvr/vrcompositor-wrapper-unwrapped
-      cat > $out/libexec/alvr/vrcompositor-wrapper << EOF
-#!/usr/bin/env bash
-unset LD_LIBRARY_PATH
-unset LD_PRELOAD
-unset VRCOMPOSITOR_LD_LIBRARY_PATH
-unset STEAM_RUNTIME
-unset STEAM_ZENITY
-exec ${pkgs.steam-run}/bin/steam-run $out/libexec/alvr/vrcompositor-wrapper-unwrapped "\$@"
-EOF
-      chmod +x $out/libexec/alvr/vrcompositor-wrapper
-    '';
-  });
+  alvrPkg = pkgs.callPackage ../../pkgs/alvr-20.13.0.nix { };
   alvrDashboardX11 = pkgs.writeShellScriptBin "alvr-dashboard-x11" ''
     unset WAYLAND_DISPLAY
     unset WAYLAND_SOCKET
@@ -26,30 +12,21 @@ EOF
 
     exec ${alvrPkg}/bin/alvr_dashboard "$@"
   '';
-  alvrDefaultSession = pkgs.writeText "alvr-session.json"
-    (builtins.toJSON {
-      session_settings = {
-        capture = {
-          capture_method = {
-            variant = "Wlr";
-          };
-        };
-        headset = {
-          controllers = {
-            enabled = false;
-            content = {
-              tracked = false;
-              hand_skeleton = {
-                enabled = false;
-              };
-            };
+  alvrDefaultSession = pkgs.writeText "alvr-session.json" (builtins.toJSON {
+    session_settings = {
+      capture = { capture_method = { variant = "Wlr"; }; };
+      headset = {
+        controllers = {
+          enabled = false;
+          content = {
+            tracked = false;
+            hand_skeleton = { enabled = false; };
           };
         };
       };
-      openvr_config = {
-        use_separate_hand_trackers = false;
-      };
-    });
+    };
+    openvr_config = { use_separate_hand_trackers = false; };
+  });
 in {
   options.roles.gaming.enable = lib.mkEnableOption "Gaming (home)";
 
@@ -63,7 +40,7 @@ in {
       dualsensectl
       piper
       openrgb
-      picom  # X11 compositor for startx environment
+      picom # X11 compositor for startx environment
       alvrPkg
       alvrDashboardX11
     ];
@@ -88,9 +65,12 @@ in {
         if [ -e "$session_file" ]; then
           ${pkgs.jq}/bin/jq '
             .openvr_config.use_separate_hand_trackers = false
+            | .openvr_config.force_sw_encoding = true
             | .session_settings.headset.controllers.enabled = false
             | .session_settings.headset.controllers.content.tracked = false
             | .session_settings.headset.controllers.content.hand_skeleton.enabled = false
+            | .session_settings.video.encoder_config.software.force_software_encoding = true
+            | .session_settings.video.encoder_config.software.thread_count = 0
           ' "$session_file" > "$tmp_file"
           mv "$tmp_file" "$session_file"
           chmod 600 "$session_file"
@@ -102,13 +82,19 @@ in {
         steamvr_root="$HOME/.local/share/Steam/steamapps/common/SteamVR"
         launcher="$steamvr_root/bin/linux64/vrcompositor-launcher.sh"
         backup="$steamvr_root/bin/linux64/vrcompositor-launcher.sh.bak"
-        launch_options="QT_QPA_PLATFORM=xcb $steamvr_root/bin/vrmonitor.sh %command%"
+        launch_options="__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia VK_DRIVER_FILES=/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json QT_QPA_PLATFORM=xcb $steamvr_root/bin/vrmonitor.sh %command%"
+        vrwebhelper_script="$steamvr_root/bin/vrwebhelper/linux64/vrwebhelper.sh"
+        steamvr_settings="$HOME/.local/share/Steam/config/steamvr.vrsettings"
 
         if [ -f "$launcher" ] && [ -f "$backup" ] \
           && ${pkgs.gnugrep}/bin/grep -Fq 'Bypassing vrcompositor-launcher' "$launcher" \
           && ${pkgs.gnugrep}/bin/grep -Fq 'exec "$ROOT/vrcompositor-launcher" "$@"' "$backup"; then
           cp "$backup" "$launcher"
           chmod 755 "$launcher"
+        fi
+
+        if [ -f "$launcher" ] && [ ! -f "$backup" ]; then
+          cp -a "$launcher" "$backup"
         fi
 
         for steam_root in "$HOME/.local/share/Steam" "$HOME/.steam/root"; do
@@ -132,6 +118,51 @@ in {
             fi
           done < <(${pkgs.findutils}/bin/find "$userdata_dir" -path '*/config/localconfig.vdf' -type f)
         done
+
+        if [ -f "$backup" ]; then
+          cp "$backup" "$launcher"
+          chmod 755 "$launcher"
+        fi
+
+        if [ -f "$vrwebhelper_script" ] \
+          && ! ${pkgs.gnugrep}/bin/grep -Fq '/run/current-system/sw/share/nix-ld/lib' "$vrwebhelper_script"; then
+          tmp_file="$vrwebhelper_script.tmp"
+          ${pkgs.gawk}/bin/awk '
+            /^exec "\$\{in_runtime\[@\]\}" \.\/vrwebhelper "\$@"$/ {
+              print "export LD_LIBRARY_PATH=\"/run/current-system/sw/share/nix-ld/lib''${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}\""
+            }
+            { print }
+          ' "$vrwebhelper_script" > "$tmp_file"
+          if ! ${pkgs.diffutils}/bin/cmp -s "$vrwebhelper_script" "$tmp_file"; then
+            mv "$tmp_file" "$vrwebhelper_script"
+            chmod 755 "$vrwebhelper_script"
+          else
+            rm -f "$tmp_file"
+          fi
+        fi
+
+        if [ -f "$steamvr_settings" ]; then
+          tmp_file="$steamvr_settings.tmp"
+          ${pkgs.jq}/bin/jq '
+            if has("driver_alvr_server") then
+              .driver_alvr_server.blocked_by_safe_mode = false
+            else
+              . + { "driver_alvr_server": { "blocked_by_safe_mode": false } }
+            end
+            | if has("driver_prism") then
+                .driver_prism.blocked_by_safe_mode = false
+              else
+                .
+              end
+          ' "$steamvr_settings" > "$tmp_file"
+
+          if ! ${pkgs.diffutils}/bin/cmp -s "$steamvr_settings" "$tmp_file"; then
+            mv "$tmp_file" "$steamvr_settings"
+            chmod 600 "$steamvr_settings"
+          else
+            rm -f "$tmp_file"
+          fi
+        fi
       '';
   };
 }
