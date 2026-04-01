@@ -66,9 +66,9 @@ in {
           ${pkgs.jq}/bin/jq '
             .openvr_config.use_separate_hand_trackers = false
             | .openvr_config.force_sw_encoding = true
-            | .session_settings.headset.controllers.enabled = false
-            | .session_settings.headset.controllers.content.tracked = false
-            | .session_settings.headset.controllers.content.hand_skeleton.enabled = false
+            | .session_settings.headset.controllers.enabled = true
+            | .session_settings.headset.controllers.content.tracked = true
+            | .session_settings.headset.controllers.content.hand_skeleton.enabled = true
             | .session_settings.video.encoder_config.software.force_software_encoding = true
             | .session_settings.video.encoder_config.software.thread_count = 0
           ' "$session_file" > "$tmp_file"
