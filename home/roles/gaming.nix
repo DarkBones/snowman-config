@@ -82,7 +82,7 @@ in {
         steamvr_root="$HOME/.local/share/Steam/steamapps/common/SteamVR"
         launcher="$steamvr_root/bin/linux64/vrcompositor-launcher.sh"
         backup="$steamvr_root/bin/linux64/vrcompositor-launcher.sh.bak"
-        launch_options="__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia VK_DRIVER_FILES=/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json QT_QPA_PLATFORM=xcb $steamvr_root/bin/vrmonitor.sh %command%"
+        launch_options="env -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u SWAYSOCK -u HYPRLAND_INSTANCE_SIGNATURE DISPLAY=\$DISPLAY XAUTHORITY=''${XAUTHORITY:-\$HOME/.Xauthority} XDG_SESSION_TYPE=x11 SDL_VIDEODRIVER=x11 GDK_BACKEND=x11 __NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only __GLX_VENDOR_LIBRARY_NAME=nvidia VK_DRIVER_FILES=/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json QT_QPA_PLATFORM=xcb $steamvr_root/bin/vrmonitor.sh %command%"
         vrwebhelper_script="$steamvr_root/bin/vrwebhelper/linux64/vrwebhelper.sh"
         steamvr_settings="$HOME/.local/share/Steam/config/steamvr.vrsettings"
 
@@ -154,6 +154,11 @@ in {
               else
                 .
               end
+            | .steamvr.showMirrorView = false
+            | .steamvr.mirrorViewDisplayMode = 0
+            | .steamvr.mirrorViewEye = 0
+            | .steamvr.enableHomeApp = false
+            | .dashboard.showOnAppExit = false
           ' "$steamvr_settings" > "$tmp_file"
 
           if ! ${pkgs.diffutils}/bin/cmp -s "$steamvr_settings" "$tmp_file"; then
