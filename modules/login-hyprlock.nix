@@ -11,7 +11,7 @@
   programs.regreet.enable = true;
 
   # Make Hyprland the default pick while still exposing XFCE as a fallback
-  # session in ReGreet for SteamVR / ALVR testing.
+  # session in ReGreet when a non-Wayland session is needed.
   services.displayManager.defaultSession = "hyprland-uwsm";
 
   programs.hyprland.enable = true;
