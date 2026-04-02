@@ -43,6 +43,11 @@
       url = "github:nix-community/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-openclaw = {
+      url = "github:openclaw/nix-openclaw";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
@@ -96,6 +101,9 @@
             inputs.stylix.nixosModules.stylix
             ./modules/stylix.nix
           ]) ++ [
+            ({ inputs, ... }: {
+              nixpkgs.overlays = [ inputs.nix-openclaw.overlays.default ];
+            })
             snowman.nixosModules.default
             home-manager.nixosModules.home-manager
             ({ currentHost, inv, ... }: {
@@ -110,9 +118,23 @@
 
             ./modules/snowman-dotfiles.nix
 
-            ({ lib, ... }: {
+            ({ lib, pkgs, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
-              home-manager.backupFileExtension = "backup";
+              home-manager.backupCommand = pkgs.writeShellScript "hm-backup" ''
+                set -euo pipefail
+
+                target="$1"
+                stamp="$(${pkgs.coreutils}/bin/date +%Y%m%d-%H%M%S)"
+                backup="''${target}.backup-''${stamp}"
+                i=0
+
+                while [ -e "$backup" ]; do
+                  i=$((i + 1))
+                  backup="''${target}.backup-''${stamp}-''${i}"
+                done
+
+                exec ${pkgs.coreutils}/bin/mv "$target" "$backup"
+              '';
 
               assertions = lib.optionals strictHw [{
                 assertion = builtins.pathExists hwFile;

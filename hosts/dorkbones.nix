@@ -64,6 +64,8 @@
 
     extraHosts = ''
       127.0.0.1 ai
+      127.0.0.1 openclaw
+      127.0.0.1 search
       127.0.0.1 sonarr
       127.0.0.1 radarr
       127.0.0.1 shelf
@@ -125,6 +127,18 @@
         "ai" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:4080";
+            proxyWebsockets = true;
+          };
+        };
+        "openclaw" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:18789";
+            proxyWebsockets = true;
+          };
+        };
+        "search" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:8888";
             proxyWebsockets = true;
           };
         };

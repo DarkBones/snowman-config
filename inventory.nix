@@ -33,6 +33,7 @@ rec {
         ./modules/nvidia.nix
         ./modules/gaming.nix
         ./modules/openwebui.nix
+        ./modules/searxng.nix
         ./modules/ollama.nix
         ./modules/login-hyprlock.nix
         ./modules/media.nix
@@ -105,7 +106,10 @@ rec {
         keys = [
           "password_hash"
           "openai_api_key"
+          "anthropic_api_key"
           "gemini_api_key"
+          "openclaw_gateway_token"
+          "openclaw_telegram_bot_token"
           "home_assistant_long_lived_token"
           "nzb_geek_username"
           "nzb_geek_key"
@@ -125,6 +129,7 @@ rec {
         hyprland.enable = true;
         lsp.enable = true;
         macos-wm.enable = true;
+        openclaw.enable = true;
         secrets.enable = true;
         ssh.enable = true;
 
