@@ -2,10 +2,23 @@
 let
   cfg = config.roles.openclaw;
   isLinux = pkgs.stdenv.isLinux;
-  documentsDir = builtins.path {
-    path = "${config.dotfiles.root}/openclaw/documents";
-    name = "openclaw-documents";
-  };
+  documentsDir = "${cfg.documentsRepoDir}/documents";
+  requiredDocumentFiles = [
+    "AGENTS.md"
+    "SOUL.md"
+    "TOOLS.md"
+  ];
+  optionalDocumentFiles = [
+    "IDENTITY.md"
+    "USER.md"
+    "LORE.md"
+    "HEARTBEAT.md"
+    "PROMPTING-EXAMPLES.md"
+  ];
+  documentFiles = requiredDocumentFiles ++ optionalDocumentFiles;
+  workspaceDir = "${config.home.homeDirectory}/.openclaw/workspace";
+  whatsappAuthDir = "${config.home.homeDirectory}/.openclaw/whatsapp/main";
+  bundledPluginsDir = "${config.programs.openclaw.package}/lib/openclaw/extensions";
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
@@ -62,15 +75,27 @@ let
 in {
   imports = [ inputs.nix-openclaw.homeManagerModules.openclaw ];
 
-  options.roles.openclaw.enable = lib.mkEnableOption "OpenClaw role";
+  options.roles.openclaw = {
+    enable = lib.mkEnableOption "OpenClaw role";
+
+    documentsRepoDir = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.home.homeDirectory}/Developer/openclaw";
+      description = ''
+        Private checkout that contains the OpenClaw documents directory.
+        The workspace files are symlinked from this checkout's documents directory.
+      '';
+    };
+  };
 
   config = lib.mkIf (cfg.enable && isLinux) {
     home.packages = [ searxngSearch ];
+    home.file.".openclaw/openclaw.json".force = true;
 
     programs.openclaw = {
       enable = true;
       package = pkgs.openclaw-gateway;
-      documents = documentsDir;
+      documents = null;
 
       skills = [
         {
@@ -102,6 +127,21 @@ in {
             dangerouslyDisableDeviceAuth = true;
           };
         };
+
+        channels.whatsapp = {
+          enabled = true;
+          defaultAccount = "main";
+
+          accounts.main = {
+            enabled = true;
+            name = "main";
+            authDir = whatsappAuthDir;
+            allowFrom = [ "*" ];
+            dmPolicy = "open";
+            groupPolicy = "disabled";
+            sendReadReceipts = false;
+          };
+        };
       };
     };
 
@@ -129,7 +169,51 @@ in {
         printf 'SEARXNG_BASE_URL=%s\n' "http://127.0.0.1:8888" >> "$env_file"
       '';
 
+    home.activation.openclawDocuments =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] (
+        ''
+          documents_dir="${documentsDir}"
+          workspace_dir="${workspaceDir}"
+
+          if [ ! -d "$documents_dir" ]; then
+            echo "OpenClaw documents directory not found: $documents_dir" >&2
+            echo "Create a private checkout there, or override roles.openclaw.documentsRepoDir." >&2
+            exit 1
+          fi
+
+          mkdir -p "$workspace_dir"
+        ''
+        + lib.concatMapStrings (name: ''
+          if [ ! -f "$documents_dir/${name}" ]; then
+            echo "Missing OpenClaw document: $documents_dir/${name}" >&2
+            exit 1
+          fi
+        '') requiredDocumentFiles
+        + lib.concatMapStrings (name: ''
+          target="$workspace_dir/${name}"
+          source="$documents_dir/${name}"
+
+          if [ -e "$target" ] && [ ! -L "$target" ]; then
+            echo "Refusing to replace non-symlink OpenClaw document: $target" >&2
+            exit 1
+          fi
+
+          if [ -f "$source" ]; then
+            ln -sfn "$source" "$target"
+          else
+            rm -f "$target"
+          fi
+        '') documentFiles
+      );
+
+    home.activation.openclawWhatsApp =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p "${whatsappAuthDir}"
+      '';
+
     systemd.user.services.openclaw-gateway.Service.EnvironmentFile =
       "-${config.home.homeDirectory}/.config/openclaw/openclaw.env";
+    systemd.user.services.openclaw-gateway.Service.Environment =
+      [ "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsDir}" ];
   };
 }
