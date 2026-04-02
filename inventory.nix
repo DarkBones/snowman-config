@@ -106,6 +106,7 @@ rec {
           "password_hash"
           "openai_api_key"
           "gemini_api_key"
+          "home_assistant_long_lived_token"
           "nzb_geek_username"
           "nzb_geek_key"
         ];
