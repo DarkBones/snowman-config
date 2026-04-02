@@ -18,7 +18,12 @@ let
   documentFiles = requiredDocumentFiles ++ optionalDocumentFiles;
   workspaceDir = "${config.home.homeDirectory}/.openclaw/workspace";
   whatsappAuthDir = "${config.home.homeDirectory}/.openclaw/whatsapp/main";
-  bundledPluginsDir = "${config.programs.openclaw.package}/lib/openclaw/extensions";
+  bundledPluginsSourceDir = "${config.programs.openclaw.package}/lib/openclaw/extensions";
+  bundledPluginsDistDir = "${config.programs.openclaw.package}/lib/openclaw/dist/extensions";
+  bundledPluginsRuntimeDir =
+    "${config.home.homeDirectory}/.openclaw/bundled-plugins-runtime";
+  bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
+  bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
@@ -142,6 +147,14 @@ in {
             sendReadReceipts = false;
           };
         };
+
+        channels.telegram = {
+          enabled = true;
+          tokenFile = "/run/secrets/openclaw_telegram_bot_token";
+          allowFrom = [ "*" ];
+          dmPolicy = "open";
+          groupPolicy = "disabled";
+        };
       };
     };
 
@@ -164,6 +177,10 @@ in {
 
         if [ -r /run/secrets/anthropic_api_key ]; then
           printf 'ANTHROPIC_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/anthropic_api_key)" >> "$env_file"
+        fi
+
+        if [ -r /run/secrets/openclaw_telegram_bot_token ]; then
+          printf 'TELEGRAM_BOT_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_telegram_bot_token)" >> "$env_file"
         fi
 
         printf 'SEARXNG_BASE_URL=%s\n' "http://127.0.0.1:8888" >> "$env_file"
@@ -211,9 +228,69 @@ in {
         mkdir -p "${whatsappAuthDir}"
       '';
 
+    home.activation.openclawBundledPlugins =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        source_dir="${bundledPluginsSourceDir}"
+        package_root="${config.programs.openclaw.package}/lib/openclaw"
+        dist_root="${bundledPluginsRuntimeDistDir}"
+        dist_dir="${bundledPluginsRuntimeExtensionsDir}"
+        runtime_dir="${bundledPluginsRuntimeDir}"
+
+        if [ -e "$runtime_dir" ]; then
+          chmod -R u+w "$runtime_dir" || true
+        fi
+        rm -rf "$runtime_dir"
+        mkdir -p "$dist_root"
+        cp -r --no-preserve=mode "$package_root/dist/." "$dist_root/"
+        chmod -R u+w "$runtime_dir"
+        ln -sfn "$package_root/node_modules" "$runtime_dir/node_modules"
+
+        for plugin_dir in "$dist_dir"/*; do
+          [ -d "$plugin_dir" ] || continue
+
+          plugin_name="$(basename "$plugin_dir")"
+          source_plugin_dir="$source_dir/$plugin_name"
+          runtime_plugin_dir="$dist_dir/$plugin_name"
+          manifest="$source_plugin_dir/openclaw.plugin.json"
+          runtime_index="$plugin_dir/index.js"
+          runtime_setup="$plugin_dir/setup-entry.js"
+
+          [ -f "$manifest" ] || continue
+          [ -f "$runtime_index" ] || continue
+
+          mkdir -p "$runtime_plugin_dir"
+          cp "$manifest" "$runtime_plugin_dir/openclaw.plugin.json"
+
+          if [ -f "$runtime_setup" ]; then
+            cat > "$runtime_plugin_dir/package.json" <<EOF
+        {
+          "name": "@openclaw/$plugin_name-runtime",
+          "private": true,
+          "type": "module",
+          "openclaw": {
+            "extensions": ["./index.js"],
+            "setupEntry": "./setup-entry.js"
+          }
+        }
+        EOF
+          else
+            cat > "$runtime_plugin_dir/package.json" <<EOF
+        {
+          "name": "@openclaw/$plugin_name-runtime",
+          "private": true,
+          "type": "module",
+          "openclaw": {
+            "extensions": ["./index.js"]
+          }
+        }
+        EOF
+          fi
+        done
+      '';
+
     systemd.user.services.openclaw-gateway.Service.EnvironmentFile =
       "-${config.home.homeDirectory}/.config/openclaw/openclaw.env";
     systemd.user.services.openclaw-gateway.Service.Environment =
-      [ "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsDir}" ];
+      [ "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsRuntimeExtensionsDir}" ];
   };
 }
