@@ -139,6 +139,7 @@ rec {
 
           linkMap = {
             ".config/ghostty" = "ghostty/.config/ghostty";
+            ".config/darkling" = "darkling/darkling";
             ".config/hypr" = "hyprland/.config/hypr";
             ".config/karabiner" = "karabiner/.config/karabiner";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
