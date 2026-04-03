@@ -30,6 +30,8 @@ let
     linuxScreenshot
     playAudioLocal
     speakLocal
+    youtubeSearchApi
+    youtubeWatchHistory
     searxngSearch
     telegramSend
     pkgs.coreutils
@@ -207,6 +209,333 @@ let
     '';
   };
 
+  youtubeWatchHistory = pkgs.writeShellApplication {
+    name = "youtube-watch-history";
+    runtimeInputs = with pkgs; [ coreutils findutils gnugrep jq sqlite ];
+    text = ''
+      set -euo pipefail
+
+      limit="''${1:-25}"
+      query="''${2:-}"
+
+      if ! printf '%s\n' "$limit" | grep -Eq '^[0-9]+$'; then
+        echo "youtube-watch-history: limit must be a positive integer" >&2
+        exit 2
+      fi
+
+      if [ "$limit" -lt 1 ]; then
+        echo "youtube-watch-history: limit must be at least 1" >&2
+        exit 2
+      fi
+
+      tmp_jsonl="$(mktemp /tmp/youtube-watch-history-XXXXXX.jsonl)"
+      : > "$tmp_jsonl"
+
+      cleanup() {
+        rm -f "$tmp_jsonl" /tmp/youtube-watch-history-db-*.sqlite
+      }
+      trap cleanup EXIT
+
+      collect_db() {
+        local browser="$1"
+        local source_db="$2"
+        local temp_db
+
+        [ -f "$source_db" ] || return 0
+
+        temp_db="$(mktemp /tmp/youtube-watch-history-db-XXXXXX.sqlite)"
+        cp "$source_db" "$temp_db"
+
+        if [ "$browser" = "chromium" ]; then
+          sqlite3 -readonly "$temp_db" "
+            SELECT json_object(
+              'browser', 'chromium',
+              'url', urls.url,
+              'title', COALESCE(urls.title, null),
+              'visited_at_epoch', CAST((visits.visit_time / 1000000) - 11644473600 AS INTEGER)
+            )
+            FROM visits
+            JOIN urls ON urls.id = visits.url
+            WHERE (
+              urls.url LIKE 'https://www.youtube.com/watch%'
+              OR urls.url LIKE 'https://m.youtube.com/watch%'
+              OR urls.url LIKE 'https://youtu.be/%'
+            )
+            ORDER BY visits.visit_time DESC
+            LIMIT 500;
+          " >> "$tmp_jsonl" || true
+        else
+          sqlite3 -readonly "$temp_db" "
+            SELECT json_object(
+              'browser', '$browser',
+              'url', moz_places.url,
+              'title', COALESCE(moz_places.title, null),
+              'visited_at_epoch', CAST(moz_historyvisits.visit_date / 1000000 AS INTEGER)
+            )
+            FROM moz_historyvisits
+            JOIN moz_places ON moz_places.id = moz_historyvisits.place_id
+            WHERE (
+              moz_places.url LIKE 'https://www.youtube.com/watch%'
+              OR moz_places.url LIKE 'https://m.youtube.com/watch%'
+              OR moz_places.url LIKE 'https://youtu.be/%'
+            )
+            ORDER BY moz_historyvisits.visit_date DESC
+            LIMIT 500;
+          " >> "$tmp_jsonl" || true
+        fi
+      }
+
+      while IFS= read -r db; do
+        collect_db "chromium" "$db"
+      done < <(
+        find "$HOME/.config/chromium" -maxdepth 3 -type f -name History 2>/dev/null
+      )
+
+      while IFS= read -r db; do
+        collect_db "firefox" "$db"
+      done < <(
+        find "$HOME/.mozilla/firefox" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
+      )
+
+      while IFS= read -r db; do
+        collect_db "zen" "$db"
+      done < <(
+        find "$HOME/.zen" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
+      )
+
+      if [ ! -s "$tmp_jsonl" ]; then
+        echo "youtube-watch-history: no local YouTube watch history database found" >&2
+        exit 1
+      fi
+
+      jq_filter="$(cat <<'EOF'
+        map(
+          . + {
+            visited_at: (.visited_at_epoch | todateiso8601),
+            video_id: (
+              if (.url | test("v=")) then
+                (.url | capture("[?&]v=(?<id>[^&]+)").id)
+              elif (.url | test("youtu\\.be/")) then
+                (.url | capture("youtu\\.be/(?<id>[^?&/]+)").id)
+              else
+                null
+              end
+            )
+          }
+        )
+        | sort_by(.visited_at_epoch)
+        | reverse
+        | reduce .[] as $item ([]; if any(.[]; .url == $item.url) then . else . + [$item] end)
+EOF
+      )"
+
+      if [ -n "$query" ]; then
+        jq_filter="$jq_filter | map(select((.title + \" \" + .url) | ascii_downcase | contains(\$query)))"
+      fi
+
+      jq_filter="$jq_filter | .[0:\$limit]"
+
+      if [ -n "$query" ]; then
+        jq -s --arg query "$(printf '%s' "$query" | tr '[:upper:]' '[:lower:]')" --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
+      else
+        jq -s --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
+      fi
+    '';
+  };
+
+  youtubeSearchApi = pkgs.writeShellApplication {
+    name = "youtube-search-api";
+    runtimeInputs = with pkgs; [ coreutils curl gnugrep jq ];
+    text = ''
+      set -euo pipefail
+
+      if [ $# -lt 1 ]; then
+        echo "usage: youtube-search-api <keywords> [video_type] [limit]" >&2
+        exit 2
+      fi
+
+      : "''${YOUTUBE_API_KEY:?YOUTUBE_API_KEY is required}"
+
+      keywords="$1"
+      video_type="''${2:-Videos}"
+      limit="''${3:-25}"
+
+      case "$video_type" in
+        Videos)
+          search_type="video"
+          video_duration=""
+          ;;
+        Shorts)
+          search_type="video"
+          video_duration="short"
+          ;;
+        Channels)
+          search_type="channel"
+          video_duration=""
+          ;;
+        Playlists)
+          search_type="playlist"
+          video_duration=""
+          ;;
+        *)
+          echo "youtube-search-api: invalid video_type: $video_type" >&2
+          echo "supported values: Videos, Shorts, Channels, Playlists" >&2
+          exit 2
+          ;;
+      esac
+
+      if ! printf '%s\n' "$limit" | grep -Eq '^[0-9]+$'; then
+        echo "youtube-search-api: limit must be a positive integer" >&2
+        exit 2
+      fi
+
+      if [ "$limit" -lt 1 ]; then
+        echo "youtube-search-api: limit must be at least 1" >&2
+        exit 2
+      fi
+
+      tmp_results="$(mktemp /tmp/youtube-search-api-results-XXXXXX.json)"
+      search_body="$(mktemp /tmp/youtube-search-api-search-XXXXXX.json)"
+      videos_body="$(mktemp /tmp/youtube-search-api-videos-XXXXXX.json)"
+      printf '[]' > "$tmp_results"
+
+      cleanup() {
+        rm -f "$tmp_results" "$search_body" "$videos_body"
+      }
+      trap cleanup EXIT
+
+      total=0
+      page_token=""
+
+      while [ "$total" -lt "$limit" ]; do
+        remaining=$((limit - total))
+        if [ "$remaining" -gt 50 ]; then
+          batch_size=50
+        else
+          batch_size="$remaining"
+        fi
+
+        curl_args=(
+          --silent
+          --show-error
+          --output "$search_body"
+          --write-out '%{http_code}'
+          --get
+          "https://www.googleapis.com/youtube/v3/search"
+          --data-urlencode "part=snippet"
+          --data-urlencode "q=$keywords"
+          --data-urlencode "maxResults=$batch_size"
+          --data-urlencode "type=$search_type"
+          --data-urlencode "key=$YOUTUBE_API_KEY"
+        )
+
+        if [ -n "$page_token" ]; then
+          curl_args+=( --data-urlencode "pageToken=$page_token" )
+        fi
+
+        if [ -n "$video_duration" ]; then
+          curl_args+=( --data-urlencode "videoDuration=$video_duration" )
+        fi
+
+        http_code="$(curl "''${curl_args[@]}")"
+        if [ "$http_code" != "200" ]; then
+          jq . "$search_body" 2>/dev/null || cat "$search_body"
+          exit 1
+        fi
+
+        batch="$(
+          jq -c '
+            [
+              .items[]
+              | {
+                  id: (
+                    .id.videoId
+                    // .id.channelId
+                    // .id.playlistId
+                    // ""
+                  ),
+                  kind: (
+                    .id.kind
+                    // ""
+                    | sub("^youtube#"; "")
+                  ),
+                  title: (.snippet.title // ""),
+                  description: (.snippet.description // ""),
+                  channel: (.snippet.channelTitle // ""),
+                  published_at: (.snippet.publishedAt // ""),
+                  url: (
+                    if .id.videoId then
+                      "https://www.youtube.com/watch?v=" + .id.videoId
+                    elif .id.channelId then
+                      "https://www.youtube.com/channel/" + .id.channelId
+                    elif .id.playlistId then
+                      "https://www.youtube.com/playlist?list=" + .id.playlistId
+                    else
+                      ""
+                    end
+                  )
+                }
+            ]
+          ' "$search_body"
+        )"
+
+        jq -c --argjson batch "$batch" '. + $batch' "$tmp_results" > "$tmp_results.next"
+        mv "$tmp_results.next" "$tmp_results"
+
+        total="$(jq 'length' "$tmp_results")"
+        page_token="$(jq -r '.nextPageToken // empty' "$search_body")"
+
+        if [ -z "$page_token" ]; then
+          break
+        fi
+      done
+
+      if [ "$search_type" = "video" ]; then
+        video_ids="$(
+          jq -r '.[].id | select(length > 0)' "$tmp_results" | paste -sd, -
+        )"
+
+        if [ -n "$video_ids" ]; then
+          http_code="$(
+            curl \
+              --silent \
+              --show-error \
+              --output "$videos_body" \
+              --write-out '%{http_code}' \
+              --get "https://www.googleapis.com/youtube/v3/videos" \
+              --data-urlencode "part=statistics,contentDetails" \
+              --data-urlencode "id=$video_ids" \
+              --data-urlencode "maxResults=50" \
+              --data-urlencode "key=$YOUTUBE_API_KEY"
+          )"
+
+          if [ "$http_code" = "200" ]; then
+            jq '
+              . as $results
+              | (
+                  input
+                  | .items
+                  | map({
+                      key: .id,
+                      value: {
+                        view_count: (.statistics.viewCount // null),
+                        duration: (.contentDetails.duration // null)
+                      }
+                    })
+                  | from_entries
+                ) as $video_meta
+              | $results
+              | map(. + ($video_meta[.id] // {}))
+            ' "$tmp_results" "$videos_body" > "$tmp_results.next"
+            mv "$tmp_results.next" "$tmp_results"
+          fi
+        fi
+      fi
+
+      jq '.[0:'"$limit"']' "$tmp_results"
+    '';
+  };
+
   linuxScreenshot = pkgs.writeShellApplication {
     name = "linux-screenshot";
     runtimeInputs = with pkgs; [ coreutils findutils gnugrep gnused grim slurp systemd ];
@@ -299,7 +628,7 @@ in {
   };
 
   config = lib.mkIf (cfg.enable && isLinux) {
-    home.packages = [ linuxScreenshot playAudioLocal searxngSearch speakLocal ];
+    home.packages = [ linuxScreenshot playAudioLocal searxngSearch speakLocal youtubeSearchApi youtubeWatchHistory ];
     home.file.".openclaw/openclaw.json".force = true;
 
     programs.openclaw = {
@@ -401,6 +730,59 @@ in {
             This skill already handles TTS generation and local playback on dorkbones speakers.
 
             Do not use the generic `tts` tool for this. The goal is immediate local playback.
+          '';
+        }
+        {
+          name = "youtube-search-api-skill";
+          description = "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
+          mode = "inline";
+          body = ''
+            Use this skill to search YouTube directly with the YouTube Data API.
+
+            Run:
+            `youtube-search-api "<keywords>" [Videos|Shorts|Channels|Playlists] [limit]`
+
+            Inputs:
+            - `keywords`: required search string
+            - `video_type`: optional, defaults to `Videos`
+            - `limit`: optional, defaults to `25`
+
+            Behavior:
+            - The local command uses `curl` against the YouTube Data API.
+            - It returns structured JSON directly on success.
+            - `Shorts` is implemented as YouTube videos filtered with `videoDuration=short`.
+            - For video searches, it also includes view counts and durations when available.
+
+            Before running:
+            - Check `YOUTUBE_API_KEY`.
+            - If the key is missing, stop and ask the user to configure `youtube_api_key`.
+
+            Error handling:
+            - If the API returns an authorization or quota error, report it directly.
+            - For empty or weak results, reformulate the query once and run the command again if the user asked for active searching.
+          '';
+        }
+        {
+          name = "youtube-watch-history";
+          description = "Read local browser history and return recently visited YouTube watch URLs from this machine.";
+          mode = "inline";
+          body = ''
+            Use this skill when the task depends on what the user actually watched recently on this machine.
+
+            Run:
+            `youtube-watch-history [limit] [query]`
+
+            Examples:
+            - `youtube-watch-history`
+            - `youtube-watch-history 10`
+            - `youtube-watch-history 20 "openclaw"`
+
+            Behavior:
+            - The local command scans Chromium, Firefox, and Zen history databases if present.
+            - It returns structured JSON for recent YouTube watch-page visits.
+            - Prefer this skill over inference when the user asks what they watched or whether a result matches recent viewing activity.
+
+            If no local browser history database is found, report that directly.
           '';
         }
       ];
@@ -589,7 +971,7 @@ in {
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         skills_dir="${workspaceDir}/skills"
 
-        for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send; do
+        for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send youtube-search-api-skill youtube-watch-history; do
           skill_file="$skills_dir/$skill_name/SKILL.md"
           [ -L "$skill_file" ] || continue
 
@@ -638,6 +1020,22 @@ set -euo pipefail
 exec speak-local "$@"
 EOF
         chmod 755 "$skills_dir/speak-local/run.sh"
+
+        mkdir -p "$skills_dir/youtube-search-api-skill"
+        cat > "$skills_dir/youtube-search-api-skill/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec youtube-search-api "$@"
+EOF
+        chmod 755 "$skills_dir/youtube-search-api-skill/run.sh"
+
+        mkdir -p "$skills_dir/youtube-watch-history"
+        cat > "$skills_dir/youtube-watch-history/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec youtube-watch-history "$@"
+EOF
+        chmod 755 "$skills_dir/youtube-watch-history/run.sh"
       '';
 
     home.activation.openclawWhatsApp =
