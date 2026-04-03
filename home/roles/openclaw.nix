@@ -25,6 +25,17 @@ let
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
   bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
   openclawScreenshotDir = "${config.home.homeDirectory}/.openclaw/media/screenshots";
+  openclawServicePath = lib.makeBinPath [
+    linuxScreenshot
+    searxngSearch
+    pkgs.coreutils
+    pkgs.findutils
+    pkgs.gnugrep
+    pkgs.gnused
+    pkgs.grim
+    pkgs.slurp
+    pkgs.systemd
+  ];
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
@@ -133,7 +144,7 @@ let
         export HYPRLAND_INSTANCE_SIGNATURE
       fi
 
-      out_dir="''${OPENCLAW_SCREENSHOT_DIR:-./media/screenshots}"
+      out_dir="''${OPENCLAW_SCREENSHOT_DIR:-${openclawScreenshotDir}}"
       mkdir -p "$out_dir"
 
       timestamp="$(date +%Y%m%d-%H%M%S)"
@@ -197,23 +208,77 @@ in {
           description = "Capture a screenshot from the current Wayland desktop on dorkbones.";
           mode = "inline";
           body = ''
-            Use `${linuxScreenshot}/bin/linux-screenshot` when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
+            Use the `linux-screenshot` CLI when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
 
             Default to a full-screen capture:
-            `${linuxScreenshot}/bin/linux-screenshot`
+            `linux-screenshot`
 
             Only use region mode when the user explicitly wants a cropped selection and can interact with the desktop:
-            `${linuxScreenshot}/bin/linux-screenshot --region`
+            `linux-screenshot --region`
 
-            The command prints `MEDIA:./media/screenshots/...png`. After capturing, inspect the screenshot and answer the user's question. If capture fails because there is no active graphical session, explain that clearly.
+            The command prints `MEDIA:/home/bas/.openclaw/media/screenshots/...png`.
+
+            After capturing, analyze the screenshot with the `image` tool.
+
+            Call the `image` tool with:
+            - `image`: the exact saved screenshot path
+            - `prompt`: a plain instruction like `Describe exactly what is visible in this screenshot.`
+
+            Do not put the filesystem path inside the `prompt`.
+            Do not set the `model` field on the `image` tool call.
+
+            If capture fails because there is no active graphical session, explain that clearly.
           '';
         }
       ];
 
       config = {
+        models.mode = "replace";
+
         agents.defaults.model = {
-          primary = "openai/gpt-5.1-codex";
-          fallbacks = [ "openai/gpt-5.4" ];
+          primary = "router/openai/gpt-5.1-codex-mini";
+          fallbacks = [ ];
+        };
+
+        agents.defaults.imageModel = {
+          primary = "openai/gpt-5-mini";
+          fallbacks = [ "anthropic/claude-opus-4-5" ];
+        };
+
+        models.providers.router = {
+          api = "openai-completions";
+          baseUrl = "https://openrouter.ai/api/v1";
+          auth = "api-key";
+          apiKey = {
+            source = "env";
+            provider = "default";
+            id = "OPENROUTER_API_KEY";
+          };
+          models = [
+            {
+              id = "auto";
+              name = "OpenRouter Auto";
+              input = [ "text" "image" ];
+            }
+            {
+              id = "anthropic/claude-sonnet-4";
+              name = "Claude Sonnet 4";
+              input = [ "text" "image" ];
+              reasoning = true;
+            }
+            {
+              id = "openai/gpt-5";
+              name = "GPT-5";
+              input = [ "text" "image" ];
+              reasoning = true;
+            }
+            {
+              id = "openai/gpt-5.1-codex-mini";
+              name = "GPT-5.1 Codex Mini";
+              input = [ "text" "image" ];
+              reasoning = true;
+            }
+          ];
         };
 
         gateway = {
@@ -272,6 +337,10 @@ in {
           printf 'ANTHROPIC_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/anthropic_api_key)" >> "$env_file"
         fi
 
+        if [ -r /run/secrets/openrouter_api_key ]; then
+          printf 'OPENROUTER_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openrouter_api_key)" >> "$env_file"
+        fi
+
         if [ -r /run/secrets/openclaw_telegram_bot_token ]; then
           printf 'TELEGRAM_BOT_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_telegram_bot_token)" >> "$env_file"
         fi
@@ -315,6 +384,45 @@ in {
           fi
         '') documentFiles
       );
+
+    home.activation.openclawLocalSkills =
+      lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        skills_dir="${workspaceDir}/skills"
+
+        for skill_name in goplaces linux-screenshot searxng-search; do
+          skill_file="$skills_dir/$skill_name/SKILL.md"
+          [ -L "$skill_file" ] || continue
+
+          source_file="$(readlink -f "$skill_file")"
+          rm -f "$skill_file"
+          cp "$source_file" "$skill_file"
+          chmod 644 "$skill_file"
+        done
+
+        mkdir -p "$skills_dir/linux-screenshot"
+        cat > "$skills_dir/linux-screenshot/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec linux-screenshot "$@"
+EOF
+        chmod 755 "$skills_dir/linux-screenshot/run.sh"
+
+        mkdir -p "$skills_dir/searxng-search"
+        cat > "$skills_dir/searxng-search/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec searxng-search "$@"
+EOF
+        chmod 755 "$skills_dir/searxng-search/run.sh"
+
+        mkdir -p "$skills_dir/goplaces"
+        cat > "$skills_dir/goplaces/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec goplaces "$@"
+EOF
+        chmod 755 "$skills_dir/goplaces/run.sh"
+      '';
 
     home.activation.openclawWhatsApp =
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -389,6 +497,9 @@ in {
     systemd.user.services.openclaw-gateway.Service.EnvironmentFile =
       "-${config.home.homeDirectory}/.config/openclaw/openclaw.env";
     systemd.user.services.openclaw-gateway.Service.Environment =
-      [ "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsRuntimeExtensionsDir}" ];
+      [
+        "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsRuntimeExtensionsDir}"
+        "PATH=${openclawServicePath}:${config.home.profileDirectory}/bin:/run/current-system/sw/bin"
+      ];
   };
 }

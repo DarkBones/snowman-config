@@ -106,6 +106,7 @@ rec {
         keys = [
           "password_hash"
           "openai_api_key"
+          "openrouter_api_key"
           "anthropic_api_key"
           "gemini_api_key"
           "openclaw_gateway_token"

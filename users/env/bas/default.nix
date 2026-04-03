@@ -14,6 +14,7 @@ let
     SNOWMAN_FLAKE = "${osConfig.users.users.bas.home}/snowman-config";
 
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
+    OPENROUTER_API_KEY_SECRET_PATH = maybe "openrouter_api_key";
     ANTHROPIC_API_KEY_SECRET_PATH = maybe "anthropic_api_key";
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";
     OPENCLAW_GATEWAY_TOKEN_SECRET_PATH = maybe "openclaw_gateway_token";
