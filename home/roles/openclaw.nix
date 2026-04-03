@@ -24,6 +24,7 @@ let
     "${config.home.homeDirectory}/.openclaw/bundled-plugins-runtime";
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
   bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
+  openclawScreenshotDir = "${config.home.homeDirectory}/.openclaw/media/screenshots";
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
@@ -77,6 +78,82 @@ let
       '
     '';
   };
+
+  linuxScreenshot = pkgs.writeShellApplication {
+    name = "linux-screenshot";
+    runtimeInputs = with pkgs; [ coreutils findutils gnugrep gnused grim slurp systemd ];
+    text = ''
+      set -euo pipefail
+
+      mode="full"
+      case "''${1:-}" in
+        "")
+          ;;
+        --full)
+          ;;
+        --region)
+          mode="region"
+          ;;
+        *)
+          echo "usage: linux-screenshot [--full|--region]" >&2
+          exit 2
+          ;;
+      esac
+
+      runtime_dir="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+      read_systemd_env() {
+        local key="$1"
+        systemctl --user show-environment | sed -n "s/^''${key}=//p" | head -n1
+      }
+
+      export XDG_RUNTIME_DIR="$runtime_dir"
+
+      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
+        WAYLAND_DISPLAY="$(read_systemd_env WAYLAND_DISPLAY || true)"
+      fi
+      if [ -z "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        HYPRLAND_INSTANCE_SIGNATURE="$(read_systemd_env HYPRLAND_INSTANCE_SIGNATURE || true)"
+      fi
+
+      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
+        socket_path="$(find "$runtime_dir" -maxdepth 1 -type s -name 'wayland-*' | sort | head -n1)"
+        if [ -n "$socket_path" ]; then
+          WAYLAND_DISPLAY="$(basename "$socket_path")"
+        fi
+      fi
+
+      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
+        echo "linux-screenshot: no Wayland display found. OpenClaw needs an active graphical session on this machine." >&2
+        exit 1
+      fi
+
+      export WAYLAND_DISPLAY
+      if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        export HYPRLAND_INSTANCE_SIGNATURE
+      fi
+
+      out_dir="''${OPENCLAW_SCREENSHOT_DIR:-./media/screenshots}"
+      mkdir -p "$out_dir"
+
+      timestamp="$(date +%Y%m%d-%H%M%S)"
+      target="$out_dir/$timestamp.png"
+
+      if [ "$mode" = "region" ]; then
+        geometry="$(slurp)"
+        if [ -z "$geometry" ]; then
+          echo "linux-screenshot: no region selected." >&2
+          exit 1
+        fi
+        grim -g "$geometry" "$target"
+      else
+        grim "$target"
+      fi
+
+      printf 'Saved screenshot to %s\n' "$target"
+      printf 'MEDIA:%s\n' "$target"
+    '';
+  };
 in {
   imports = [ inputs.nix-openclaw.homeManagerModules.openclaw ];
 
@@ -94,7 +171,7 @@ in {
   };
 
   config = lib.mkIf (cfg.enable && isLinux) {
-    home.packages = [ searxngSearch ];
+    home.packages = [ linuxScreenshot searxngSearch ];
     home.file.".openclaw/openclaw.json".force = true;
 
     programs.openclaw = {
@@ -113,6 +190,22 @@ in {
             Pass the plain-language query directly.
 
             Prefer this skill over provider-backed web search when the local SearxNG instance should be the source of results.
+          '';
+        }
+        {
+          name = "linux-screenshot";
+          description = "Capture a screenshot from the current Wayland desktop on dorkbones.";
+          mode = "inline";
+          body = ''
+            Use `${linuxScreenshot}/bin/linux-screenshot` when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
+
+            Default to a full-screen capture:
+            `${linuxScreenshot}/bin/linux-screenshot`
+
+            Only use region mode when the user explicitly wants a cropped selection and can interact with the desktop:
+            `${linuxScreenshot}/bin/linux-screenshot --region`
+
+            The command prints `MEDIA:./media/screenshots/...png`. After capturing, inspect the screenshot and answer the user's question. If capture fails because there is no active graphical session, explain that clearly.
           '';
         }
       ];
@@ -226,6 +319,11 @@ in {
     home.activation.openclawWhatsApp =
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         mkdir -p "${whatsappAuthDir}"
+      '';
+
+    home.activation.openclawMediaDirs =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p "${openclawScreenshotDir}"
       '';
 
     home.activation.openclawBundledPlugins =
