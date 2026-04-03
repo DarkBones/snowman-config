@@ -25,8 +25,11 @@ let
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
   bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
   openclawScreenshotDir = "${config.home.homeDirectory}/.openclaw/media/screenshots";
+  openclawPlaybackGain = "0.1";
   openclawServicePath = lib.makeBinPath [
     linuxScreenshot
+    playAudioLocal
+    speakLocal
     searxngSearch
     telegramSend
     pkgs.coreutils
@@ -127,6 +130,83 @@ let
     '';
   };
 
+  playAudioLocal = pkgs.writeShellApplication {
+    name = "play-audio-local";
+    runtimeInputs = with pkgs; [ coreutils vlc ];
+    text = ''
+      set -euo pipefail
+
+      if [ $# -ne 1 ]; then
+        echo "usage: play-audio-local <path|MEDIA:path>" >&2
+        exit 2
+      fi
+
+      input="$1"
+      case "$input" in
+        MEDIA:*)
+          input="''${input#MEDIA:}"
+          ;;
+      esac
+
+      if [ ! -f "$input" ]; then
+        echo "play-audio-local: file not found: $input" >&2
+        exit 1
+      fi
+
+      exec cvlc --play-and-exit --intf dummy --gain ${openclawPlaybackGain} "$input"
+    '';
+  };
+
+  speakLocal = pkgs.writeShellApplication {
+    name = "speak-local";
+    runtimeInputs = with pkgs; [ coreutils curl jq vlc ];
+    text = ''
+      set -euo pipefail
+
+      if [ $# -lt 1 ]; then
+        echo "usage: speak-local <text...>" >&2
+        exit 2
+      fi
+
+      : "''${ELEVENLABS_API_KEY:?ELEVENLABS_API_KEY is required}"
+
+      text="$*"
+      temp_dir="$(mktemp -d /tmp/openclaw-speak-local-XXXXXX)"
+      audio_path="$temp_dir/voice.mp3"
+
+      cleanup() {
+        rm -rf "$temp_dir"
+      }
+      trap cleanup EXIT
+
+      curl --silent --show-error --fail \
+        --request POST \
+        --url "https://api.elevenlabs.io/v1/text-to-speech/2mBZPd4Kz3QN38J0coPH?output_format=mp3_44100_128" \
+        --header "xi-api-key: ''${ELEVENLABS_API_KEY}" \
+        --header 'content-type: application/json' \
+        --data "$(
+          jq -cn \
+            --arg text "$text" \
+            '{
+              text: $text,
+              model_id: "eleven_v3",
+              apply_text_normalization: "auto",
+              language_code: "en",
+              voice_settings: {
+                stability: 0.5,
+                similarity_boost: 0.75,
+                style: 0.0,
+                use_speaker_boost: true,
+                speed: 1.0
+              }
+            }'
+        )" \
+        --output "$audio_path"
+
+      exec cvlc --play-and-exit --intf dummy --gain ${openclawPlaybackGain} "$audio_path"
+    '';
+  };
+
   linuxScreenshot = pkgs.writeShellApplication {
     name = "linux-screenshot";
     runtimeInputs = with pkgs; [ coreutils findutils gnugrep gnused grim slurp systemd ];
@@ -219,7 +299,7 @@ in {
   };
 
   config = lib.mkIf (cfg.enable && isLinux) {
-    home.packages = [ linuxScreenshot searxngSearch ];
+    home.packages = [ linuxScreenshot playAudioLocal searxngSearch speakLocal ];
     home.file.".openclaw/openclaw.json".force = true;
 
     programs.openclaw = {
@@ -297,6 +377,32 @@ in {
             If capture fails because there is no active graphical session, explain that clearly.
           '';
         }
+        {
+          name = "speak-local";
+          description = "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
+          mode = "inline";
+          body = ''
+            Use this skill when the user wants to hear speech locally on this machine.
+
+            Run:
+            `speak-local <text to say>`
+
+            Before you run it, shape the text for speech:
+            - Prefer natural, narrative phrasing over flat prose.
+            - Prefer short Eleven v3 audio tags when they help delivery, like `[whispers]`, `[curious]`, `[sighs]`, or `[excited]`.
+            - Use light punctuation for pacing: commas, em dashes, ellipses, and occasional short quoted beats.
+            - Do not use SSML break tags like `<break ... />`; Eleven v3 relies on punctuation and audio tags instead.
+            - Do not overload the text with lots of tags or stage directions.
+            - Normalize awkward speech inputs before playback: expand URLs, slash commands, timestamps, file paths, and dense numbers into how a human would naturally say them.
+            - If a pronunciation is wrong, try a more phonetic spelling or a simpler alias.
+
+            Keep the spoken text concise and performance-ready. Rewrite it slightly for delivery when that improves the result, unless the user explicitly wants exact wording.
+
+            This skill already handles TTS generation and local playback on dorkbones speakers.
+
+            Do not use the generic `tts` tool for this. The goal is immediate local playback.
+          '';
+        }
       ];
 
       config = {
@@ -310,6 +416,28 @@ in {
         agents.defaults.imageModel = {
           primary = "openai/gpt-5-mini";
           fallbacks = [ "anthropic/claude-opus-4-5" ];
+        };
+
+        messages.tts = {
+          auto = "tagged";
+          mode = "final";
+          provider = "elevenlabs";
+          maxTextLength = 4000;
+          timeoutMs = 30000;
+          elevenlabs = {
+            baseUrl = "https://api.elevenlabs.io";
+            voiceId = "2mBZPd4Kz3QN38J0coPH";
+            modelId = "eleven_v3";
+            applyTextNormalization = "auto";
+            languageCode = "en";
+            voiceSettings = {
+              stability = 0.5;
+              similarityBoost = 0.75;
+              style = 0.0;
+              useSpeakerBoost = true;
+              speed = 1.0;
+            };
+          };
         };
 
         models.providers.router = {
@@ -408,6 +536,11 @@ in {
           printf 'OPENROUTER_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openrouter_api_key)" >> "$env_file"
         fi
 
+        if [ -r /run/secrets/eleven_labs_api_key ]; then
+          printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
+          printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
+        fi
+
         if [ -r /run/secrets/openclaw_telegram_bot_token ]; then
           printf 'TELEGRAM_BOT_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_telegram_bot_token)" >> "$env_file"
         fi
@@ -456,7 +589,7 @@ in {
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         skills_dir="${workspaceDir}/skills"
 
-        for skill_name in goplaces linux-screenshot searxng-search telegram-send; do
+        for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send; do
           skill_file="$skills_dir/$skill_name/SKILL.md"
           [ -L "$skill_file" ] || continue
 
@@ -497,6 +630,14 @@ set -euo pipefail
 exec telegram-send "$@"
 EOF
         chmod 755 "$skills_dir/telegram-send/run.sh"
+
+        mkdir -p "$skills_dir/speak-local"
+        cat > "$skills_dir/speak-local/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec speak-local "$@"
+EOF
+        chmod 755 "$skills_dir/speak-local/run.sh"
       '';
 
     home.activation.openclawWhatsApp =

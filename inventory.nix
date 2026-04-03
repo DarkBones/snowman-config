@@ -108,6 +108,7 @@ rec {
           "openai_api_key"
           "openrouter_api_key"
           "anthropic_api_key"
+          "eleven_labs_api_key"
           "gemini_api_key"
           "openclaw_gateway_token"
           "openclaw_telegram_bot_token"
