@@ -28,9 +28,12 @@ let
   openclawServicePath = lib.makeBinPath [
     linuxScreenshot
     searxngSearch
+    telegramSend
     pkgs.coreutils
+    pkgs.curl
     pkgs.findutils
     pkgs.gnugrep
+    pkgs.jq
     pkgs.gnused
     pkgs.grim
     pkgs.slurp
@@ -87,6 +90,40 @@ let
             | join("\n")
           end
       '
+    '';
+  };
+
+  telegramSend = pkgs.writeShellApplication {
+    name = "telegram-send";
+    runtimeInputs = with pkgs; [ coreutils curl jq ];
+    text = ''
+      set -euo pipefail
+
+      if [ $# -lt 2 ]; then
+        echo "usage: telegram-send <chat-id> <text...>" >&2
+        exit 2
+      fi
+
+      : "''${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN is required}"
+
+      chat_id="$1"
+      shift
+      text="$*"
+
+      response="$(
+        curl --silent --show-error --fail \
+          --request POST \
+          --url "https://api.telegram.org/bot''${TELEGRAM_BOT_TOKEN}/sendMessage" \
+          --header 'content-type: application/json' \
+          --data "$(
+            jq -cn \
+              --arg chat_id "$chat_id" \
+              --arg text "$text" \
+              '{ chat_id: $chat_id, text: $text }'
+          )"
+      )"
+
+      printf '%s\n' "$response" | jq .
     '';
   };
 
@@ -201,6 +238,36 @@ in {
             Pass the plain-language query directly.
 
             Prefer this skill over provider-backed web search when the local SearxNG instance should be the source of results.
+
+            When a fetch or search result shows an upstream error page or block page, report it literally.
+
+            If the source says `403 Forbidden`, say `403 Forbidden`.
+            If the source says `blocked by network security`, say that.
+
+            Do not invent causes like captchas, bans, rate limits, login walls, anti-bot checks, or API requirements unless the fetched content explicitly says that.
+
+            Distinguish clearly between:
+            - direct facts from the fetched content
+            - your inferences
+
+            If the fetch failed or was blocked, quote the short relevant line from the response and then explain the practical consequence.
+          '';
+        }
+        {
+          name = "telegram-send";
+          description = "Send a plain Telegram message through the Telegram Bot API.";
+          mode = "inline";
+          body = ''
+            Use this skill when sending a normal Telegram message.
+
+            Use the `telegram-send` CLI instead of the generic `message` tool.
+
+            Run:
+            `telegram-send <telegram-target> <message text>`
+
+            Pass only the Telegram target and the plain text to send.
+            Do not use poll-related arguments for a normal check-in.
+            Do not use the generic `message` tool for Telegram plain-text sends unless the user explicitly asks for a poll.
           '';
         }
         {
@@ -389,7 +456,7 @@ in {
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         skills_dir="${workspaceDir}/skills"
 
-        for skill_name in goplaces linux-screenshot searxng-search; do
+        for skill_name in goplaces linux-screenshot searxng-search telegram-send; do
           skill_file="$skills_dir/$skill_name/SKILL.md"
           [ -L "$skill_file" ] || continue
 
@@ -422,6 +489,14 @@ set -euo pipefail
 exec goplaces "$@"
 EOF
         chmod 755 "$skills_dir/goplaces/run.sh"
+
+        mkdir -p "$skills_dir/telegram-send"
+        cat > "$skills_dir/telegram-send/run.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exec telegram-send "$@"
+EOF
+        chmod 755 "$skills_dir/telegram-send/run.sh"
       '';
 
     home.activation.openclawWhatsApp =
