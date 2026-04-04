@@ -72,7 +72,7 @@
     extraHosts = ''
       127.0.0.1 ai
       127.0.0.1 openclaw
-      127.0.0.1 search
+      127.0.0.1 searxng
       127.0.0.1 sonarr
       127.0.0.1 radarr
       127.0.0.1 shelf
@@ -155,7 +155,7 @@
             proxyWebsockets = true;
           };
         };
-        "search" = {
+        "searxng" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:8888";
             proxyWebsockets = true;
