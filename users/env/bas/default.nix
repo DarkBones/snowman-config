@@ -18,10 +18,10 @@ let
     ANTHROPIC_API_KEY_SECRET_PATH = maybe "anthropic_api_key";
     ELEVEN_LABS_API_KEY_SECRET_PATH = maybe "eleven_labs_api_key";
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";
+    YOUTUBE_API_KEY_SECRET_PATH = maybe "youtube_api_key";
     OPENCLAW_GATEWAY_TOKEN_SECRET_PATH = maybe "openclaw_gateway_token";
     OPENCLAW_TELEGRAM_BOT_TOKEN_SECRET_PATH =
       maybe "openclaw_telegram_bot_token";
-    HA_TOKEN_SECRET_PATH = maybe "home_assistant_long_lived_token";
     NZB_GEEK_USERNAME_SECRET_PATH = maybe "nzb_geek_username";
     NZB_GEEK_KEY_SECRET_PATH = maybe "nzb_geek_key";
     HA_TOKEN_SECRET_PATH = maybe "home_assistant_long_lived_token";

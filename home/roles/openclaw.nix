@@ -628,7 +628,16 @@ in {
   };
 
   config = lib.mkIf (cfg.enable && isLinux) {
-    home.packages = [ linuxScreenshot playAudioLocal searxngSearch speakLocal youtubeSearchApi youtubeWatchHistory ];
+    home.packages = [
+      linuxScreenshot
+      playAudioLocal
+      searxngSearch
+      speakLocal
+      youtubeSearchApi
+      youtubeWatchHistory
+      pkgs.python3
+      pkgs.python3Packages.pip
+    ];
     home.file.".openclaw/openclaw.json".force = true;
 
     programs.openclaw = {
@@ -730,6 +739,33 @@ in {
             This skill already handles TTS generation and local playback on dorkbones speakers.
 
             Do not use the generic `tts` tool for this. The goal is immediate local playback.
+          '';
+        }
+        {
+          name = "python-project-env";
+          description = "Set up and use a project-local Python virtualenv for Python work inside the OpenClaw workspace.";
+          mode = "inline";
+          body = ''
+            Use this skill whenever you need to install Python dependencies or run a Python project inside the OpenClaw workspace.
+
+            The system Python on this machine is Nix-managed. Do not run bare `pip install ...` against the system interpreter.
+
+            Default workflow:
+            1. Change into the target project directory.
+            2. Create a local virtualenv if `.venv` does not exist:
+               `python -m venv .venv`
+            3. Activate it:
+               `source .venv/bin/activate`
+            4. Upgrade pip inside the virtualenv:
+               `python -m pip install -U pip`
+            5. Install dependencies inside the virtualenv:
+               `python -m pip install -r requirements.txt`
+
+            Rules:
+            - Prefer `python -m pip ...` over bare `pip ...`.
+            - Keep the virtualenv inside the project as `.venv`.
+            - If the project uses a different dependency file or tool, adapt, but still keep installs inside `.venv` unless the project explicitly requires something else.
+            - If a command needs the environment, run it from an activated `.venv` or call `.venv/bin/python` directly.
           '';
         }
         {
@@ -921,6 +957,10 @@ in {
         if [ -r /run/secrets/eleven_labs_api_key ]; then
           printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
           printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
+        fi
+
+        if [ -r /run/secrets/youtube_api_key ]; then
+          printf 'YOUTUBE_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/youtube_api_key)" >> "$env_file"
         fi
 
         if [ -r /run/secrets/openclaw_telegram_bot_token ]; then

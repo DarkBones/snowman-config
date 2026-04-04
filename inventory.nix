@@ -146,6 +146,7 @@ rec {
           "anthropic_api_key"
           "eleven_labs_api_key"
           "gemini_api_key"
+          "youtube_api_key"
           "openclaw_gateway_token"
           "openclaw_telegram_bot_token"
           "home_assistant_long_lived_token"

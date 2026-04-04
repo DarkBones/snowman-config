@@ -116,7 +116,7 @@
               };
             })
 
-            ./modules/snowman-dotfiles.nix
+            # ./modules/snowman.nix
 
             ({ lib, pkgs, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
