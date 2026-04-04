@@ -12,7 +12,7 @@ in {
         server = {
           bind_address = "127.0.0.1";
           port = 8888;
-          base_url = if currentHost == "dorkbones" then "http://search/" else null;
+          base_url = if currentHost == "dorkbones" then "http://searxng/" else null;
           secret_key = "$SEARX_SECRET_KEY";
         };
 
