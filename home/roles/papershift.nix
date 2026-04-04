@@ -26,6 +26,8 @@ let
     prettierd
   ];
 in {
+  imports = [ ./papershift-tooling.nix ];
+
   options.roles.papershift.enable = lib.mkEnableOption "Papershift role";
 
   config = lib.mkIf cfg.enable { home.packages = papershiftPkgs; };

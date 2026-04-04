@@ -7,6 +7,7 @@
   environment.systemPackages = with pkgs; [
     papirus-icon-theme
     colloid-icon-theme
+    bibata-cursors
     xfce.xfce4-settings
   ];
 
@@ -23,6 +24,7 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+    wireplumber.enable = true;
   };
 
   # --- Thunar (File Manager) ---

@@ -194,6 +194,35 @@ in {
     openFirewall = false;
   };
 
+  networking.hosts."127.0.0.1" = [
+    "sonarr"
+    "radarr"
+    "nzb"
+  ];
+
+  services.nginx.virtualHosts = {
+    sonarr = {
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8989";
+        proxyWebsockets = true;
+      };
+    };
+
+    radarr = {
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:7878";
+        proxyWebsockets = true;
+      };
+    };
+
+    nzb = {
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:8091";
+        proxyWebsockets = true;
+      };
+    };
+  };
+
   assertions = [
     {
       assertion = config.services.sabnzbd.user == "sabnzbd";

@@ -2,10 +2,8 @@
 let
   hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
   cfg = config.roles.desktop;
-
-  system = builtins.currentSystem or "";
-  isLinux = lib.hasInfix "linux" system;
-  isDarwin = lib.hasInfix "darwin" system;
+  isLinux = pkgsUnstable.stdenv.isLinux;
+  isDarwin = pkgsUnstable.stdenv.isDarwin;
 
   commonPkgs = with pkgsUnstable; [ spotify ];
   linuxPkgs = with pkgsUnstable; [

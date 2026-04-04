@@ -29,6 +29,10 @@ rec {
       extraModules = [
         ./hosts/dorkbones.nix
         ./hosts/dorkbones/boot.nix
+        ./modules/reverse-proxy.nix
+        ./modules/linux-workstation-base.nix
+        ./modules/tailscale.nix
+        ./modules/openclaw-proxy.nix
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
         ./modules/gaming.nix
@@ -41,8 +45,10 @@ rec {
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
-        ./hosts/papershift-mbp.nix # TODO: REMOVE
-        ({ ... }: { roles.gaming.enable = true; roles.alvr.enable = true; })
+        ({ ... }: {
+          roles.gaming.enable = true;
+          roles.alvr.enable = true;
+        })
       ];
 
       # wifi = {
@@ -71,6 +77,7 @@ rec {
 
       extraModules = [
         ./hosts/rpi4.nix
+        ./modules/tailscale.nix
         ./modules/home-assistant.nix
         ./modules/pihole.nix
         ./modules/taskserver.nix
@@ -92,10 +99,11 @@ rec {
         "searxng"
         "snowman"
         "ssh"
+        "papershift"
         "macos-wm"
       ];
 
-      extraModules = [ ./hosts/papershift-mbp.nix ]; # TODO: REMOVE
+      extraModules = [ ];
     };
 
     papershift-mbp = {
@@ -113,10 +121,11 @@ rec {
         "searxng"
         "snowman"
         "ssh"
+        "papershift"
         "macos-wm"
       ];
 
-      extraModules = [ ./hosts/papershift-mbp.nix ];
+      extraModules = [ ];
     };
   };
 
@@ -170,6 +179,7 @@ rec {
         lsp.enable = true;
         macos-wm.enable = true;
         openclaw.enable = true;
+        papershift.enable = true;
         secrets.enable = true;
         searxng.enable = true;
         snowman.enable = true;

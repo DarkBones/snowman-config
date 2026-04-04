@@ -11,5 +11,14 @@
 
   users.users.audiobookshelf.extraGroups = [ "media" ];
 
+  networking.hosts."127.0.0.1" = [ "shelf" ];
+
+  services.nginx.virtualHosts.shelf = {
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:13378";
+      proxyWebsockets = true;
+    };
+  };
+
   systemd.tmpfiles.rules = [ "z /srv/media/Audiobooks 2775 bas media - -" ];
 }

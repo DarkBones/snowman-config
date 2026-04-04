@@ -92,6 +92,9 @@
           hwFile = ./hosts/${hostName}-hardware-configuration.nix;
           hostRoles =
             if host ? availableRoles then host.availableRoles else null;
+          managedUsers = builtins.filter
+            (user: (inv.users.${user}.homeManaged or false))
+            (attrs.users or [ ]);
 
           hasRole = role: hostRoles == null || lib.elem role hostRoles;
         in lib.nixosSystem {
@@ -113,6 +116,17 @@
                   inv.hosts.${currentHost}.availableRoles
                 else
                   null;
+              };
+            })
+            ({ lib, ... }: {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                # Snowman's inventory path owns integrated HM user assembly.
+                # This layer only overrides NixOS-integrated HM activation.
+                users = lib.genAttrs managedUsers (_: {
+                  systemd.user.startServices = lib.mkForce true;
+                });
               };
             })
 

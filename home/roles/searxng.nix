@@ -47,7 +47,7 @@ in {
       enable = true;
       config = {
         Label = "org.nix.searxng";
-        ProgramArguments = [ ensureSearxng ];
+        ProgramArguments = [ "${ensureSearxng}" ];
         RunAtLoad = true;
         KeepAlive = true;
         EnvironmentVariables = {

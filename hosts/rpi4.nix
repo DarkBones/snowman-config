@@ -22,12 +22,6 @@
 
     wireless.enable = lib.mkForce false;
   };
-
-  services.tailscale = {
-    enable = true;
-    openFirewall = true;
-  };
-
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;

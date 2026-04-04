@@ -1,10 +1,8 @@
-{ pkgs, config, lib, ... }:
+{ lib, config, pkgs, ... }:
 let
-  homeDir =
-    config.home-manager.users.bas.home.homeDirectory or (if pkgs.stdenv.isDarwin then
-      "/Users/bas"
-    else
-      "/home/bas");
+  cfg = config.roles.papershift;
+
+  homeDir = config.home.homeDirectory;
 
   root = "${homeDir}/Developer/papershift";
   pulseRoot = "${root}/pulse";
@@ -71,20 +69,20 @@ let
     export VITE_CABLE_URL="ws://127.0.0.1:8080/cable"
   '';
 
-  agentPython = pkgs.python3.withPackages (ps: [
-    ps.fastapi
-    ps.httpx
-    ps.langchain
-    ps.markdown2
-    ps.openai
-    ps."openai-agents"
-    ps.pypdf2
-    ps."python-docx"
-    ps."python-dotenv"
-    ps.uvicorn
-    ps."weaviate-client"
-    ps.debugpy
-  ]);
+  agentPython = pkgs.python3.withPackages (ps:
+    [
+      ps.fastapi
+      ps.httpx
+      ps.langchain
+      ps.markdown2
+      ps.openai
+      ps."openai-agents"
+      ps.pypdf2
+      ps."python-docx"
+      ps."python-dotenv"
+      ps.uvicorn
+      ps.debugpy
+    ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ ps."weaviate-client" ]);
 
   pulseShellNix = pkgs.writeText "pulse-shell.nix" ''
     { pkgs ? import ${pkgs.path} {
@@ -326,8 +324,6 @@ let
       --rpc_host 127.0.0.1:50051
   '';
 
-  # Use a separate pinned nixpkgs for shift_app so it can stay on Ruby 2.7
-  # without constraining Pulse, which uses newer packages from the main flake.
   corePkgs = import (builtins.fetchTree {
     type = "github";
     owner = "NixOS";
@@ -558,147 +554,147 @@ let
       '
     '';
 in {
-  home-manager.users.bas.roles.papershift.enable = true;
+  config = lib.mkIf cfg.enable {
+    home.packages = [
+      pkgs.postgresql
+      pulseEnsureInfra
+      pulseBootstrap
+      pulseFrontendBootstrap
+      pulseFrontendShell
+      pulseFrontendDev
+      pulseBackendDev
+      pulseApiDev
+      pulseAnycableDev
+      pulseSidekiqDev
+      pulseAgentDev
+      pulseWsDev
+      coreEnsureInfra
+      coreBootstrap
+      coreWebDev
+      coreSidekiqDev
+      coreSidekiqAssignmentsDev
 
-  home-manager.users.bas.home.packages = [
-    pkgs.postgresql
-    pulseEnsureInfra
-    pulseBootstrap
-    pulseFrontendBootstrap
-    pulseFrontendShell
-    pulseFrontendDev
-    pulseBackendDev
-    pulseApiDev
-    pulseAnycableDev
-    pulseSidekiqDev
-    pulseAgentDev
-    pulseWsDev
-    coreEnsureInfra
-    coreBootstrap
-    coreWebDev
-    coreSidekiqDev
-    coreSidekiqAssignmentsDev
+      (pkgs.writeShellScriptBin "pulse-shell" ''
+        set -euo pipefail
+        ${pulseEnsureInfra}/bin/pulse-ensure-infra
+        exec nix-shell "${pulseShellNix}" --command '. "${pulseEnv}"; ${pkgs.zsh}/bin/zsh -i'
+      '')
 
-    (pkgs.writeShellScriptBin "pulse-shell" ''
-      set -euo pipefail
-      ${pulseEnsureInfra}/bin/pulse-ensure-infra
-      exec nix-shell "${pulseShellNix}" --command '. "${pulseEnv}"; ${pkgs.zsh}/bin/zsh -i'
-    '')
+      (pkgs.writeShellScriptBin "core-shell" ''
+        set -euo pipefail
+        ${coreEnsureInfra}/bin/core-ensure-infra
+        exec nix-shell "${coreShellNix}" --command '. "${coreEnv}"; ${pkgs.zsh}/bin/zsh -i'
+      '')
 
-    (pkgs.writeShellScriptBin "core-shell" ''
-      set -euo pipefail
-      ${coreEnsureInfra}/bin/core-ensure-infra
-      exec nix-shell "${coreShellNix}" --command '. "${coreEnv}"; ${pkgs.zsh}/bin/zsh -i'
-    '')
+      (pkgs.writeShellScriptBin "core-rubocop-format" ''
+        set -euo pipefail
 
-    (pkgs.writeShellScriptBin "core-rubocop-format" ''
-      set -euo pipefail
+        if [ "$#" -ne 1 ]; then
+          echo "usage: core-rubocop-format <project-relative-file>" >&2
+          exit 2
+        fi
 
-      if [ "$#" -ne 1 ]; then
-        echo "usage: core-rubocop-format <project-relative-file>" >&2
-        exit 2
-      fi
+        relpath="$1"
+        tmpfile="$(mktemp)"
+        trap 'rm -f "$tmpfile"' EXIT
+        cat > "$tmpfile"
 
-      relpath="$1"
-      tmpfile="$(mktemp)"
-      trap 'rm -f "$tmpfile"' EXIT
-      cat > "$tmpfile"
+        exec nix-shell "${coreShellNix}" --command "
+          . '${coreEnv}'
+          cd '${coreRoot}'
+          bundle exec rubocop -a \
+            --except Style/NegatedIf,Style/IfUnlessModifier,Style/GuardClause \
+            -f quiet --stderr --stdin '$relpath' < '$tmpfile'
+        "
+      '')
 
-      exec nix-shell "${coreShellNix}" --command "
-        . '${coreEnv}'
-        cd '${coreRoot}'
-        bundle exec rubocop -a \
-          --except Style/NegatedIf,Style/IfUnlessModifier,Style/GuardClause \
-          -f quiet --stderr --stdin '$relpath' < '$tmpfile'
-      "
-    '')
+      (pkgs.writeShellScriptBin "pulse-pg-stop" ''
+        ${pkgs.postgresql}/bin/pg_ctl -D "${pgData}" stop -m fast || true
+      '')
 
-    (pkgs.writeShellScriptBin "pulse-pg-stop" ''
-      ${pkgs.postgresql}/bin/pg_ctl -D "${pgData}" stop -m fast || true
-    '')
+      (pkgs.writeShellScriptBin "core-pg-stop" ''
+        ${pkgs.postgresql}/bin/pg_ctl -D "${corePgData}" stop -m fast || true
+      '')
 
-    (pkgs.writeShellScriptBin "core-pg-stop" ''
-      ${pkgs.postgresql}/bin/pg_ctl -D "${corePgData}" stop -m fast || true
-    '')
+      (pkgs.writeShellScriptBin "pulse-redis-stop" ''
+        if [ -f "${redisPidFile}" ]; then
+          kill "$(cat "${redisPidFile}")" || true
+          rm -f "${redisPidFile}"
+        fi
+      '')
 
-    (pkgs.writeShellScriptBin "pulse-redis-stop" ''
-      if [ -f "${redisPidFile}" ]; then
-        kill "$(cat "${redisPidFile}")" || true
-        rm -f "${redisPidFile}"
-      fi
-    '')
+      (pkgs.writeShellScriptBin "core-redis-stop" ''
+        if [ -f "${coreRedisPidFile}" ]; then
+          kill "$(cat "${coreRedisPidFile}")" || true
+          rm -f "${coreRedisPidFile}"
+        fi
+      '')
+    ] ++ lib.optionals pkgs.stdenv.isLinux [
+      (pkgs.writeShellScriptBin "pulse-chrome-dev" ''
+        set -euo pipefail
+        mkdir -p "${runtimeDir}/chrome"
+        exec ${pkgs.chromium}/bin/chromium \
+          --headless \
+          --disable-gpu \
+          --no-first-run \
+          --remote-debugging-address=0.0.0.0 \
+          --remote-debugging-port=9222 \
+          --user-data-dir="${runtimeDir}/chrome"
+      '')
 
-    (pkgs.writeShellScriptBin "core-redis-stop" ''
-      if [ -f "${coreRedisPidFile}" ]; then
-        kill "$(cat "${coreRedisPidFile}")" || true
-        rm -f "${coreRedisPidFile}"
-      fi
-    '')
-  ] ++ lib.optionals pkgs.stdenv.isLinux [
-    (pkgs.writeShellScriptBin "pulse-chrome-dev" ''
-      set -euo pipefail
-      mkdir -p "${runtimeDir}/chrome"
-      exec ${pkgs.chromium}/bin/chromium \
-        --headless \
-        --disable-gpu \
-        --no-first-run \
-        --remote-debugging-address=0.0.0.0 \
-        --remote-debugging-port=9222 \
-        --user-data-dir="${runtimeDir}/chrome"
-    '')
+      (pkgs.writeShellScriptBin "pulse-dev" ''
+        set -euo pipefail
 
-    (pkgs.writeShellScriptBin "pulse-dev" ''
-            set -euo pipefail
+        config_file="$(mktemp)"
+        trap 'rm -f "$config_file"' EXIT
 
-            config_file="$(mktemp)"
-            trap 'rm -f "$config_file"' EXIT
+        ws_process=""
+        if command -v anycable-go >/dev/null 2>&1; then
+          ws_process=$'  ws:\n    command: pulse-ws-dev\n'
+        else
+          echo "[pulse] anycable-go is not installed; starting without websocket server" >&2
+        fi
 
-            ws_process=""
-            if command -v anycable-go >/dev/null 2>&1; then
-              ws_process=$'  ws:\n    command: pulse-ws-dev\n'
-            else
-              echo "[pulse] anycable-go is not installed; starting without websocket server" >&2
-            fi
+        ${pkgs.coreutils}/bin/cat > "$config_file" <<EOF
+version: "0.5"
+processes:
+  frontend:
+    command: pulse-frontend-dev
+  api:
+    command: pulse-api-dev
+  agent:
+    command: pulse-agent-dev
+  chrome:
+    command: pulse-chrome-dev
+  sidekiq:
+    command: pulse-sidekiq-dev
+  anycable:
+    command: pulse-anycable-dev
+$ws_process
+EOF
 
-            ${pkgs.coreutils}/bin/cat > "$config_file" <<EOF
-      version: "0.5"
-      processes:
-        frontend:
-          command: pulse-frontend-dev
-        api:
-          command: pulse-api-dev
-        agent:
-          command: pulse-agent-dev
-        chrome:
-          command: pulse-chrome-dev
-        sidekiq:
-          command: pulse-sidekiq-dev
-        anycable:
-          command: pulse-anycable-dev
-      $ws_process
-      EOF
+        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+      '')
 
-            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-    '')
+      (pkgs.writeShellScriptBin "core-dev" ''
+        set -euo pipefail
 
-    (pkgs.writeShellScriptBin "core-dev" ''
-            set -euo pipefail
+        config_file="$(mktemp)"
+        trap 'rm -f "$config_file"' EXIT
 
-            config_file="$(mktemp)"
-            trap 'rm -f "$config_file"' EXIT
+        ${pkgs.coreutils}/bin/cat > "$config_file" <<EOF
+version: "0.5"
+processes:
+  web:
+    command: core-web-dev
+  sidekiq:
+    command: core-sidekiq-dev
+  sidekiq_assignments:
+    command: core-sidekiq-assignments-dev
+EOF
 
-            ${pkgs.coreutils}/bin/cat > "$config_file" <<EOF
-      version: "0.5"
-      processes:
-        web:
-          command: core-web-dev
-        sidekiq:
-          command: core-sidekiq-dev
-        sidekiq_assignments:
-          command: core-sidekiq-assignments-dev
-      EOF
-
-            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-    '')
-  ];
+        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+      '')
+    ];
+  };
 }
