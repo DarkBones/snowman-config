@@ -1,7 +1,15 @@
-{ pkgs, lib, ... }: {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: {
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
-  systemd.tmpfiles.rules = [ "L+ /bin/bash - - - - ${pkgs.bash}/bin/bash" ];
+  systemd.tmpfiles.rules = [
+    "L+ /bin/bash - - - - ${pkgs.bash}/bin/bash"
+    "d /var/lib/openclaw-dashboard 0750 root nginx -"
+  ];
   boot.initrd.systemd.enable = true;
   zramSwap = {
     enable = true;
@@ -10,12 +18,49 @@
 
   systemd.oomd.enable = true;
 
+  systemd.services.openclaw-dashboard-autologin = {
+    description = "Generate local OpenClaw dashboard autologin page";
+    wantedBy = ["multi-user.target"];
+    before = ["nginx.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      Group = "nginx";
+      StateDirectory = "openclaw-dashboard";
+      UMask = "0027";
+    };
+    script = ''
+      set -euo pipefail
+
+      token_file=${config.sops.secrets.openclaw_gateway_token.path}
+      js_file=/var/lib/openclaw-dashboard/autologin.js
+
+      token="$(${pkgs.coreutils}/bin/tr -d '\n' < "$token_file")"
+      token_json="$(printf '%s' "$token" | ${pkgs.jq}/bin/jq -Rsa .)"
+
+      cat > "$js_file" <<EOF
+      (() => {
+        if (window.location.hash.includes("token=")) return;
+        const token = $token_json;
+        window.location.replace("/index.html#token=" + encodeURIComponent(token));
+      })();
+      EOF
+
+      chmod 0640 "$js_file"
+    '';
+  };
+
+  systemd.services.nginx = {
+    requires = ["openclaw-dashboard-autologin.service"];
+    after = ["openclaw-dashboard-autologin.service"];
+  };
+
   environment = {
     variables = {
       XCURSOR_THEME = "Bibata-Modern-Classic";
       XCURSOR_SIZE = lib.mkDefault 24;
     };
-    systemPackages = with pkgs; [ parted bibata-cursors efibootmgr ];
+    systemPackages = with pkgs; [parted bibata-cursors efibootmgr];
   };
 
   programs.kdeconnect.enable = true;
@@ -27,29 +72,30 @@
       extraConfig = ''
         Defaults: ha !requiretty
       '';
-      extraRules = [{
-        users = [ "ha" ];
-        commands = [
-          {
-            command = "/run/current-system/sw/bin/systemctl suspend";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/systemctl hibernate";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/systemctl lock-session";
-            options = [ "NOPASSWD" ];
-          }
+      extraRules = [
+        {
+          users = ["ha"];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/systemctl suspend";
+              options = ["NOPASSWD"];
+            }
+            {
+              command = "/run/current-system/sw/bin/systemctl hibernate";
+              options = ["NOPASSWD"];
+            }
+            {
+              command = "/run/current-system/sw/bin/systemctl lock-session";
+              options = ["NOPASSWD"];
+            }
 
-          {
-            command =
-              "/run/current-system/sw/bin/systemctl restart sunshine.service";
-            options = [ "NOPASSWD" ];
-          }
-        ];
-      }];
+            {
+              command = "/run/current-system/sw/bin/systemctl restart sunshine.service";
+              options = ["NOPASSWD"];
+            }
+          ];
+        }
+      ];
     };
   };
 
@@ -59,7 +105,7 @@
     users.bas = {
       home.username = "bas";
       home.homeDirectory = "/home/bas";
-      imports = [ ../home ];
+      imports = [../home];
       systemd.user.startServices = lib.mkForce true;
     };
   };
@@ -67,7 +113,7 @@
   networking = {
     enableIPv6 = false;
 
-    nameservers = [ "1.1.1.1" "8.8.8.8" ]; # TODO: Quad 9
+    nameservers = ["1.1.1.1" "8.8.8.8"]; # TODO: Quad 9
 
     extraHosts = ''
       127.0.0.1 ai
@@ -107,7 +153,7 @@
       checkReversePath = "loose";
 
       # Trust LAN + Tailscale interfaces
-      trustedInterfaces = [ "wlan0" "tailscale0" ];
+      trustedInterfaces = ["wlan0" "tailscale0"];
     };
   };
 
@@ -150,9 +196,27 @@
           };
         };
         "openclaw" = {
+          locations."= /__openclaw/autologin.js" = {
+            extraConfig = ''
+              alias /var/lib/openclaw-dashboard/autologin.js;
+              default_type application/javascript;
+              add_header Cache-Control "no-store" always;
+              add_header Pragma "no-cache" always;
+              add_header X-Robots-Tag "noindex, nofollow" always;
+              allow 127.0.0.1;
+              allow ::1;
+              deny all;
+            '';
+          };
           locations."/" = {
             proxyPass = "http://127.0.0.1:18789";
             proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Accept-Encoding "";
+              sub_filter_once on;
+              sub_filter_types text/html;
+              sub_filter '</head>' '<script src="/__openclaw/autologin.js"></script></head>';
+            '';
           };
         };
         "searxng" = {
