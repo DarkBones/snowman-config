@@ -75,6 +75,7 @@ in {
   networking.hosts = { "${rpi4HomeNetwork.ipv4}" = rpi4HomeNetwork.aliases; };
 
   snowman.reverseProxy.enable = true;
+  snowman.desktopNotifySsh.enable = true;
 
   services.searx.settings.server.base_url = "http://searxng/";
 

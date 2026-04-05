@@ -22,7 +22,7 @@ rec {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" "ha" ];
+      users = [ "bas" "ha" "notify" ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -32,6 +32,7 @@ rec {
         ./modules/reverse-proxy.nix
         ./modules/linux-workstation-base.nix
         ./modules/tailscale.nix
+        ./modules/desktop-notify-ssh.nix
         ./modules/openclaw-proxy.nix
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
@@ -240,6 +241,16 @@ rec {
 
     ha = {
       uid = 1100;
+      groups = [ ];
+      shell = "bash";
+      isSystemUser = true;
+
+      sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
+      roles = { };
+    };
+
+    notify = {
+      uid = 1101;
       groups = [ ];
       shell = "bash";
       isSystemUser = true;
