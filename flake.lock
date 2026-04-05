@@ -548,16 +548,16 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1774806253,
-        "narHash": "sha256-geo6gyWpWAQvqQ+Pc9iUw8PhqQ8tpLLY07pF83dYioo=",
+        "lastModified": 1775372549,
+        "narHash": "sha256-olpM0C1YzIgjWw2OXZL+vk+kSAXlMTgkYhC3FBRE18E=",
         "owner": "DarkBones",
         "repo": "snowman",
-        "rev": "c9f1c0271de4932b03caf3a17cf60ceb2e570248",
+        "rev": "0a61cbdb9a3938ad9087610dce193bd5ece89917",
         "type": "github"
       },
       "original": {
         "owner": "DarkBones",
-        "ref": "rename-script",
+        "ref": "dotfiles-mode",
         "repo": "snowman",
         "type": "github"
       }

@@ -1,13 +1,8 @@
-{ lib, pkgs, dotfilesSources, ... }:
+{ config, lib, pkgs, dotfilesSources, ... }:
 
 let
-  mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
-  isDev = mode == "dev";
-
-  # DEV = your mutable checkout
+  isDev = config.snowman.dotfiles.isDev;
   devDot = /home/bas/Developer/dotfiles;
-
-  # PROD = pinned store input
   prodDot = dotfilesSources.bas;
 
   dot = if isDev then devDot else prodDot;

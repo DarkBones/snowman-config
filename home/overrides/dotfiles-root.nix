@@ -4,11 +4,11 @@ let
   sourceKey = cfg.sourceKey or config.home.username;
   dotfilesRepo = dotfilesSources.${sourceKey} or null;
 
-  mode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
+  rawMode = builtins.getEnv "SNOWMAN_DOTFILES_MODE";
+  mode = if rawMode == "dev" || rawMode == "prod" then rawMode else "prod";
   isDev = mode == "dev";
 
   repoDir = "${config.home.homeDirectory}/${cfg.dir or "Developer/dotfiles"}";
-
   root = if isDev then
     repoDir
   else if dotfilesRepo != null then
@@ -16,6 +16,20 @@ let
   else
     throw "dotfiles: PROD mode but no pinned dotfiles source for ${sourceKey}";
 in {
+  options.dotfiles.mode = lib.mkOption {
+    type = lib.types.enum [ "dev" "prod" ];
+    readOnly = true;
+    default = mode;
+    description = "Resolved dotfiles mode.";
+  };
+
+  options.dotfiles.isDev = lib.mkOption {
+    type = lib.types.bool;
+    readOnly = true;
+    default = isDev;
+    description = "Whether dotfiles mode is dev.";
+  };
+
   options.dotfiles.root = lib.mkOption {
     type = lib.types.str;
     readOnly = true;
