@@ -1,4 +1,7 @@
-{ lib, ... }: {
+{ lib, inv, currentHost, ... }:
+let
+  lan = lib.attrByPath [ "hosts" currentHost "network" "home" ] null inv;
+in {
   services.resolved.enable = lib.mkForce false;
 
   networking = {
@@ -22,7 +25,7 @@
         interface = "end0";
       };
 
-      hosts = [ "192.168.178.63 pihole" "192.168.178.63 ha" ];
+      hosts = map (alias: "${lan.ipv4} ${alias}") lan.aliases;
     };
   };
 

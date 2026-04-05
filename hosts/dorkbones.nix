@@ -1,4 +1,7 @@
-{ pkgs, ... }: {
+{ pkgs, inv, ... }:
+let
+  rpi4HomeNetwork = inv.hosts.rpi4.network.home;
+in {
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -69,7 +72,7 @@
     };
   };
 
-  networking.hosts = { "192.168.178.63" = [ "ha" "pihole" ]; };
+  networking.hosts = { "${rpi4HomeNetwork.ipv4}" = rpi4HomeNetwork.aliases; };
 
   snowman.reverseProxy.enable = true;
 
@@ -80,7 +83,7 @@
       serverName = "ha";
 
       locations."/" = {
-        proxyPass = "http://192.168.178.63:8123";
+        proxyPass = "http://${rpi4HomeNetwork.ipv4}:8123";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
@@ -95,7 +98,7 @@
       serverName = "pihole";
 
       locations."/" = {
-        proxyPass = "http://192.168.178.63";
+        proxyPass = "http://${rpi4HomeNetwork.ipv4}";
         proxyWebsockets = true;
       };
     };

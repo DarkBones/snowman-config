@@ -71,6 +71,10 @@ rec {
       mutableUsers = false;
       hardware.boot.firmware = "raspberry-pi";
       compatibility = true;
+      network.home = {
+        ipv4 = "192.168.178.63";
+        aliases = [ "ha" "pihole" ];
+      };
 
       availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
       users = [ "bas" ];
