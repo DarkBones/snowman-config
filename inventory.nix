@@ -142,7 +142,6 @@ rec {
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
-        ./users/keys/bas-arch.pub
         ./users/keys/papershift-laptop.pub
         ./users/keys/bas-mbp.pub
         ./users/keys/bas-dorkbones.pub
@@ -245,7 +244,8 @@ rec {
       shell = "bash";
       isSystemUser = true;
 
-      sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
+      sshPubKeyFiles =
+        [ ./users/keys/ha-rpi.pub ./users/keys/bas-dorkbones.pub ];
       roles = { };
     };
 
@@ -255,7 +255,13 @@ rec {
       shell = "bash";
       isSystemUser = true;
 
-      sshPubKeyFiles = [ ./users/keys/ha-rpi.pub ];
+      sshPubKeyFiles = [
+        ./users/keys/papershift-laptop.pub
+        ./users/keys/bas-mbp.pub
+        ./users/keys/bas-dorkbones.pub
+        ./users/keys/home-assistant-pi.pub
+        ./users/keys/ha-rpi.pub
+      ];
       roles = { };
     };
   };
