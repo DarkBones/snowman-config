@@ -31,7 +31,7 @@
     };
 
     snowman = {
-      url = "github:DarkBones/snowman/dotfiles-mode";
+      url = "github:DarkBones/snowman";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

@@ -191,7 +191,7 @@ rec {
 
         dotfiles = {
           enable = true;
-          dir = "Developer/dotfiles";
+          dir = "~/Developer/dotfiles";
 
           linkMap = {
             ".config/ghostty" = "ghostty/.config/ghostty";
