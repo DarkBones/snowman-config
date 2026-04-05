@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, inputs, ... }:
 let
   cfg = config.roles.papershift;
 
@@ -324,12 +324,7 @@ let
       --rpc_host 127.0.0.1:50051
   '';
 
-  corePkgs = import (builtins.fetchTree {
-    type = "github";
-    owner = "NixOS";
-    repo = "nixpkgs";
-    ref = "nixos-23.11";
-  }) {
+  corePkgs = import inputs.nixpkgs-23_11 {
     system = pkgs.stdenv.hostPlatform.system;
     config.allowUnfree = true;
     config.permittedInsecurePackages = [ "ruby-2.7.8" "openssl-1.1.1w" ];
