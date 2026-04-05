@@ -6,12 +6,15 @@ let
     else
       "";
 
-  vars = {
+  vars = rec {
     EDITOR = "nvim";
     LANG = "en_US.UTF-8";
 
-    FLAKE = "${osConfig.users.users.bas.home}/Developer/snowman";
-    SNOWMAN_FLAKE = "${osConfig.users.users.bas.home}/snowman-config";
+    SNOWMAN_BASE_PATH = "${osConfig.users.users.bas.home}/Developer/snowman";
+    SNOWMAN_CONFIG_PATH = "${osConfig.users.users.bas.home}/snowman-config";
+
+    # Used by the `snowman` helper to override which body repo flake it targets.
+    SNOWMAN_FLAKE = SNOWMAN_CONFIG_PATH;
 
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
     OPENROUTER_API_KEY_SECRET_PATH = maybe "openrouter_api_key";

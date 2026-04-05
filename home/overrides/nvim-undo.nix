@@ -1,6 +1,5 @@
 { lib, config, ... }:
-let
-  dotfilesEnabled = config.roles.dotfiles.enable or false;
+let dotfilesEnabled = config.roles.dotfiles.enable or false;
 in {
   config = lib.mkIf dotfilesEnabled {
     home.activation.ensureNvimUndoDir =
