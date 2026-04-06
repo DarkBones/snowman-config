@@ -183,7 +183,7 @@ let
 
       curl --silent --show-error --fail \
         --request POST \
-        --url "https://api.elevenlabs.io/v1/text-to-speech/2mBZPd4Kz3QN38J0coPH?output_format=mp3_44100_128" \
+        --url "https://api.elevenlabs.io/v1/text-to-speech/WQ6Xb0Hj95La1FFC6b16?output_format=mp3_44100_128" \
         --header "xi-api-key: ''${ELEVENLABS_API_KEY}" \
         --header 'content-type: application/json' \
         --data "$(
@@ -844,7 +844,7 @@ in {
           timeoutMs = 30000;
           elevenlabs = {
             baseUrl = "https://api.elevenlabs.io";
-            voiceId = "2mBZPd4Kz3QN38J0coPH";
+            voiceId = "WQ6Xb0Hj95La1FFC6b16";
             modelId = "eleven_v3";
             applyTextNormalization = "auto";
             languageCode = "en";

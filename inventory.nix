@@ -33,6 +33,7 @@ rec {
         ./modules/linux-workstation-base.nix
         ./modules/tailscale.nix
         ./modules/desktop-notify-ssh.nix
+        ./modules/openclaw.nix
         ./modules/openclaw-proxy.nix
         ./modules/hyprland-host.nix
         ./modules/nvidia.nix
@@ -49,6 +50,7 @@ rec {
         ({ ... }: {
           roles.gaming.enable = true;
           roles.alvr.enable = true;
+          services.openclawLocal.enable = true;
         })
       ];
 
@@ -182,7 +184,6 @@ rec {
         hyprland.enable = true;
         lsp.enable = true;
         macos-wm.enable = true;
-        openclaw.enable = true;
         papershift.enable = true;
         secrets.enable = true;
         searxng.enable = true;
