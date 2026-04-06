@@ -5,15 +5,9 @@ let
   targetUid = toString targetUser.uid;
   targetHome = config.users.users.${cfg.user}.home;
   speakCommand = "${targetHome}/bin/speak";
-  openclawSpeakAuthorizedKeys = pkgs.writeShellScriptBin
-    "snowman-desktop-speak-authorized-keys" ''
-      set -euo pipefail
-
-      openclaw_pubkey="/var/lib/openclaw/.ssh/id_ed25519.pub"
-      if [ -r "$openclaw_pubkey" ]; then
-        cat "$openclaw_pubkey"
-      fi
-    '';
+  authorizedKeysRuntimeDir = "/run/snowman/ssh";
+  authorizedKeysRuntimeFile =
+    "${authorizedKeysRuntimeDir}/${cfg.sshUser}.authorized_keys";
 
   speakBridgeScript = pkgs.writeText "snowman-desktop-speak-bridge.py" ''
     import argparse
@@ -152,8 +146,32 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages =
-      [ speakHelper speakLocalHelper openclawSpeakAuthorizedKeys ];
+    environment.systemPackages = [ speakHelper speakLocalHelper ];
+
+    systemd.tmpfiles.rules = [ "d ${authorizedKeysRuntimeDir} 0755 root root -" ];
+
+    systemd.services.desktop-speak-ssh-authorize-openclaw = {
+      description = "Expose OpenClaw SSH key for the restricted speak receiver";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "openclaw-prepare.service" ];
+      requires = [ "openclaw-prepare.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "root";
+        Group = "root";
+      };
+      script = ''
+        set -euo pipefail
+
+        install -d -m 0755 -o root -g root ${authorizedKeysRuntimeDir}
+
+        if [ -r /var/lib/openclaw/.ssh/id_ed25519.pub ]; then
+          install -m 0644 -o root -g root /var/lib/openclaw/.ssh/id_ed25519.pub ${authorizedKeysRuntimeFile}
+        else
+          rm -f ${authorizedKeysRuntimeFile}
+        fi
+      '';
+    };
 
     security.sudo.extraRules = [{
       users = [ cfg.sshUser ];
@@ -169,8 +187,7 @@ in {
         AllowStreamLocalForwarding no
         AllowTcpForwarding no
         AuthenticationMethods publickey
-        AuthorizedKeysCommand ${openclawSpeakAuthorizedKeys}/bin/snowman-desktop-speak-authorized-keys
-        AuthorizedKeysCommandUser root
+        AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u ${authorizedKeysRuntimeFile}
         ForceCommand ${speakHelper}/bin/snowman-desktop-speak
         GatewayPorts no
         KbdInteractiveAuthentication no

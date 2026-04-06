@@ -182,81 +182,21 @@ let
     '';
   };
 
-  playAudioLocal = pkgs.writeShellApplication {
-    name = "play-audio-local";
-    runtimeInputs = with pkgs; [ coreutils vlc ];
-    text = ''
-      set -euo pipefail
-
-      if [ $# -ne 1 ]; then
-        echo "usage: play-audio-local <path|MEDIA:path>" >&2
-        exit 2
-      fi
-
-      input="$1"
-      case "$input" in
-        MEDIA:*)
-          input="''${input#MEDIA:}"
-          ;;
-      esac
-
-      if [ ! -f "$input" ]; then
-        echo "play-audio-local: file not found: $input" >&2
-        exit 1
-      fi
-
-      exec cvlc --play-and-exit --intf dummy --gain ${openclawPlaybackGain} "$input"
-    '';
-  };
-
-  speakLocal = pkgs.writeShellApplication {
+  speakLocalCommand = pkgs.writeShellApplication {
     name = "speak-local";
-    runtimeInputs = with pkgs; [ coreutils curl jq vlc ];
+    runtimeInputs = with pkgs; [ coreutils ];
     text = ''
       set -euo pipefail
 
-      if [ $# -lt 1 ]; then
-        echo "usage: speak-local <text...>" >&2
-        exit 2
+      state_dir="''${OPENCLAW_STATE_DIR:-${stateDir}}"
+      runner="$state_dir/workspace/skills/speak-local/run.sh"
+
+      if [ ! -x "$runner" ]; then
+        echo "speak-local: workspace runner not found or not executable: $runner" >&2
+        exit 127
       fi
 
-      : "''${ELEVENLABS_API_KEY:?ELEVENLABS_API_KEY is required}"
-      : "''${OPENCLAW_ELEVENLABS_VOICE_ID:?OPENCLAW_ELEVENLABS_VOICE_ID is required}"
-
-      text="$*"
-      temp_dir="$(mktemp -d /tmp/openclaw-speak-local-XXXXXX)"
-      audio_path="$temp_dir/voice.mp3"
-
-      cleanup() {
-        rm -rf "$temp_dir"
-      }
-      trap cleanup EXIT
-
-      curl --silent --show-error --fail \
-        --request POST \
-        --url "https://api.elevenlabs.io/v1/text-to-speech/''${OPENCLAW_ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128" \
-        --header "xi-api-key: ''${ELEVENLABS_API_KEY}" \
-        --header 'content-type: application/json' \
-        --data "$(
-          jq -cn \
-            --arg text "$text" \
-            '{
-              text: $text,
-              model_id: "eleven_v3",
-              apply_text_normalization: "auto",
-              language_code: "en",
-              voice_settings: {
-                stability: 0.5,
-                similarity_boost: 0.75,
-                style: 0.0,
-                use_speaker_boost: true,
-                speed: 1.0
-              }
-            }'
-        )" \
-        --output "$audio_path"
-
-      exec cvlc --play-and-exit --intf dummy --gain ${openclawPlaybackGain} "$audio_path"
+      exec "$runner" "$@"
     '';
   };
 
@@ -674,9 +614,8 @@ let
   openclawServicePath = lib.makeBinPath [
     openclawSync
     openclawSyncStatus
+    speakLocalCommand
     linuxScreenshot
-    playAudioLocal
-    speakLocal
     youtubeSearchApi
     youtubeWatchHistory
     searxngSearch
@@ -765,33 +704,6 @@ let
         Do not set the `model` field on the `image` tool call.
 
         If capture fails because there is no active graphical session, explain that clearly.
-      '';
-    }
-    {
-      name = "speak-local";
-      description =
-        "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
-      command = "speak-local";
-      body = ''
-        Use this skill when the user wants to hear speech locally on this machine.
-
-        Run:
-        `speak-local <text to say>`
-
-        Before you run it, shape the text for speech:
-        - Prefer natural, narrative phrasing over flat prose.
-        - Prefer short Eleven v3 audio tags when they help delivery, like `[whispers]`, `[curious]`, `[sighs]`, or `[excited]`.
-        - Use light punctuation for pacing: commas, em dashes, ellipses, and occasional short quoted beats.
-        - Do not use SSML break tags like `<break ... />`; Eleven v3 relies on punctuation and audio tags instead.
-        - Do not overload the text with lots of tags or stage directions.
-        - Normalize awkward speech inputs before playback: expand URLs, slash commands, timestamps, file paths, and dense numbers into how a human would naturally say them.
-        - If a pronunciation is wrong, try a more phonetic spelling or a simpler alias.
-
-        Keep the spoken text concise and performance-ready. Rewrite it slightly for delivery when that improves the result, unless the user explicitly wants exact wording.
-
-        This skill already handles TTS generation and local playback on dorkbones speakers.
-
-        Do not use the generic `tts` tool for this. The goal is immediate local playback.
       '';
     }
     {
@@ -904,9 +816,8 @@ let
       security = "allowlist";
       ask = "on-miss";
       pathPrepend = [
+        "${speakLocalCommand}/bin"
         "${linuxScreenshot}/bin"
-        "${playAudioLocal}/bin"
-        "${speakLocal}/bin"
         "${youtubeSearchApi}/bin"
         "${youtubeWatchHistory}/bin"
         "${searxngSearch}/bin"
@@ -1314,6 +1225,10 @@ in {
         find "$state_dir" \
           \( -path "$repo_mount_dir" -o -path "$repo_mount_dir/*" \) -prune \
           -o ! -type l -type f -exec chmod 0660 {} +
+        chmod 0600 "$ssh_private_key"
+        chmod 0644 "$ssh_public_key" "$ssh_known_hosts"
+        find "$scripts_dir" -maxdepth 1 -type f -exec chmod 0750 {} +
+        find "$skills_dir" -mindepth 2 -maxdepth 2 -type f -name run.sh -exec chmod 0750 {} +
         chmod 0600 "$env_file" "$telegram_token_file"
         date +%s > "${syncStampPath}"
         chown ${cfg.operatorUser}:openclaw "${syncStampPath}"
@@ -1373,6 +1288,7 @@ in {
       };
     };
 
-    environment.systemPackages = [ openclawSync openclawSyncStatus ];
+    environment.systemPackages =
+      [ openclawSync openclawSyncStatus speakLocalCommand ];
   };
 }
