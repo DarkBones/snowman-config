@@ -22,7 +22,7 @@ rec {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" "ha" "notify" ];
+      users = [ "bas" "ha" "notify" "speak" ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -33,6 +33,7 @@ rec {
         ./modules/linux-workstation-base.nix
         ./modules/tailscale.nix
         ./modules/desktop-notify-ssh.nix
+        ./modules/desktop-speak-ssh.nix
         ./modules/openclaw.nix
         ./modules/openclaw-proxy.nix
         ./modules/hyprland-host.nix
@@ -51,6 +52,8 @@ rec {
           roles.gaming.enable = true;
           roles.alvr.enable = true;
           services.openclawLocal.enable = true;
+          snowman.desktopNotifySsh.enable = true;
+          snowman.desktopSpeakSsh.enable = true;
         })
       ];
 
@@ -159,7 +162,7 @@ rec {
           "openai_api_key"
           "openrouter_api_key"
           "anthropic_api_key"
-          "eleven_labs_api_key"
+          "elevenlabs_api_key"
           "gemini_api_key"
           "youtube_api_key"
           "openclaw_gateway_token"
@@ -259,6 +262,20 @@ rec {
       sshPubKeyFiles = [
         ./users/keys/papershift-laptop.pub
         ./users/keys/bas-mbp.pub
+        ./users/keys/bas-dorkbones.pub
+        ./users/keys/home-assistant-pi.pub
+        ./users/keys/ha-rpi.pub
+      ];
+      roles = { };
+    };
+
+    speak = {
+      uid = 1102;
+      groups = [ ];
+      shell = "bash";
+      isSystemUser = true;
+
+      sshPubKeyFiles = [
         ./users/keys/bas-dorkbones.pub
         ./users/keys/home-assistant-pi.pub
         ./users/keys/ha-rpi.pub

@@ -882,9 +882,9 @@ in {
           printf 'OPENROUTER_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openrouter_api_key)" >> "$env_file"
         fi
 
-        if [ -r /run/secrets/eleven_labs_api_key ]; then
-          printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
-          printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/eleven_labs_api_key)" >> "$env_file"
+        if [ -r /run/secrets/elevenlabs_api_key ]; then
+          printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
+          printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
         fi
 
         if [ -r /run/secrets/youtube_api_key ]; then

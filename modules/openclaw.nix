@@ -3,6 +3,10 @@ let
   cfg = config.services.openclawLocal;
 
   stateDir = "/var/lib/openclaw";
+  sshDir = "${stateDir}/.ssh";
+  sshPrivateKeyPath = "${sshDir}/id_ed25519";
+  sshPublicKeyPath = "${sshPrivateKeyPath}.pub";
+  sshKnownHostsPath = "${sshDir}/known_hosts";
   repoMountDir = "${stateDir}/repo";
   workspaceDir = "${stateDir}/workspace";
   workspaceScriptsDir = "${workspaceDir}/scripts";
@@ -688,6 +692,7 @@ let
     pkgs.sqlite
     pkgs.systemd
     pkgs.vlc
+    pkgs.openssh
   ];
 
   skills = [
@@ -906,6 +911,7 @@ let
         "${youtubeWatchHistory}/bin"
         "${searxngSearch}/bin"
         "${telegramSend}/bin"
+        "${pkgs.openssh}/bin"
         "/run/current-system/sw/bin"
       ];
     };
@@ -1058,6 +1064,10 @@ in {
         env_file="$state_dir/openclaw.env"
         approvals_dir="$state_dir/.openclaw"
         approvals_file="$approvals_dir/exec-approvals.json"
+        ssh_dir="${sshDir}"
+        ssh_private_key="${sshPrivateKeyPath}"
+        ssh_public_key="${sshPublicKeyPath}"
+        ssh_known_hosts="${sshKnownHostsPath}"
         telegram_token_file="${telegramTokenPath}"
         config_file="${openclawConfigPath}"
         shared_dir="${cfg.sharedDir}"
@@ -1075,6 +1085,7 @@ in {
         install -d -m 2770 -o ${cfg.operatorUser} -g openclaw \
           "$state_dir" \
           "$approvals_dir" \
+          "$ssh_dir" \
           "$workspace_dir" \
           "$skills_dir" \
           "$scripts_dir" \
@@ -1085,6 +1096,18 @@ in {
         : > "$env_file"
         chmod 0600 "$env_file"
         chown openclaw:openclaw "$env_file"
+
+        chmod 0700 "$ssh_dir"
+        chown openclaw:openclaw "$ssh_dir"
+        if [ ! -f "$ssh_private_key" ]; then
+          ${pkgs.openssh}/bin/ssh-keygen -q -t ed25519 -N "" -f "$ssh_private_key"
+        fi
+        chown openclaw:openclaw "$ssh_private_key" "$ssh_public_key"
+        chmod 0600 "$ssh_private_key"
+        chmod 0644 "$ssh_public_key"
+        touch "$ssh_known_hosts"
+        chown openclaw:openclaw "$ssh_known_hosts"
+        chmod 0644 "$ssh_known_hosts"
 
         append_secret() {
           local env_name="$1"
@@ -1099,8 +1122,8 @@ in {
         append_secret OPENAI_API_KEY ${config.sops.secrets.openai_api_key.path}
         append_secret ANTHROPIC_API_KEY ${config.sops.secrets.anthropic_api_key.path}
         append_secret OPENROUTER_API_KEY ${config.sops.secrets.openrouter_api_key.path}
-        append_secret ELEVENLABS_API_KEY ${config.sops.secrets.eleven_labs_api_key.path}
-        append_secret XI_API_KEY ${config.sops.secrets.eleven_labs_api_key.path}
+        append_secret ELEVENLABS_API_KEY ${config.sops.secrets.elevenlabs_api_key.path}
+        append_secret XI_API_KEY ${config.sops.secrets.elevenlabs_api_key.path}
         append_secret YOUTUBE_API_KEY ${config.sops.secrets.youtube_api_key.path}
         append_secret TELEGRAM_BOT_TOKEN ${config.sops.secrets.openclaw_telegram_bot_token.path}
         ${lib.optionalString (cfg.elevenLabsVoiceId != null) ''

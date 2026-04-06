@@ -19,7 +19,7 @@ let
     OPENAI_API_KEY_SECRET_PATH = maybe "openai_api_key";
     OPENROUTER_API_KEY_SECRET_PATH = maybe "openrouter_api_key";
     ANTHROPIC_API_KEY_SECRET_PATH = maybe "anthropic_api_key";
-    ELEVEN_LABS_API_KEY_SECRET_PATH = maybe "eleven_labs_api_key";
+    ELEVENLABS_API_KEY_SECRET_PATH = maybe "elevenlabs_api_key";
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";
     YOUTUBE_API_KEY_SECRET_PATH = maybe "youtube_api_key";
     OPENCLAW_GATEWAY_TOKEN_SECRET_PATH = maybe "openclaw_gateway_token";
