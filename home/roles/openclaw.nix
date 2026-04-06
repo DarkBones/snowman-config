@@ -3,11 +3,7 @@ let
   cfg = config.roles.openclaw;
   isLinux = pkgs.stdenv.isLinux;
   documentsDir = "${cfg.documentsRepoDir}/documents";
-  requiredDocumentFiles = [
-    "AGENTS.md"
-    "SOUL.md"
-    "TOOLS.md"
-  ];
+  requiredDocumentFiles = [ "AGENTS.md" "SOUL.md" "TOOLS.md" ];
   optionalDocumentFiles = [
     "IDENTITY.md"
     "USER.md"
@@ -18,16 +14,19 @@ let
   documentFiles = requiredDocumentFiles ++ optionalDocumentFiles;
   workspaceDir = "${config.home.homeDirectory}/.openclaw/workspace";
   whatsappAuthDir = "${config.home.homeDirectory}/.openclaw/whatsapp/main";
-  bundledPluginsSourceDir = "${config.programs.openclaw.package}/lib/openclaw/extensions";
-  bundledPluginsDistDir = "${config.programs.openclaw.package}/lib/openclaw/dist/extensions";
+  bundledPluginsSourceDir =
+    "${config.programs.openclaw.package}/lib/openclaw/extensions";
+  bundledPluginsDistDir =
+    "${config.programs.openclaw.package}/lib/openclaw/dist/extensions";
   bundledPluginsRuntimeDir =
     "${config.home.homeDirectory}/.openclaw/bundled-plugins-runtime";
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
-  bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
-  openclawScreenshotDir = "${config.home.homeDirectory}/.openclaw/media/screenshots";
+  bundledPluginsRuntimeExtensionsDir =
+    "${bundledPluginsRuntimeDistDir}/extensions";
+  openclawScreenshotDir =
+    "${config.home.homeDirectory}/.openclaw/media/screenshots";
   openclawPlaybackGain = "0.1";
   openclawServicePath = lib.makeBinPath [
-    linuxScreenshot
     playAudioLocal
     speakLocal
     youtubeSearchApi
@@ -213,133 +212,133 @@ let
     name = "youtube-watch-history";
     runtimeInputs = with pkgs; [ coreutils findutils gnugrep jq sqlite ];
     text = ''
-      set -euo pipefail
+            set -euo pipefail
 
-      limit="''${1:-25}"
-      query="''${2:-}"
+            limit="''${1:-25}"
+            query="''${2:-}"
 
-      if ! printf '%s\n' "$limit" | grep -Eq '^[0-9]+$'; then
-        echo "youtube-watch-history: limit must be a positive integer" >&2
-        exit 2
-      fi
+            if ! printf '%s\n' "$limit" | grep -Eq '^[0-9]+$'; then
+              echo "youtube-watch-history: limit must be a positive integer" >&2
+              exit 2
+            fi
 
-      if [ "$limit" -lt 1 ]; then
-        echo "youtube-watch-history: limit must be at least 1" >&2
-        exit 2
-      fi
+            if [ "$limit" -lt 1 ]; then
+              echo "youtube-watch-history: limit must be at least 1" >&2
+              exit 2
+            fi
 
-      tmp_jsonl="$(mktemp /tmp/youtube-watch-history-XXXXXX.jsonl)"
-      : > "$tmp_jsonl"
+            tmp_jsonl="$(mktemp /tmp/youtube-watch-history-XXXXXX.jsonl)"
+            : > "$tmp_jsonl"
 
-      cleanup() {
-        rm -f "$tmp_jsonl" /tmp/youtube-watch-history-db-*.sqlite
-      }
-      trap cleanup EXIT
+            cleanup() {
+              rm -f "$tmp_jsonl" /tmp/youtube-watch-history-db-*.sqlite
+            }
+            trap cleanup EXIT
 
-      collect_db() {
-        local browser="$1"
-        local source_db="$2"
-        local temp_db
+            collect_db() {
+              local browser="$1"
+              local source_db="$2"
+              local temp_db
 
-        [ -f "$source_db" ] || return 0
+              [ -f "$source_db" ] || return 0
 
-        temp_db="$(mktemp /tmp/youtube-watch-history-db-XXXXXX.sqlite)"
-        cp "$source_db" "$temp_db"
+              temp_db="$(mktemp /tmp/youtube-watch-history-db-XXXXXX.sqlite)"
+              cp "$source_db" "$temp_db"
 
-        if [ "$browser" = "chromium" ]; then
-          sqlite3 -readonly "$temp_db" "
-            SELECT json_object(
-              'browser', 'chromium',
-              'url', urls.url,
-              'title', COALESCE(urls.title, null),
-              'visited_at_epoch', CAST((visits.visit_time / 1000000) - 11644473600 AS INTEGER)
-            )
-            FROM visits
-            JOIN urls ON urls.id = visits.url
-            WHERE (
-              urls.url LIKE 'https://www.youtube.com/watch%'
-              OR urls.url LIKE 'https://m.youtube.com/watch%'
-              OR urls.url LIKE 'https://youtu.be/%'
-            )
-            ORDER BY visits.visit_time DESC
-            LIMIT 500;
-          " >> "$tmp_jsonl" || true
-        else
-          sqlite3 -readonly "$temp_db" "
-            SELECT json_object(
-              'browser', '$browser',
-              'url', moz_places.url,
-              'title', COALESCE(moz_places.title, null),
-              'visited_at_epoch', CAST(moz_historyvisits.visit_date / 1000000 AS INTEGER)
-            )
-            FROM moz_historyvisits
-            JOIN moz_places ON moz_places.id = moz_historyvisits.place_id
-            WHERE (
-              moz_places.url LIKE 'https://www.youtube.com/watch%'
-              OR moz_places.url LIKE 'https://m.youtube.com/watch%'
-              OR moz_places.url LIKE 'https://youtu.be/%'
-            )
-            ORDER BY moz_historyvisits.visit_date DESC
-            LIMIT 500;
-          " >> "$tmp_jsonl" || true
-        fi
-      }
-
-      while IFS= read -r db; do
-        collect_db "chromium" "$db"
-      done < <(
-        find "$HOME/.config/chromium" -maxdepth 3 -type f -name History 2>/dev/null
-      )
-
-      while IFS= read -r db; do
-        collect_db "firefox" "$db"
-      done < <(
-        find "$HOME/.mozilla/firefox" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
-      )
-
-      while IFS= read -r db; do
-        collect_db "zen" "$db"
-      done < <(
-        find "$HOME/.zen" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
-      )
-
-      if [ ! -s "$tmp_jsonl" ]; then
-        echo "youtube-watch-history: no local YouTube watch history database found" >&2
-        exit 1
-      fi
-
-      jq_filter="$(cat <<'EOF'
-        map(
-          . + {
-            visited_at: (.visited_at_epoch | todateiso8601),
-            video_id: (
-              if (.url | test("v=")) then
-                (.url | capture("[?&]v=(?<id>[^&]+)").id)
-              elif (.url | test("youtu\\.be/")) then
-                (.url | capture("youtu\\.be/(?<id>[^?&/]+)").id)
+              if [ "$browser" = "chromium" ]; then
+                sqlite3 -readonly "$temp_db" "
+                  SELECT json_object(
+                    'browser', 'chromium',
+                    'url', urls.url,
+                    'title', COALESCE(urls.title, null),
+                    'visited_at_epoch', CAST((visits.visit_time / 1000000) - 11644473600 AS INTEGER)
+                  )
+                  FROM visits
+                  JOIN urls ON urls.id = visits.url
+                  WHERE (
+                    urls.url LIKE 'https://www.youtube.com/watch%'
+                    OR urls.url LIKE 'https://m.youtube.com/watch%'
+                    OR urls.url LIKE 'https://youtu.be/%'
+                  )
+                  ORDER BY visits.visit_time DESC
+                  LIMIT 500;
+                " >> "$tmp_jsonl" || true
               else
-                null
-              end
+                sqlite3 -readonly "$temp_db" "
+                  SELECT json_object(
+                    'browser', '$browser',
+                    'url', moz_places.url,
+                    'title', COALESCE(moz_places.title, null),
+                    'visited_at_epoch', CAST(moz_historyvisits.visit_date / 1000000 AS INTEGER)
+                  )
+                  FROM moz_historyvisits
+                  JOIN moz_places ON moz_places.id = moz_historyvisits.place_id
+                  WHERE (
+                    moz_places.url LIKE 'https://www.youtube.com/watch%'
+                    OR moz_places.url LIKE 'https://m.youtube.com/watch%'
+                    OR moz_places.url LIKE 'https://youtu.be/%'
+                  )
+                  ORDER BY moz_historyvisits.visit_date DESC
+                  LIMIT 500;
+                " >> "$tmp_jsonl" || true
+              fi
+            }
+
+            while IFS= read -r db; do
+              collect_db "chromium" "$db"
+            done < <(
+              find "$HOME/.config/chromium" -maxdepth 3 -type f -name History 2>/dev/null
             )
-          }
-        )
-        | sort_by(.visited_at_epoch)
-        | reverse
-        | reduce .[] as $item ([]; if any(.[]; .url == $item.url) then . else . + [$item] end)
-EOF
-      )"
 
-      if [ -n "$query" ]; then
-        jq_filter="$jq_filter | map(select((.title + \" \" + .url) | ascii_downcase | contains(\$query)))"
-      fi
+            while IFS= read -r db; do
+              collect_db "firefox" "$db"
+            done < <(
+              find "$HOME/.mozilla/firefox" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
+            )
 
-      jq_filter="$jq_filter | .[0:\$limit]"
+            while IFS= read -r db; do
+              collect_db "zen" "$db"
+            done < <(
+              find "$HOME/.zen" -maxdepth 3 -type f -name places.sqlite 2>/dev/null
+            )
 
-      if [ -n "$query" ]; then
-        jq -s --arg query "$(printf '%s' "$query" | tr '[:upper:]' '[:lower:]')" --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
-      else
-        jq -s --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
-      fi
+            if [ ! -s "$tmp_jsonl" ]; then
+              echo "youtube-watch-history: no local YouTube watch history database found" >&2
+              exit 1
+            fi
+
+            jq_filter="$(cat <<'EOF'
+              map(
+                . + {
+                  visited_at: (.visited_at_epoch | todateiso8601),
+                  video_id: (
+                    if (.url | test("v=")) then
+                      (.url | capture("[?&]v=(?<id>[^&]+)").id)
+                    elif (.url | test("youtu\\.be/")) then
+                      (.url | capture("youtu\\.be/(?<id>[^?&/]+)").id)
+                    else
+                      null
+                    end
+                  )
+                }
+              )
+              | sort_by(.visited_at_epoch)
+              | reverse
+              | reduce .[] as $item ([]; if any(.[]; .url == $item.url) then . else . + [$item] end)
+      EOF
+            )"
+
+            if [ -n "$query" ]; then
+              jq_filter="$jq_filter | map(select((.title + \" \" + .url) | ascii_downcase | contains(\$query)))"
+            fi
+
+            jq_filter="$jq_filter | .[0:\$limit]"
+
+            if [ -n "$query" ]; then
+              jq -s --arg query "$(printf '%s' "$query" | tr '[:upper:]' '[:lower:]')" --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
+            else
+              jq -s --argjson limit "$limit" "$jq_filter" "$tmp_jsonl"
+            fi
     '';
   };
 
@@ -535,82 +534,6 @@ EOF
       jq '.[0:'"$limit"']' "$tmp_results"
     '';
   };
-
-  linuxScreenshot = pkgs.writeShellApplication {
-    name = "linux-screenshot";
-    runtimeInputs = with pkgs; [ coreutils findutils gnugrep gnused grim slurp systemd ];
-    text = ''
-      set -euo pipefail
-
-      mode="full"
-      case "''${1:-}" in
-        "")
-          ;;
-        --full)
-          ;;
-        --region)
-          mode="region"
-          ;;
-        *)
-          echo "usage: linux-screenshot [--full|--region]" >&2
-          exit 2
-          ;;
-      esac
-
-      runtime_dir="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-
-      read_systemd_env() {
-        local key="$1"
-        systemctl --user show-environment | sed -n "s/^''${key}=//p" | head -n1
-      }
-
-      export XDG_RUNTIME_DIR="$runtime_dir"
-
-      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
-        WAYLAND_DISPLAY="$(read_systemd_env WAYLAND_DISPLAY || true)"
-      fi
-      if [ -z "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-        HYPRLAND_INSTANCE_SIGNATURE="$(read_systemd_env HYPRLAND_INSTANCE_SIGNATURE || true)"
-      fi
-
-      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
-        socket_path="$(find "$runtime_dir" -maxdepth 1 -type s -name 'wayland-*' | sort | head -n1)"
-        if [ -n "$socket_path" ]; then
-          WAYLAND_DISPLAY="$(basename "$socket_path")"
-        fi
-      fi
-
-      if [ -z "''${WAYLAND_DISPLAY:-}" ]; then
-        echo "linux-screenshot: no Wayland display found. OpenClaw needs an active graphical session on this machine." >&2
-        exit 1
-      fi
-
-      export WAYLAND_DISPLAY
-      if [ -n "''${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-        export HYPRLAND_INSTANCE_SIGNATURE
-      fi
-
-      out_dir="''${OPENCLAW_SCREENSHOT_DIR:-${openclawScreenshotDir}}"
-      mkdir -p "$out_dir"
-
-      timestamp="$(date +%Y%m%d-%H%M%S)"
-      target="$out_dir/$timestamp.png"
-
-      if [ "$mode" = "region" ]; then
-        geometry="$(slurp)"
-        if [ -z "$geometry" ]; then
-          echo "linux-screenshot: no region selected." >&2
-          exit 1
-        fi
-        grim -g "$geometry" "$target"
-      else
-        grim "$target"
-      fi
-
-      printf 'Saved screenshot to %s\n' "$target"
-      printf 'MEDIA:%s\n' "$target"
-    '';
-  };
 in {
   imports = [ inputs.nix-openclaw.homeManagerModules.openclaw ];
 
@@ -629,7 +552,6 @@ in {
 
   config = lib.mkIf (cfg.enable && isLinux) {
     home.packages = [
-      linuxScreenshot
       playAudioLocal
       searxngSearch
       speakLocal
@@ -673,7 +595,8 @@ in {
         }
         {
           name = "telegram-send";
-          description = "Send a plain Telegram message through the Telegram Bot API.";
+          description =
+            "Send a plain Telegram message through the Telegram Bot API.";
           mode = "inline";
           body = ''
             Use this skill when sending a normal Telegram message.
@@ -690,7 +613,8 @@ in {
         }
         {
           name = "linux-screenshot";
-          description = "Capture a screenshot from the current Wayland desktop on dorkbones.";
+          description =
+            "Capture a screenshot from the current Wayland desktop on dorkbones.";
           mode = "inline";
           body = ''
             Use the `linux-screenshot` CLI when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
@@ -717,7 +641,8 @@ in {
         }
         {
           name = "speak-local";
-          description = "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
+          description =
+            "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
           mode = "inline";
           body = ''
             Use this skill when the user wants to hear speech locally on this machine.
@@ -743,7 +668,8 @@ in {
         }
         {
           name = "python-project-env";
-          description = "Set up and use a project-local Python virtualenv for Python work inside the OpenClaw workspace.";
+          description =
+            "Set up and use a project-local Python virtualenv for Python work inside the OpenClaw workspace.";
           mode = "inline";
           body = ''
             Use this skill whenever you need to install Python dependencies or run a Python project inside the OpenClaw workspace.
@@ -770,7 +696,8 @@ in {
         }
         {
           name = "youtube-search-api-skill";
-          description = "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
+          description =
+            "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
           mode = "inline";
           body = ''
             Use this skill to search YouTube directly with the YouTube Data API.
@@ -800,7 +727,8 @@ in {
         }
         {
           name = "youtube-watch-history";
-          description = "Read local browser history and return recently visited YouTube watch URLs from this machine.";
+          description =
+            "Read local browser history and return recently visited YouTube watch URLs from this machine.";
           mode = "inline";
           body = ''
             Use this skill when the task depends on what the user actually watched recently on this machine.
@@ -971,111 +899,107 @@ in {
       '';
 
     home.activation.openclawDocuments =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] (
-        ''
-          documents_dir="${documentsDir}"
-          workspace_dir="${workspaceDir}"
+      lib.hm.dag.entryAfter [ "writeBoundary" ] (''
+        documents_dir="${documentsDir}"
+        workspace_dir="${workspaceDir}"
 
-          if [ ! -d "$documents_dir" ]; then
-            echo "OpenClaw documents directory not found: $documents_dir" >&2
-            echo "Create a private checkout there, or override roles.openclaw.documentsRepoDir." >&2
-            exit 1
-          fi
+        if [ ! -d "$documents_dir" ]; then
+          echo "OpenClaw documents directory not found: $documents_dir" >&2
+          echo "Create a private checkout there, or override roles.openclaw.documentsRepoDir." >&2
+          exit 1
+        fi
 
-          mkdir -p "$workspace_dir"
-        ''
-        + lib.concatMapStrings (name: ''
-          if [ ! -f "$documents_dir/${name}" ]; then
-            echo "Missing OpenClaw document: $documents_dir/${name}" >&2
-            exit 1
-          fi
-        '') requiredDocumentFiles
-        + lib.concatMapStrings (name: ''
-          target="$workspace_dir/${name}"
-          source="$documents_dir/${name}"
+        mkdir -p "$workspace_dir"
+      '' + lib.concatMapStrings (name: ''
+        if [ ! -f "$documents_dir/${name}" ]; then
+          echo "Missing OpenClaw document: $documents_dir/${name}" >&2
+          exit 1
+        fi
+      '') requiredDocumentFiles + lib.concatMapStrings (name: ''
+        target="$workspace_dir/${name}"
+        source="$documents_dir/${name}"
 
-          if [ -e "$target" ] && [ ! -L "$target" ]; then
-            echo "Refusing to replace non-symlink OpenClaw document: $target" >&2
-            exit 1
-          fi
+        if [ -e "$target" ] && [ ! -L "$target" ]; then
+          echo "Refusing to replace non-symlink OpenClaw document: $target" >&2
+          exit 1
+        fi
 
-          if [ -f "$source" ]; then
-            ln -sfn "$source" "$target"
-          else
-            rm -f "$target"
-          fi
-        '') documentFiles
-      );
+        if [ -f "$source" ]; then
+          ln -sfn "$source" "$target"
+        else
+          rm -f "$target"
+        fi
+      '') documentFiles);
 
     home.activation.openclawLocalSkills =
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-        skills_dir="${workspaceDir}/skills"
+                skills_dir="${workspaceDir}/skills"
 
-        for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send youtube-search-api-skill youtube-watch-history; do
-          skill_file="$skills_dir/$skill_name/SKILL.md"
-          [ -L "$skill_file" ] || continue
+                for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send youtube-search-api-skill youtube-watch-history; do
+                  skill_file="$skills_dir/$skill_name/SKILL.md"
+                  [ -L "$skill_file" ] || continue
 
-          source_file="$(readlink -f "$skill_file")"
-          rm -f "$skill_file"
-          cp "$source_file" "$skill_file"
-          chmod 644 "$skill_file"
-        done
+                  source_file="$(readlink -f "$skill_file")"
+                  rm -f "$skill_file"
+                  cp "$source_file" "$skill_file"
+                  chmod 644 "$skill_file"
+                done
 
-        mkdir -p "$skills_dir/linux-screenshot"
-        cat > "$skills_dir/linux-screenshot/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec linux-screenshot "$@"
-EOF
-        chmod 755 "$skills_dir/linux-screenshot/run.sh"
+                mkdir -p "$skills_dir/linux-screenshot"
+                cat > "$skills_dir/linux-screenshot/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec linux-screenshot "$@"
+        EOF
+                chmod 755 "$skills_dir/linux-screenshot/run.sh"
 
-        mkdir -p "$skills_dir/searxng-search"
-        cat > "$skills_dir/searxng-search/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec searxng-search "$@"
-EOF
-        chmod 755 "$skills_dir/searxng-search/run.sh"
+                mkdir -p "$skills_dir/searxng-search"
+                cat > "$skills_dir/searxng-search/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec searxng-search "$@"
+        EOF
+                chmod 755 "$skills_dir/searxng-search/run.sh"
 
-        mkdir -p "$skills_dir/goplaces"
-        cat > "$skills_dir/goplaces/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec goplaces "$@"
-EOF
-        chmod 755 "$skills_dir/goplaces/run.sh"
+                mkdir -p "$skills_dir/goplaces"
+                cat > "$skills_dir/goplaces/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec goplaces "$@"
+        EOF
+                chmod 755 "$skills_dir/goplaces/run.sh"
 
-        mkdir -p "$skills_dir/telegram-send"
-        cat > "$skills_dir/telegram-send/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec telegram-send "$@"
-EOF
-        chmod 755 "$skills_dir/telegram-send/run.sh"
+                mkdir -p "$skills_dir/telegram-send"
+                cat > "$skills_dir/telegram-send/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec telegram-send "$@"
+        EOF
+                chmod 755 "$skills_dir/telegram-send/run.sh"
 
-        mkdir -p "$skills_dir/speak-local"
-        cat > "$skills_dir/speak-local/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec speak-local "$@"
-EOF
-        chmod 755 "$skills_dir/speak-local/run.sh"
+                mkdir -p "$skills_dir/speak-local"
+                cat > "$skills_dir/speak-local/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec speak-local "$@"
+        EOF
+                chmod 755 "$skills_dir/speak-local/run.sh"
 
-        mkdir -p "$skills_dir/youtube-search-api-skill"
-        cat > "$skills_dir/youtube-search-api-skill/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec youtube-search-api "$@"
-EOF
-        chmod 755 "$skills_dir/youtube-search-api-skill/run.sh"
+                mkdir -p "$skills_dir/youtube-search-api-skill"
+                cat > "$skills_dir/youtube-search-api-skill/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec youtube-search-api "$@"
+        EOF
+                chmod 755 "$skills_dir/youtube-search-api-skill/run.sh"
 
-        mkdir -p "$skills_dir/youtube-watch-history"
-        cat > "$skills_dir/youtube-watch-history/run.sh" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-exec youtube-watch-history "$@"
-EOF
-        chmod 755 "$skills_dir/youtube-watch-history/run.sh"
+                mkdir -p "$skills_dir/youtube-watch-history"
+                cat > "$skills_dir/youtube-watch-history/run.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec youtube-watch-history "$@"
+        EOF
+                chmod 755 "$skills_dir/youtube-watch-history/run.sh"
       '';
 
     home.activation.openclawWhatsApp =
@@ -1150,10 +1074,9 @@ EOF
 
     systemd.user.services.openclaw-gateway.Service.EnvironmentFile =
       "-${config.home.homeDirectory}/.config/openclaw/openclaw.env";
-    systemd.user.services.openclaw-gateway.Service.Environment =
-      [
-        "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsRuntimeExtensionsDir}"
-        "PATH=${openclawServicePath}:${config.home.profileDirectory}/bin:/run/current-system/sw/bin"
-      ];
+    systemd.user.services.openclaw-gateway.Service.Environment = [
+      "OPENCLAW_BUNDLED_PLUGINS_DIR=${bundledPluginsRuntimeExtensionsDir}"
+      "PATH=${openclawServicePath}:${config.home.profileDirectory}/bin:/run/current-system/sw/bin"
+    ];
   };
 }

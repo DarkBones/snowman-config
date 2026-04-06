@@ -3,6 +3,7 @@ let
   cfg = config.services.openclawLocal;
 
   stateDir = "/var/lib/openclaw";
+  repoMountDir = "${stateDir}/repo";
   workspaceDir = "${stateDir}/workspace";
   workspaceScriptsDir = "${workspaceDir}/scripts";
   whatsappAuthDir = "${stateDir}/whatsapp/main";
@@ -16,6 +17,7 @@ let
   customSkillsDir = "${repoDir}/custom/skills";
   customScriptsDir = "${repoDir}/custom/scripts";
   openclawConfigPath = "${stateDir}/openclaw.json";
+  syncStampPath = "${stateDir}/.sync-stamp";
   requiredDocumentFiles = [ "AGENTS.md" "SOUL.md" "TOOLS.md" ];
   optionalDocumentFiles = [
     "IDENTITY.md"
@@ -119,6 +121,63 @@ let
     '';
   };
 
+  openclawSync = pkgs.writeShellApplication {
+    name = "openclaw-sync";
+    runtimeInputs = with pkgs; [ coreutils systemd ];
+    text = ''
+      set -euo pipefail
+
+      if [ "$(id -u)" -ne 0 ]; then
+        echo "openclaw-sync: run with sudo" >&2
+        exit 1
+      fi
+
+      systemctl restart openclaw-prepare.service
+      systemctl restart openclaw.service
+      printf 'OpenClaw synced and restarted.\n'
+    '';
+  };
+
+  openclawSyncStatus = pkgs.writeShellApplication {
+    name = "openclaw-sync-status";
+    runtimeInputs = with pkgs; [ coreutils findutils gnugrep ];
+    text = ''
+      set -euo pipefail
+
+      repo_dir="${repoDir}"
+      stamp_path="${syncStampPath}"
+
+      if [ ! -d "$repo_dir" ]; then
+        echo "missing-repo: $repo_dir"
+        exit 1
+      fi
+
+      if [ ! -f "$stamp_path" ]; then
+        echo "out-of-sync: no sync stamp"
+        exit 1
+      fi
+
+      stamp="$(tr -d '\n' < "$stamp_path")"
+      if ! printf '%s\n' "$stamp" | grep -Eq '^[0-9]+$'; then
+        echo "out-of-sync: invalid sync stamp"
+        exit 1
+      fi
+
+      if find \
+        "$repo_dir/documents" \
+        "$repo_dir/custom/skills" \
+        "$repo_dir/custom/scripts" \
+        -type f \
+        -newermt "@$stamp" \
+        -print -quit 2>/dev/null | grep -q .; then
+        echo "out-of-sync"
+        exit 1
+      fi
+
+      echo "in-sync"
+    '';
+  };
+
   playAudioLocal = pkgs.writeShellApplication {
     name = "play-audio-local";
     runtimeInputs = with pkgs; [ coreutils vlc ];
@@ -158,6 +217,7 @@ let
       fi
 
       : "''${ELEVENLABS_API_KEY:?ELEVENLABS_API_KEY is required}"
+      : "''${OPENCLAW_ELEVENLABS_VOICE_ID:?OPENCLAW_ELEVENLABS_VOICE_ID is required}"
 
       text="$*"
       temp_dir="$(mktemp -d /tmp/openclaw-speak-local-XXXXXX)"
@@ -170,7 +230,7 @@ let
 
       curl --silent --show-error --fail \
         --request POST \
-        --url "https://api.elevenlabs.io/v1/text-to-speech/WQ6Xb0Hj95La1FFC6b16?output_format=mp3_44100_128" \
+        --url "https://api.elevenlabs.io/v1/text-to-speech/''${OPENCLAW_ELEVENLABS_VOICE_ID}?output_format=mp3_44100_128" \
         --header "xi-api-key: ''${ELEVENLABS_API_KEY}" \
         --header 'content-type: application/json' \
         --data "$(
@@ -608,6 +668,8 @@ let
   };
 
   openclawServicePath = lib.makeBinPath [
+    openclawSync
+    openclawSyncStatus
     linuxScreenshot
     playAudioLocal
     speakLocal
@@ -832,6 +894,22 @@ let
       };
     };
 
+    tools.exec = {
+      host = "gateway";
+      security = "allowlist";
+      ask = "on-miss";
+      pathPrepend = [
+        "${linuxScreenshot}/bin"
+        "${playAudioLocal}/bin"
+        "${speakLocal}/bin"
+        "${youtubeSearchApi}/bin"
+        "${youtubeWatchHistory}/bin"
+        "${searxngSearch}/bin"
+        "${telegramSend}/bin"
+        "/run/current-system/sw/bin"
+      ];
+    };
+
     models = {
       mode = "replace";
       providers.router = {
@@ -954,6 +1032,7 @@ in {
       group = "openclaw";
       home = stateDir;
       createHome = true;
+      shell = pkgs.bash;
     };
 
     users.users.${cfg.operatorUser}.extraGroups = [ "openclaw" ];
@@ -967,6 +1046,7 @@ in {
         User = "root";
         Group = "root";
         UMask = "0077";
+        BindReadOnlyPaths = [ "${repoDir}:${repoMountDir}" ];
       };
       script = ''
         set -euo pipefail
@@ -976,13 +1056,16 @@ in {
         skills_dir="$workspace_dir/skills"
         scripts_dir="${workspaceScriptsDir}"
         env_file="$state_dir/openclaw.env"
+        approvals_dir="$state_dir/.openclaw"
+        approvals_file="$approvals_dir/exec-approvals.json"
         telegram_token_file="${telegramTokenPath}"
         config_file="${openclawConfigPath}"
         shared_dir="${cfg.sharedDir}"
         repo_dir="${repoDir}"
-        documents_dir="${documentsDir}"
-        custom_skills_dir="${customSkillsDir}"
-        custom_scripts_dir="${customScriptsDir}"
+        repo_mount_dir="${repoMountDir}"
+        documents_dir="$repo_mount_dir/documents"
+        custom_skills_dir="$repo_mount_dir/custom/skills"
+        custom_scripts_dir="$repo_mount_dir/custom/scripts"
         runtime_dir=${bundledPluginsRuntimeDir}
         dist_root=${bundledPluginsRuntimeDistDir}
         dist_dir=${bundledPluginsRuntimeExtensionsDir}
@@ -991,6 +1074,7 @@ in {
 
         install -d -m 2770 -o ${cfg.operatorUser} -g openclaw \
           "$state_dir" \
+          "$approvals_dir" \
           "$workspace_dir" \
           "$skills_dir" \
           "$scripts_dir" \
@@ -1039,6 +1123,35 @@ in {
         sed "s/__OPENCLAW_ELEVENLABS_VOICE_ID__/$voice_id/g" ${openclawConfigTemplate} > "$config_file"
         chown openclaw:openclaw "$config_file"
         chmod 0640 "$config_file"
+
+        if [ -f "$approvals_file" ]; then
+          ${pkgs.jq}/bin/jq '
+            .version = 1
+            | .defaults = ((.defaults // {}) + {
+                security: "allowlist",
+                ask: "on-miss",
+                askFallback: "deny",
+                autoAllowSkills: true
+              })
+            | .agents = (.agents // {})
+          ' "$approvals_file" > "$approvals_file.tmp"
+          mv "$approvals_file.tmp" "$approvals_file"
+        else
+          printf '%s\n' \
+            '{' \
+            '  "version": 1,' \
+            '  "defaults": {' \
+            '    "security": "allowlist",' \
+            '    "ask": "on-miss",' \
+            '    "askFallback": "deny",' \
+            '    "autoAllowSkills": true' \
+            '  },' \
+            '  "agents": {}' \
+            '}' \
+            > "$approvals_file"
+        fi
+        chown openclaw:openclaw "$approvals_file"
+        chmod 0660 "$approvals_file"
 
         if [ -d "$documents_dir" ]; then
           ${lib.concatMapStrings (name: ''
@@ -1095,9 +1208,12 @@ in {
         '') skills}
 
         if [ -d "$custom_scripts_dir" ]; then
+          rm -f "$scripts_dir"/*
           while IFS= read -r source_script; do
             script_name="$(basename "$source_script")"
-            ln -sfn "$source_script" "$scripts_dir/$script_name"
+            cp "$source_script" "$scripts_dir/$script_name"
+            chown openclaw:openclaw "$scripts_dir/$script_name"
+            chmod 0750 "$scripts_dir/$script_name"
           done < <(find "$custom_scripts_dir" -mindepth 1 -maxdepth 1 -type f)
         fi
 
@@ -1105,7 +1221,13 @@ in {
           while IFS= read -r source_skill_dir; do
             skill_name="$(basename "$source_skill_dir")"
             rm -rf "$skills_dir/$skill_name"
-            ln -sfn "$source_skill_dir" "$skills_dir/$skill_name"
+            cp -r --no-preserve=mode "$source_skill_dir" "$skills_dir/$skill_name"
+            chown -R openclaw:openclaw "$skills_dir/$skill_name"
+            find "$skills_dir/$skill_name" -type d -exec chmod 2770 {} +
+            find "$skills_dir/$skill_name" -type f -exec chmod 0660 {} +
+            if [ -f "$skills_dir/$skill_name/run.sh" ]; then
+              chmod 0750 "$skills_dir/$skill_name/run.sh"
+            fi
           done < <(find "$custom_skills_dir" -mindepth 1 -maxdepth 1 -type d)
         fi
 
@@ -1157,11 +1279,22 @@ in {
           fi
         done
 
-        chgrp -R openclaw "$state_dir"
-        find "$state_dir" -type d -exec chown ${cfg.operatorUser}:openclaw {} +
-        find "$state_dir" -type d -exec chmod 2770 {} +
-        find "$state_dir" -type f -exec chmod 0660 {} +
+        find "$state_dir" \
+          \( -path "$repo_mount_dir" -o -path "$repo_mount_dir/*" \) -prune \
+          -o ! -type l -exec chgrp openclaw {} +
+        find "$state_dir" \
+          \( -path "$repo_mount_dir" -o -path "$repo_mount_dir/*" \) -prune \
+          -o ! -type l -type d -exec chown ${cfg.operatorUser}:openclaw {} +
+        find "$state_dir" \
+          \( -path "$repo_mount_dir" -o -path "$repo_mount_dir/*" \) -prune \
+          -o ! -type l -type d -exec chmod 2770 {} +
+        find "$state_dir" \
+          \( -path "$repo_mount_dir" -o -path "$repo_mount_dir/*" \) -prune \
+          -o ! -type l -type f -exec chmod 0660 {} +
         chmod 0600 "$env_file" "$telegram_token_file"
+        date +%s > "${syncStampPath}"
+        chown ${cfg.operatorUser}:openclaw "${syncStampPath}"
+        chmod 0660 "${syncStampPath}"
       '';
     };
 
@@ -1209,12 +1342,14 @@ in {
         RemoveIPC = true;
         CapabilityBoundingSet = [ "" ];
         AmbientCapabilities = [ "" ];
-        ReadOnlyPaths = [ "-${repoDir}" ];
+        BindReadOnlyPaths = [ "${repoDir}:${repoMountDir}" ];
         BindPaths = [ cfg.sharedDir ];
         RestrictAddressFamilies =
           [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
         ReadWritePaths = [ stateDir cfg.sharedDir ];
       };
     };
+
+    environment.systemPackages = [ openclawSync openclawSyncStatus ];
   };
 }
