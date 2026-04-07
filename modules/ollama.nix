@@ -1,7 +1,7 @@
 { inputs, pkgsUnstable, ... }:
 let
   ollamaFromGitHub = pkgsUnstable.ollama-cuda.overrideAttrs (_: {
-    version = "0.17.7";
+    version = "0.20.2";
     src = inputs.ollama-src;
     proxyVendor = true;
     subPackages = [ "." ];

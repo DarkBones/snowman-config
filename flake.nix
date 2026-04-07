@@ -13,7 +13,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     awww.url = "git+https://codeberg.org/LGFae/awww";
     ollama-src = {
-      url = "github:ollama/ollama/v0.17.7";
+      url = "github:ollama/ollama/v0.20.2";
       flake = false;
     };
 

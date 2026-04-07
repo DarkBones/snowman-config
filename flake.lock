@@ -503,16 +503,16 @@
     "ollama-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1772757024,
-        "narHash": "sha256-cAqc38NHvUo5gphq1csTyosTcpUjFcs0dzB0wreEGjs=",
+        "lastModified": 1775278255,
+        "narHash": "sha256-Ic3eLOohLR7MQGkLvDJBNOCiBBKxh6l8X9MgK0b4w+Y=",
         "owner": "ollama",
         "repo": "ollama",
-        "rev": "9b0c7cc7b90562b370ce6a30efdc667326799223",
+        "rev": "4589fa2cf5afd15fb19aca96c15b5fbf885d11cf",
         "type": "github"
       },
       "original": {
         "owner": "ollama",
-        "ref": "v0.17.7",
+        "ref": "v0.20.2",
         "repo": "ollama",
         "type": "github"
       }
