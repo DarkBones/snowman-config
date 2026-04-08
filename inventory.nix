@@ -192,6 +192,7 @@ rec {
         searxng.enable = true;
         snowman.enable = true;
         ssh.enable = true;
+        openclaw.enable = true;
 
         dotfiles = {
           enable = true;

@@ -66,11 +66,20 @@ in {
           ${pkgs.jq}/bin/jq '
             .openvr_config.use_separate_hand_trackers = false
             | .openvr_config.force_sw_encoding = true
+            | .openvr_config.eye_resolution_width = 1440
+            | .openvr_config.eye_resolution_height = 1584
+            | .openvr_config.target_eye_resolution_width = 1440
+            | .openvr_config.target_eye_resolution_height = 1584
+            | .openvr_config.refresh_rate = 72
             | .session_settings.headset.controllers.enabled = true
             | .session_settings.headset.controllers.content.tracked = true
             | .session_settings.headset.controllers.content.hand_skeleton.enabled = true
             | .session_settings.video.encoder_config.software.force_software_encoding = true
-            | .session_settings.video.encoder_config.software.thread_count = 0
+            | .session_settings.video.encoder_config.software.thread_count = 4
+            | .session_settings.video.preferred_fps = 72.0
+            | .session_settings.video.transcoding_view_resolution.Absolute.width = 1440
+            | .session_settings.video.emulated_headset_view_resolution.Absolute.width = 1440
+            | .session_settings.video.bitrate.mode.ConstantMbps = 50
           ' "$session_file" > "$tmp_file"
           mv "$tmp_file" "$session_file"
           chmod 600 "$session_file"

@@ -557,6 +557,7 @@ in {
       speakLocal
       youtubeSearchApi
       youtubeWatchHistory
+      pkgs.cron
       pkgs.python3
       pkgs.python3Packages.pip
     ];
