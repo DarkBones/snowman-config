@@ -52,6 +52,7 @@ rec {
           roles.gaming.enable = true;
           roles.alvr.enable = true;
           services.openclawLocal.enable = true;
+          services.openclawLocal.proactiveResearch.enable = true;
           snowman.desktopNotifySsh.enable = true;
           snowman.desktopSpeakSsh.enable = true;
         })

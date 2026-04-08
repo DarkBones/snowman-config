@@ -32,6 +32,8 @@ let
   ];
   documentFiles = requiredDocumentFiles ++ optionalDocumentFiles;
   telegramTokenPath = "${stateDir}/telegram-bot-token";
+  proactiveResearchSkillDir = "${workspaceDir}/skills/proactive-research";
+  proactiveResearchScriptsDir = "${proactiveResearchSkillDir}/scripts";
 
   bundledPluginsSourceDir = "${pkgs.openclaw-gateway}/lib/openclaw/extensions";
   openclawPackageRoot = "${pkgs.openclaw-gateway}/lib/openclaw";
@@ -939,6 +941,10 @@ in {
         OPENCLAW_ELEVENLABS_VOICE_ID and rendered into the OpenClaw config.
       '';
     };
+
+    proactiveResearch.enable = lib.mkEnableOption ''
+      declarative timers for the proactive-research OpenClaw skill
+    '';
   };
 
   config = lib.mkIf cfg.enable {
@@ -1285,6 +1291,148 @@ in {
         RestrictAddressFamilies =
           [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
         ReadWritePaths = [ stateDir cfg.sharedDir ];
+      };
+    };
+
+    systemd.services.openclaw-proactive-research-hourly =
+      lib.mkIf cfg.proactiveResearch.enable {
+        description = "OpenClaw proactive research hourly monitor";
+        after = [ "network-online.target" "openclaw-prepare.service" ];
+        requires = [ "openclaw-prepare.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "openclaw";
+          Group = "openclaw";
+          WorkingDirectory = proactiveResearchSkillDir;
+          Environment = [
+            "HOME=${stateDir}"
+            "OPENCLAW_STATE_DIR=${stateDir}"
+            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+          ];
+          EnvironmentFile = "-${stateDir}/openclaw.env";
+          ExecStart =
+            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency hourly";
+          UMask = "0077";
+        };
+        unitConfig = {
+          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+        };
+      };
+
+    systemd.services.openclaw-proactive-research-daily =
+      lib.mkIf cfg.proactiveResearch.enable {
+        description = "OpenClaw proactive research daily monitor";
+        after = [ "network-online.target" "openclaw-prepare.service" ];
+        requires = [ "openclaw-prepare.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "openclaw";
+          Group = "openclaw";
+          WorkingDirectory = proactiveResearchSkillDir;
+          Environment = [
+            "HOME=${stateDir}"
+            "OPENCLAW_STATE_DIR=${stateDir}"
+            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+          ];
+          EnvironmentFile = "-${stateDir}/openclaw.env";
+          ExecStart =
+            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency daily";
+          UMask = "0077";
+        };
+        unitConfig = {
+          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+        };
+      };
+
+    systemd.services.openclaw-proactive-research-weekly =
+      lib.mkIf cfg.proactiveResearch.enable {
+        description = "OpenClaw proactive research weekly monitor";
+        after = [ "network-online.target" "openclaw-prepare.service" ];
+        requires = [ "openclaw-prepare.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "openclaw";
+          Group = "openclaw";
+          WorkingDirectory = proactiveResearchSkillDir;
+          Environment = [
+            "HOME=${stateDir}"
+            "OPENCLAW_STATE_DIR=${stateDir}"
+            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+          ];
+          EnvironmentFile = "-${stateDir}/openclaw.env";
+          ExecStart =
+            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency weekly";
+          UMask = "0077";
+        };
+        unitConfig = {
+          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+        };
+      };
+
+    systemd.services.openclaw-proactive-research-digest =
+      lib.mkIf cfg.proactiveResearch.enable {
+        description = "OpenClaw proactive research weekly digest";
+        after = [ "network-online.target" "openclaw-prepare.service" ];
+        requires = [ "openclaw-prepare.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "openclaw";
+          Group = "openclaw";
+          WorkingDirectory = proactiveResearchSkillDir;
+          Environment = [
+            "HOME=${stateDir}"
+            "OPENCLAW_STATE_DIR=${stateDir}"
+            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+          ];
+          EnvironmentFile = "-${stateDir}/openclaw.env";
+          ExecStart =
+            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/digest.py --send";
+          UMask = "0077";
+        };
+        unitConfig = {
+          ConditionPathExists = "${proactiveResearchScriptsDir}/digest.py";
+        };
+      };
+
+    systemd.timers = lib.mkIf cfg.proactiveResearch.enable {
+      openclaw-proactive-research-hourly = {
+        description = "Run OpenClaw proactive research hourly monitor";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "hourly";
+          Persistent = true;
+          Unit = "openclaw-proactive-research-hourly.service";
+        };
+      };
+
+      openclaw-proactive-research-daily = {
+        description = "Run OpenClaw proactive research daily monitor";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "*-*-* 09:00:00";
+          Persistent = true;
+          Unit = "openclaw-proactive-research-daily.service";
+        };
+      };
+
+      openclaw-proactive-research-weekly = {
+        description = "Run OpenClaw proactive research weekly monitor";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun *-*-* 09:00:00";
+          Persistent = true;
+          Unit = "openclaw-proactive-research-weekly.service";
+        };
+      };
+
+      openclaw-proactive-research-digest = {
+        description = "Run OpenClaw proactive research weekly digest";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun *-*-* 18:00:00";
+          Persistent = true;
+          Unit = "openclaw-proactive-research-digest.service";
+        };
       };
     };
 
