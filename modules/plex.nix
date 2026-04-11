@@ -6,6 +6,7 @@
     enable = true;
     openFirewall = false;
     dataDir = "/var/lib/plex";
+    accelerationDevices = [ ];
   };
 
   users.users.plex.extraGroups = [ "media" ];
@@ -18,6 +19,8 @@
       proxyWebsockets = true;
     };
   };
+
+  systemd.services.plex.environment.LD_LIBRARY_PATH = lib.mkForce "";
 
   systemd.tmpfiles.rules = [
     "z /srv/media 2775 bas media - -"

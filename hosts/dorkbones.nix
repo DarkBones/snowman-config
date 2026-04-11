@@ -7,6 +7,11 @@ in {
 
   environment = { systemPackages = with pkgs; [ parted efibootmgr ]; };
 
+  systemd.services.NetworkManager-wait-online.serviceConfig.ExecStart = [
+    ""
+    "${pkgs.networkmanager}/bin/nm-online -q --timeout=30"
+  ];
+
   security = {
     sudo = {
       extraConfig = ''

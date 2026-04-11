@@ -103,10 +103,8 @@ in {
   systemd.services.vpn-ensure-nm-openvpn = {
     description = "Ensure NetworkManager OpenVPN profile from SOPS";
     wantedBy = [ "multi-user.target" ];
-    after =
-      [ "NetworkManager.service" "network-online.target" "sops-nix.service" ];
-    wants =
-      [ "NetworkManager.service" "network-online.target" "sops-nix.service" ];
+    after = [ "NetworkManager.service" "sops-nix.service" ];
+    wants = [ "NetworkManager.service" "sops-nix.service" ];
 
     serviceConfig = {
       Type = "oneshot";
