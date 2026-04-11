@@ -11,44 +11,47 @@ let
   mkScript = name: script: pkgs.writeShellScriptBin name "set -euo pipefail\n${script}";
 
   # Infrastructure management helpers
-  mkInfraManager = { name, runtime, port ? 54329, redisPort ? 6381 }: mkScript name ''
-    mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
+  mkInfraManager = { name, runtime, port ? 54329, redisPort ? 6381 }:
+    mkScript "${name}-ensure-infra" ''
+      mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
 
-    if [ ! -f "${runtime}/postgres/PG_VERSION" ]; then
-      echo "[${name}] initializing postgres"
-      ${pkgs.postgresql}/bin/initdb -D "${runtime}/postgres" >/dev/null
-    fi
+      if [ ! -f "${runtime}/postgres/PG_VERSION" ]; then
+        echo "[${name}] initializing postgres"
+        ${pkgs.postgresql}/bin/initdb -D "${runtime}/postgres" >/dev/null
+      fi
 
-    if ! ${pkgs.postgresql}/bin/pg_isready -h "${runtime}/postgres-socket" -p ${toString port} >/dev/null 2>&1; then
-      echo "[${name}] starting postgres"
-      ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" stop -m fast >/dev/null 2>&1 || true
-      rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
-      ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
-        -l "${runtime}/postgres.log" \
-        -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
-        start >/dev/null
-    fi
+      if ! ${pkgs.postgresql}/bin/pg_isready -h "${runtime}/postgres-socket" -p ${toString port} >/dev/null 2>&1; then
+        echo "[${name}] starting postgres"
+        ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" stop -m fast >/dev/null 2>&1 || true
+        rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
+        ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
+          -l "${runtime}/postgres.log" \
+          -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
+          start >/dev/null
+      fi
 
-    if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
-      echo "[${name}] starting redis"
-      [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
-      ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
-        --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
-    fi
-  '';
+      if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
+        echo "[${name}] starting redis"
+        [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
+        ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
+          --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
+      fi
+    '';
 
   pulseEnsureInfra = mkInfraManager { name = "pulse"; runtime = pulseRuntime; };
   coreEnsureInfra = mkInfraManager { name = "core"; runtime = coreRuntime; };
 
   # Generic devShell wrapper
-  mkDevShell = { name, shell, envSetup ? "", cmd, ensureInfra ? false }:
-    mkScript name ''
-      ${lib.optionalString ensureInfra "${pulseEnsureInfra}/bin/pulse-ensure-infra"}
-      exec nix develop "${configFlake}#${shell}" -c bash -c '
-        ${envSetup}
-        exec ${cmd}
-      '
-    '';
+  mkDevShell = { name, shell, envSetup ? "", cmd, ensureInfra ? null }:
+    mkScript name (
+      lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n" +
+      ''
+        exec nix develop "${configFlake}#${shell}" -c bash -c '
+          ${envSetup}
+          exec ${cmd}
+        '
+      ''
+    );
 
   # Pulse environment setup (reusable)
   pulseEnvSetup = ''
@@ -95,42 +98,42 @@ in
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
         cmd = "${pkgs.zsh}/bin/zsh -i";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-backend-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
         cmd = "bin/rails s";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-api-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
         cmd = "./lib/scripts/entrypoint.sh && exec bin/web";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-anycable-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup + "\nexport ANYCABLE_RPC_HOST=0.0.0.0:50051";
         cmd = "bin/anycable";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-sidekiq-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
         cmd = "bin/worker";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-bootstrap";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
         cmd = "bundle config set build.ds9 --use-system-libraries && bundle install && bin/rails db:create db:prepare";
-        ensureInfra = true;
+        ensureInfra = pulseEnsureInfra;
       })
 
       # Pulse frontend
