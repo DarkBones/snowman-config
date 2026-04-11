@@ -5,13 +5,15 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-23_11.url = "github:NixOS/nixpkgs/nixos-23.11";
+    # nixpkgs master for Darwin - has LLVM 19 which supports macOS 26
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs";
 
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Unstable home-manager for Darwin (macOS 26 support)
-    home-manager-unstable.url = "github:nix-community/home-manager";
-    home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    # Master home-manager for Darwin (macOS 26 support with nixpkgs master)
+    home-manager-darwin.url = "github:nix-community/home-manager";
+    home-manager-darwin.inputs.nixpkgs.follows = "nixpkgs-darwin";
 
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -78,11 +80,11 @@
             });
         };
 
-      # Use unstable for Darwin (better macOS 26 support), stable for Linux
+      # Use nixpkgs master for Darwin (has LLVM 19 for macOS 26 support), stable for Linux
       makePkgs = system:
         let
           isDarwin = lib.hasSuffix "-darwin" system;
-          selectedNixpkgs = if isDarwin then inputs.nixpkgs-unstable else nixpkgs;
+          selectedNixpkgs = if isDarwin then inputs.nixpkgs-darwin else nixpkgs;
         in import selectedNixpkgs {
           inherit system;
           config.allowUnfree = true;
@@ -241,8 +243,8 @@
               enabledUserRoles;
             system = host.system or "x86_64-linux";
             isDarwin = lib.hasSuffix "-darwin" system;
-            # Use unstable home-manager for Darwin (macOS 26 support)
-            hm = if isDarwin then inputs.home-manager-unstable else inputs.home-manager;
+            # Use master home-manager for Darwin (macOS 26 support)
+            hm = if isDarwin then inputs.home-manager-darwin else inputs.home-manager;
           in [{
             name = cfgName;
             value = hm.lib.homeManagerConfiguration {
