@@ -1,71 +1,1452 @@
+~/snowman-config mbp--papershift--alvr                                                                                09:24:05
 ❯ nix run nixpkgs#home-manager -- switch --flake .#bas@mbp
-warning: Git tree '/Users/bas/snowman-config' is dirty
-error:
-       … while calling the 'derivationStrict' builtin
-         at «nix-internal»/derivation-internal.nix:37:12:
-           36|
-           37|   strict = derivationStrict drvAttrs;
-             |            ^
-           38|
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1130.97s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1130.97s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1130.97s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-96803-2483349015/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/2pm8vdvqharndaw41zwd8mv8x26vka7v-cctools-binutils-darwin-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/npkb4nsickdkfya3xkh5s2smcm9mcbb7-cctools-binutils-darwin-16.0.6-973.0.1
+         /nix/store/vp14i8mdqhl87wv0wz5i7sy4yg1g1z3b-cctools-binutils-darwin-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/sbkkqvpy8v0j43kaip6p33cy8gyfcn0x-cctools-binutils-darwin-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/k600bp0iy357j869bcvk4y13w2hcapi6-cctools-binutils-darwin-16.0.6-973.0.1-man
+         /nix/store/ph17z9h470bbdd1r1gwvi8hmy96gpqgv-cctools-binutils-darwin-16.0.6-973.0.1
+error: Cannot build '/nix/store/5inf3lwnzj7sljyd4labjghmwycvsirw-cctools-llvm-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6cphz3ijyi8fql3vjav2aj8gz7scmq8w-cctools-llvm-16.0.6-973.0.1-man
+         /nix/store/ag6ldd5rqbiaxki2a4pcd704ldqdbpxk-cctools-llvm-16.0.6-973.0.1
+         /nix/store/yqw3g503h1c2k08fb5xi4pnnz692r8nj-cctools-llvm-16.0.6-973.0.1-dev
+error: Cannot build '/nix/store/7qfnas55nnhib1rpp1c093296a3f3dbr-cctools-llvm-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/firba2w79n2b12zzrlzd25a5hz4r1l4f-cctools-llvm-16.0.6-973.0.1-man
+         /nix/store/r6mfqkp593n0nz18kbknk5lpxvcl3w5y-cctools-llvm-16.0.6-973.0.1-dev
+         /nix/store/ysr5ryqlf788cskcn1xfwy3rb4rkzwb8-cctools-llvm-16.0.6-973.0.1
+error: Cannot build '/nix/store/krfq09n5q956269ifgic4anl24w1ydlv-clang-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/46synqikf8qn23d0553vszrb7qxnnhng-clang-16.0.6-dev
+         /nix/store/9j5niirh811mjdmxb6848i7427l65dxn-clang-16.0.6
+         /nix/store/hgr5slscxhwz9bmhwlqlczgpwk9pkfb5-clang-16.0.6-lib
+         /nix/store/r8hhnd94cl4rizkqkhv8czixxvq3cyqn-clang-16.0.6-python
+error: Cannot build '/nix/store/jizhsnxym87g60hvvdns6qhdzzg6zf30-clang-at-least-16-LLVMgold-path.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/aycqyz49ky4h93lkk6n2pcj5fh6bhgqg-clang-at-least-16-LLVMgold-path.patch
+error: Cannot build '/nix/store/2h5mccl1yljdz0fn45da992cxsa0vjjk-compiler-rt-libc-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5bax8i0brdbjrfwalsc28h7m6dm61xmv-compiler-rt-libc-16.0.6-dev
+         /nix/store/w74llp7n777887lc42769953b6171r8z-compiler-rt-libc-16.0.6
+error: Cannot build '/nix/store/fvvdxmfvg4k8cdy1mmbswbc65rx3kxwv-lld-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/f2cg2hx4qc83rzccw7vabanwvpsa1a75-lld-16.0.6
+         /nix/store/sklz26byp4q6fvnlsa64qcjk3g3d6snm-lld-16.0.6-lib
+         /nix/store/z5nr1qq249b1xksi0qql5yns72y15xva-lld-16.0.6-dev
+error: Cannot build '/nix/store/q8181ddc5c1451mdnlsg317sfs6snv55-lld-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1wlismvk6z1nl29xv2w22g5rybjv85mc-lld-16.0.6
+         /nix/store/im1s7qjmsrbax1hwa1cs4s3q99fxl4r2-lld-16.0.6-dev
+         /nix/store/qa6v1qpyx3z6c8hgjnn3pk8vma48w9vw-lld-16.0.6-lib
+error: Cannot build '/nix/store/5kibwbkp1q4xwgwycb3q7anm83n7v659-llvm-binutils-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/x2q3kmqn1i4g21wcq74vz0l7wb40isvx-llvm-binutils-16.0.6
+error: Cannot build '/nix/store/622igy7q7yfx14hdfm7w2i9yl3jskd4p-llvm-binutils-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xmhakfb092bwsqcqhad6ahv04jpnqkfs-llvm-binutils-16.0.6
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/8r4p8ypm2rascmcxg1wqak7sgmlid5gl-bootstrap-stage3-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rn8b98j1y5aa0s38g823bvjp3acj5240-bootstrap-stage3-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/hlc5dqfzj4ckjf2z4j04ix5wbwmhcjga-bootstrap-stage4-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j3mjpq0jbx30p693b8dqja52h8i20mv1-bootstrap-stage4-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/08yc11wxbcbkfcbg4rf2j06pj74jcdwy-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9xxk6f7ckn1p5rdycaixgzg3mszj8828-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/s23bcg1arssvwcc1dxnr77jjbrpyj1yc-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/8a5pclci955cwy23hd3a1jgs62iqk4rd-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1cqxd75gj0wf42azy3c2mhsbn1k7d8mg-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/yzfd3br1r5xr6hkp745b7s5qmaqwz4vq-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/rq0910zhha5v1mhbn8p8xk61swrfcy9d-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9k59myapvh21rbphg8w0mn2q8ym6dp4i-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/hlhzd4f9kh99d3wfldkg9zxmqpsrx159-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/7368dch892lmj6ak0flplh4b7zls7ccp-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/56ic75005lznxssyi3wf91xwnz3xsnxr-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/bxd3r9k2h09mxqvk8xby698pqxpa2frk-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/740a9ss3vl59frkjcpd4znxzxc32rqnb-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/c841ka06fsvhzj57klri69kcg4imcgsz-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/zd37wb1q58xs35i18pda84rcdmx150n9-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/fqhhyqrbq5c8jliddmi3w2x6k7i511p6-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2fkcbnap4blj13kgn962kf2jh5dkscwj-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/zw0zgdax4y0ghdj9bm2vg5cbz4azx6na-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rxmmlsgd6k783nfna8ivk9krna2f1r7y-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/rflaf6ywyxpam2q7vn5q2p7a7c0wmig7-perl-5.38.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j3fjmy4jhy9j3cnzciizw51sr1q7wvka-perl-5.38.2
+         /nix/store/kr5mwzb5q1fichz73wggs1swmajhnyw1-perl-5.38.2-man
+         /nix/store/qkah70w49jxj24p0jlahqfh1lj9w6ix8-perl-5.38.2-devdoc
+error: Cannot build '/nix/store/dv2b3zlg9yn8s3spwpbnp1154962jbj7-post-link-sign-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/n2fklzvjq39bxsmvs0aidfmg9wgr0wf8-post-link-sign-hook
+error: Cannot build '/nix/store/861xpfa1fcgl0ivicir5cqrx1ambysbb-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xqmmzwqimvlyycmxazclmxf21cb4kfd1-stdenv-darwin
+error: Cannot build '/nix/store/dwc77jjskxqignx05ic9842ghnpalqin-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dd4d2h60s7dggdmrzzc2chm9m4g2wqyq-stdenv-darwin
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/42jiwlxis03wmfjw9gyn1z4xbakzf6p9-001-fix-rpath.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cbr11p3l7077i2niliy8lqjf1hw37hp9-001-fix-rpath.patch
+error: Cannot build '/nix/store/il38551j86s047h9vcc7hq84bihni1hq-Architectures.xcspec.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cr80dw4s5a1w6vmpqfmdrhnd9kl4ivpa-Architectures.xcspec
+error: Cannot build '/nix/store/fk7dw5kqkm86dpa9vdfdmvjap0vqss7a-Info.plist.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/sybhjyj7pzm6j4l2svawfb8kf9zfd0cl-Info.plist
+error: Cannot build '/nix/store/4blvzqxzphv0z46v8rz7k0vf6s0x4azw-MacOSX-SDK-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/crq7g69d8lbz6ajc6pwvniw55mb6caga-MacOSX-SDK-11.0.0
+error: Cannot build '/nix/store/frcasixi5na9nk75gr0xm3vyj361w4v9-PackageTypes.xcspec.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kpyd2bplic7j1if03bzgj6qrzyd7md2n-PackageTypes.xcspec
+error: Cannot build '/nix/store/7r5qz7wzgawgn50a39vhakmpc8n8zk5l-Platforms.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/s1yymmsh1f2vz4kc6qjqg1c98xwxv40x-Platforms
+error: Cannot build '/nix/store/kxih5815i0h6ighrbzgy9knkrq4fr2bg-ProductTypes.xcspec.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/100i3wz4vvqda64aqla0ln4hsgp46lm1-ProductTypes.xcspec
+error: Cannot build '/nix/store/63is0czz3snspdpr927y5sdm6w6bd3vg-SDKSettings.json.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/yqah36hvy9zk89h6gc32si9hv73avdzf-SDKSettings.json
+error: Cannot build '/nix/store/1nsfklmd07b3y5xph7yldawmlyayl8n0-SDKSettings.plist.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/l8904bflz80g6z3s7vszbwyb3w0km6lp-SDKSettings.plist
+error: Cannot build '/nix/store/7ygwr5mg2lqgqf7vv3c5nxkqwi09nqg8-SDKs.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/nha3w260l7q5lkcvargxr7j3crf88gy2-SDKs
+error: Cannot build '/nix/store/dx07dx3dldyfwpwsdbil6f28cnx7kvxs-SystemVersion.plist.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6yabpsw2qq5qm8np7ija9hh88xp3hl60-SystemVersion.plist
+error: Cannot build '/nix/store/h4q34rbinqfmla5gy4y954ylav8095yf-ToolchainInfo.plist.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/sgdas6rxcvbj906vr2jrvbqqc8gydghp-ToolchainInfo.plist
+error: Cannot build '/nix/store/viyzfsbw6s9cy8bjzcg5fh1zvin1iykb-Toolchains.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/22qnsm12l3524828r8rcybk29jv9zmd3-Toolchains
+error: Cannot build '/nix/store/14kwdbclsb7grz9z5fasha0vfmygfkfl-adv_cmds-119.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/62p3advvwjx1l0ig5rgmwjaxsqpiwvx9-adv_cmds-119-ps
+         /nix/store/jkq9ra6s8vvp0cxlqpzawh8cmclwq309-adv_cmds-119
+         /nix/store/vv4b4234d5ibk49k1j3c3620fhscxwav-adv_cmds-119-locale
+error: Cannot build '/nix/store/06gichfbamyjfi7mk2igncsq3awzzyl4-apple-framework-AppKit-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2kl6j3lzhk5hvpzdjj6dyk3hi62bafna-apple-framework-AppKit-11.0.0
+error: Cannot build '/nix/store/84fj3vva5cj7kg0fsmlrqjrpvkmxz5ix-apple-framework-ApplicationServices-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/gbwz7ybbvl7fbsq92bvgys6frggq6d6f-apple-framework-ApplicationServices-11.0.0
+error: Cannot build '/nix/store/df8alw45q95bm0bbd6xy54cbwar0z6jy-apple-framework-AudioToolbox-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fa22c9jfi81pdsgyskmq5nfyr4yn89b3-apple-framework-AudioToolbox-11.0.0
+error: Cannot build '/nix/store/wlfjg92hzdcyvsf6h68pr2ydmdhq8jq6-apple-framework-AudioUnit-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ih4ajl3b1awzbhjyqinwcd2r39fc2km4-apple-framework-AudioUnit-11.0.0
+error: Cannot build '/nix/store/sdfk46058jiba7ax8xbnj228h65r1170-apple-framework-CFNetwork-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/sky8igvhj4d9vw11pb6iniw4x3qhsw60-apple-framework-CFNetwork-11.0.0
+error: Cannot build '/nix/store/0gsk82qz4war7hfgirm7ad7kjjfxci0j-apple-framework-Carbon-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/11xxhban4p46pn8safv5w5rv6d7lbzhz-apple-framework-Carbon-11.0.0
+error: Cannot build '/nix/store/2va0dfyhqfzpjywa2h024bwwdirs2jiz-apple-framework-CloudKit-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/m111iag5fpvwy4yd4x2yb10wz1frxc9g-apple-framework-CloudKit-11.0.0
+error: Cannot build '/nix/store/31r0d0nhalh0k7hipbj93279fm0q4qk7-apple-framework-Cocoa-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/y7aggpxm01h743c2ifqivvza9fl9p1hm-apple-framework-Cocoa-11.0.0
+error: Cannot build '/nix/store/wap0968sr1agbjh25m9l3ar9npj0wqr6-apple-framework-ColorSync-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/nhjqx6i4wnwvgbm5pq85mg9b0s4xap72-apple-framework-ColorSync-11.0.0
+error: Cannot build '/nix/store/r8mxf5i7775aq5xpjk5xinxsab8knq44-apple-framework-Combine-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ndr43xa670r8a2hzirw3ymrgyhvn3g7i-apple-framework-Combine-11.0.0
+error: Cannot build '/nix/store/nhiadryk99l4823dnxkif071pk7i75zm-apple-framework-CoreAudio-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wncq6fhrjvjbf09dqk7y3kj79fxbk6kx-apple-framework-CoreAudio-11.0.0
+error: Cannot build '/nix/store/j6kfaqj8p54ss1avm46jgykvbsc7fr6q-apple-framework-CoreAudioTypes-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xsazvdvs98c63wih2xk6kw262k1pk0g7-apple-framework-CoreAudioTypes-11.0.0
+error: Cannot build '/nix/store/ylqd24fd2p0w9a3962f5ll5yk6hjmr5r-apple-framework-CoreData-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5rpjxmwr22c9ngl1xyvdyj92hjzpc1xq-apple-framework-CoreData-11.0.0
+error: Cannot build '/nix/store/bw2504gbzqrwxpmi7rpcni02ir0kp1sv-apple-framework-CoreFoundation-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8nwiysygm693zsmv0mmcjmd8rfvj9da4-apple-framework-CoreFoundation-11.0.0
+error: Cannot build '/nix/store/dsg7zhwpv4yrwigm1ffsl0bzx153fxjn-apple-framework-CoreFoundation-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/g6n0zw1ih31ky69gpqcm4hk62s0spa38-apple-framework-CoreFoundation-11.0.0
+error: Cannot build '/nix/store/s8254q0hfr5r0kliypbsidhw6k30iy63-apple-framework-CoreGraphics-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hrj38khnmmg1k0f2h3196fwp7r1krp61-apple-framework-CoreGraphics-11.0.0
+error: Cannot build '/nix/store/881jb1j8lribsb4axn0619c7c8n9hgm8-apple-framework-CoreImage-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hg0h73388hzxfyhvqvd6f2w7dppvfxlm-apple-framework-CoreImage-11.0.0
+error: Cannot build '/nix/store/ndv0d89dmpy741f96r6745n79vnj9995-apple-framework-CoreLocation-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ybwhbgl02a69d30cr8cj0chb8iqcq1bz-apple-framework-CoreLocation-11.0.0
+error: Cannot build '/nix/store/ih8i8znpciiimnqbb04h77azy117hpyw-apple-framework-CoreMIDI-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9pgawiz96pgms8ifp4ak6d5h1sgkh34f-apple-framework-CoreMIDI-11.0.0
+error: Cannot build '/nix/store/l1nnh8zflmg68f4dn7dzv70p3sczpr5d-apple-framework-CoreServices-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/191vryxqs7nx77fc8a6yz870rkxa9c67-apple-framework-CoreServices-11.0.0
+error: Cannot build '/nix/store/yra9cxc08gbwfw8q5zzp7j1krviqkp3a-apple-framework-CoreText-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/lnv3gszhlm09ihclii918jw1m1ahiyjm-apple-framework-CoreText-11.0.0
+error: Cannot build '/nix/store/cxw7w55w3mipgw8aslz69agk3ngl0xzx-apple-framework-CoreVideo-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/q07hvll094d123j1avqlckzpk60q814d-apple-framework-CoreVideo-11.0.0
+error: Cannot build '/nix/store/jy2qk20bpwj7fj28j018synrbzn090wy-apple-framework-CoreVideo-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kz8gsrd1rxmg6fi8mrc8f0rrcv8mb18a-apple-framework-CoreVideo-11.0.0
+error: Cannot build '/nix/store/hd8fn868n4m867vmg4mi825cgjfjij6y-apple-framework-DiskArbitration-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/vfwmpcrcjib2cvlwhbsnr5j5c5m9vpi3-apple-framework-DiskArbitration-11.0.0
+error: Cannot build '/nix/store/8kd4wlqvxm86fzgks5khgw02bcrzzad5-apple-framework-Foundation-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dj85fnq6w1g3zw9w6bd753371swyp6as-apple-framework-Foundation-11.0.0
+error: Cannot build '/nix/store/691pg247ciw7nhnw9z9xfp9pvz8kcbb9-apple-framework-IOKit-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3wnnmqfhff7sa8sn0anzx94i4wzfpba0-apple-framework-IOKit-11.0.0
+error: Cannot build '/nix/store/nrygipmsypg5z3724797ydh4rfsqnhk9-apple-framework-IOSurface-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0aqn63h9b94r9xgwskxpxilwakldy4qz-apple-framework-IOSurface-11.0.0
+error: Cannot build '/nix/store/g1b515krkn5ddycdvfpj3dpia5qpa6bb-apple-framework-ImageIO-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/60b827fnnixyhlxzahfq8s1bvbgfs43h-apple-framework-ImageIO-11.0.0
+error: Cannot build '/nix/store/jh9dsq3j4jflxxkn9svf606k3rza9cm6-apple-framework-Metal-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9mr2m5jnl23zx8rhpypa5983p1dqcd51-apple-framework-Metal-11.0.0
+error: Cannot build '/nix/store/syfz1b5gxwzxm70s2k0rqn1jc49c2lky-apple-framework-NetFS-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fbv5x8hvhww453w24m15rild8igzxwnz-apple-framework-NetFS-11.0.0
+error: Cannot build '/nix/store/ypa437lf99m78c1dcpdi7p0q34yf8g31-apple-framework-OpenCL-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/yw3g47imwilmy60vq9wkbxpsvrr3s76m-apple-framework-OpenCL-11.0.0
+error: Cannot build '/nix/store/b02zsjaxg5lhhx1h5hb0480xlwajlcr4-apple-framework-OpenGL-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kb09llac6x7a5fkibxp4yxgjmzvwc4lh-apple-framework-OpenGL-11.0.0
+error: Cannot build '/nix/store/9n39sdjbl53vc11bl3s062pbmc8sqiy1-apple-framework-QuartzCore-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2x77azhq3y48dyjhkqsbrkk58gvc67sp-apple-framework-QuartzCore-11.0.0
+error: Cannot build '/nix/store/5hblrxk9vqnbvj943s9mlr636444mnml-apple-framework-Security-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8wngj6fidq1msndsb86alv3ymbrrf82z-apple-framework-Security-11.0.0
+error: Cannot build '/nix/store/xrlm7rsjk57ccxzc2lf4p5cck8zj7gs0-apple-framework-ServiceManagement-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/lhhw2ksvl85r7fzli3vh11cpwzb6kd5f-apple-framework-ServiceManagement-11.0.0
+error: Cannot build '/nix/store/11a5rr321c1gvzbipxp789gwxx7419ax-apple-framework-SystemConfiguration-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8fb3rczsinv7as5lh5y0i875c0a2d4yb-apple-framework-SystemConfiguration-11.0.0
+error: Cannot build '/nix/store/783b94z36588md6gansxassk1jvwxaim-apple-lib-libDER.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/svi9ibdqfv6jpjck1ch63hc2aikk3yn8-apple-lib-libDER
+error: Cannot build '/nix/store/j695pxlm0bnhxhmrjm1cgdvnc3jhbjk3-apple-private-framework-AudioToolboxCore-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3xzz61xnr83syf6ylpkqm0dx9xkgyhyl-apple-private-framework-AudioToolboxCore-11.0.0
+error: Cannot build '/nix/store/w9dr15h1m4cx8m174ypgy3mmxgy7qvik-apple-private-framework-UIFoundation-11.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ivxk412kqq1vqdx9nadymjiqvbkfyg14-apple-private-framework-UIFoundation-11.0.0
+error: Cannot build '/nix/store/z5arlqxvg9rbk58j27lrvza7ylxsh3ks-asciidoc-10.2.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0hvf4gyhhnp965ylib7v7kcdh7n3xkmi-asciidoc-10.2.0-dist
+         /nix/store/7wvh5brailqllpadp5slr3gjvk9kvlmr-asciidoc-10.2.0
+error: Cannot build '/nix/store/6iwdralwdacfp38kzyx1l60z4c4hah82-autoconf-2.71.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/b2096imy82dkn8681cch8s93frsa86ln-autoconf-2.71-doc
+         /nix/store/di7ivggs4fanbd2xn3m9bwmj74vr1jdv-autoconf-2.71
+error: Cannot build '/nix/store/xzv7q7g8s7vvi5c0wwsda75a9526qj17-automake-1.16.5.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/jxds9fq03zzzhirqh451hqcmhcfjgwd7-automake-1.16.5
+error: Cannot build '/nix/store/cmqf432n2qlhlmf66y4n0hxgq1h6g9w3-autoreconf-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/01xvid3ps9z27cdj66z71pl27s2hpzzg-autoreconf-hook
+error: Cannot build '/nix/store/k6284802kpcbh20lmdgyiz2398ggpbbm-bash-5.2-p15.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/38ngpd16l9w9yvf320sfj5zs0zry6gak-bash-5.2-p15-info
+         /nix/store/d2g9zq1cyxw2xrqz9571vyn63dzwr63a-bash-5.2-p15-man
+         /nix/store/q5daj5d3wg1yl6qlr3mjndpk5gbpx1zz-bash-5.2-p15-dev
+         /nix/store/r66mmvxg0jm1kfdj1ycpiph0xwa2lrp9-bash-5.2-p15
+         /nix/store/xds6lbphbszdpqw73wndq65by7jsxmj2-bash-5.2-p15-doc
+error: Cannot build '/nix/store/sj4qwqc1z0xfpjyi3yljj7dv4r9zwqdg-binutils-2.40.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/253i7vqpwax85whyl795jhabr47n1lnf-binutils-2.40
+         /nix/store/5205p7hi0x1vlfap75r1qwg9ic6jqkld-binutils-2.40-info
+         /nix/store/a8xvacci3c7x7krxrvb2nclhvfq1qiyh-binutils-2.40-man
+         /nix/store/q8qrlcm1adx525avmxvchyv8p32s7cyf-binutils-2.40-lib
+         /nix/store/xl5wi51inwwywwy5hn6z9ipmglv8v6fp-binutils-2.40-dev
+error: Cannot build '/nix/store/vyi0px1pbr3wp9wgnia1xrhn3phhgcqn-bison-3.8.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/d9s410abw31cg0f68pr6brjh33vgdzn9-bison-3.8.2
+error: Cannot build '/nix/store/gypwz7chv3s285gqk2fiia4wd7km4wck-bootstrap-stage2-CF-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ykimhkw5lb3qyqdip9pbapdlmy611adl-bootstrap-stage2-CF-stdenv-darwin
+error: Cannot build '/nix/store/1wxp6f7xxbpw1pq488aj9zp6v873v87p-bootstrap-stage2-Libsystem-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/c4m603k7i5kcza2rysjhw6k5bij598kf-bootstrap-stage2-Libsystem-stdenv-darwin
+error: Cannot build '/nix/store/85878dh4sb0806qqshmcid7fcc5sys8l-bootstrap-stage3-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kvkfabrq6iy9pdhvfwbsb4wvcwhx0jp0-bootstrap-stage3-stdenv-darwin
+error: Cannot build '/nix/store/lpajvaakfsl5p089ribqnv0r654kzids-bootstrap-stage4-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5aqxvaga6gi7z61j61ylhksfgnj9vw70-bootstrap-stage4-stdenv-darwin
+error: Cannot build '/nix/store/ynmr6k57bi735pp8smhmyx9xbvlrma6b-bootstrap_cmds-121.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/jpnmqj3p05384s6680hazij54ddbdwdc-bootstrap_cmds-121
+error: Cannot build '/nix/store/kimbz3p2mlb9hmcmssf0x116dacncj7b-bsdmake-24.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/k0fyyk2aa2d2xdf3qacjh3mkbprdnpsk-bsdmake-24
+error: Cannot build '/nix/store/bigzikxyxw64c6m7ic3ppw7a75pyr95c-catalog-legacy-uris.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rnh3vhh4k9nirwkh63wkwicba002vi4a-catalog-legacy-uris.patch
+error: Cannot build '/nix/store/p2cjc8v44ks2mqsx6vivfk4g7dcj0nnl-catalog-legacy-uris.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dhrgg8j24dncpv312gkkv0fb7czic415-catalog-legacy-uris.patch
+error: Cannot build '/nix/store/9yi4mcrfhgm8x2xwqpy6sv5iywjr8pfd-cmake-3.27.7.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/n1c5r39amk930fcag3bcq5bd2g2hr1y1-cmake-3.27.7
+error: Cannot build '/nix/store/cs14wniq3v00jsafndsy8s5a33nsi3mn-ctags-816.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/mj62xi1nvfqmlj71fiyhxlzf3vh2vcsf-ctags-816
+error: Cannot build '/nix/store/4pamkb0hdbir52sj383d8wq40yy62mk3-curl-8.4.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/06xhfrziv64g25ric6izknwx816j6532-curl-8.4.0-devdoc
+         /nix/store/2kdwrdwz9v8mkw9r241vnn2s98vdpqih-curl-8.4.0-man
+         /nix/store/585f1b2gl9i8vmlbks7vyizcp0r77m1y-curl-8.4.0-dev
+         /nix/store/bx1k8x710zpsdk993bwf8h803b1vqi6w-curl-8.4.0-bin
+         /nix/store/qxsvs4x238srjl7iq36lnj2kfrwkx3mm-curl-8.4.0
+error: Cannot build '/nix/store/qak9isn3abm0zbn39z5p9sgpfc6c3d5y-die-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/86navfj0fcw98bjdlb7a1l19slzib5s2-die-hook
+error: Cannot build '/nix/store/ysvflr19bv6k5xijpaxmqdd4m24ppkix-docbook-xml-4.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/a9b6b987sdwpkr5pn7xfhz2cgg3ch3n4-docbook-xml-4.3
+error: Cannot build '/nix/store/yksf5pkrghmvs191l8fzpvw77qff44ab-docbook-xml-4.5.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5dap11hy178fvgfyqvzvh0z15x7x2zg8-docbook-xml-4.5
+error: Cannot build '/nix/store/2b141naw4nwzzdllcvkhs6x8bmwlhxcz-docbook-xsl-nons-1.79.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fqqdqa50vh9f7gmn54z97sxy3m680y0d-docbook-xsl-nons-1.79.2
+error: Cannot build '/nix/store/20gfkajfvidhapya50alb4hbk7xj485k-docbook-xsl-ns-1.79.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/f7kq3xs1ckm7rq0wmlkdab22vm0wplwj-docbook-xsl-ns-1.79.2
+error: Cannot build '/nix/store/2ic0nnfzys4211sh2wxjz5gji4g7w78b-docbook2X-0.8.8.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/pbpwc8h9qs83vcg7kxyszs7xxn11knwv-docbook2X-0.8.8
+error: Cannot build '/nix/store/0ync23q0xya378aqrax67nlckzq62y7p-ensure-newer-sources-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j1g39g9mwkpj2afba7hz6r1gbvlkx7w9-ensure-newer-sources-hook
+error: Cannot build '/nix/store/70d2ajnnx67rgy3h9k2lwgc30amsmydj-ensure-newer-sources-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/n97d1p7q7nvs63ra6mh4m45aggkvcpqn-ensure-newer-sources-hook.sh
+error: Cannot build '/nix/store/fxfqwp7z3gyzcapxq9cbkyj6f32kz77g-expat-2.5.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dmg518zw09ya6mwgq78g8yzrpwcqjwni-expat-2.5.0-dev
+         /nix/store/m0slc5bq2hj88zc2rf132w6bskbh4k66-expat-2.5.0
+error: Cannot build '/nix/store/gkqyh4ylm8hl273y9h9yrp38vxsdgnf5-find-xml-catalogs-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/43hl503gny2z7vihx7chsxydig5fp52s-find-xml-catalogs-hook
+error: Cannot build '/nix/store/k4v4qbli45ybz8n0769zc3k0aqxyiv2n-flex-2.6.4.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/vi5mqmflndvd2fv8klzabdk3n62wizh9-flex-2.6.4
+error: Cannot build '/nix/store/pgadh6c4sjwivwra768a166pn6sxfmii-gdbm-1.23.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0grkwa5fld8pkahn7fis13m8cwxyqrhz-gdbm-1.23
+error: Cannot build '/nix/store/d05pxfra7jj4rp9ysig8dh67lkmssjyg-git-2.42.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/m7yvhwvk8pr1p56g6ykgg4355c550jrb-git-2.42.2-doc
+         /nix/store/r24f6ygxl33fcl6wxlfdi7mhnr92cixk-git-2.42.2
+error: Cannot build '/nix/store/wiy9878p1hs0skmysnzdpjzpjs90r1zm-glib-2.78.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/7nmck2ww4i5lbgl4jvps4zf7aypk85i1-glib-2.78.6-dev
+         /nix/store/d88ipch8493bc537jjlx80iawb12g9p8-glib-2.78.6-devdoc
+         /nix/store/f2rb56c2v1dfn698fhwlqga7cxjhj7sm-glib-2.78.6-bin
+         /nix/store/wk1rjizb8ivp5z98wpgwa3h3gkyh7wx6-glib-2.78.6
+error: Cannot build '/nix/store/79jzxak2cpv280vkgw3k2acjfl0apw4v-gmp-with-cxx-6.3.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/942i5i6x7sydrbs53rbpb08yyq9hip2p-gmp-with-cxx-6.3.0-dev
+         /nix/store/cj6zqs6ia79m12jl6yz04vn1fp2py9zg-gmp-with-cxx-6.3.0
+         /nix/store/q048jpa2y6lay6ssz68z5mxbd9bc098j-gmp-with-cxx-6.3.0-info
+error: Cannot build '/nix/store/nrx3l483azmgvgrzmyv903vac0b3q3aa-gnum4-1.4.19.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kf7j15wn1y592aaqaszihxymrajja5nx-gnum4-1.4.19
+error: Cannot build '/nix/store/qn06q7sjf4bv5zmyjr674v07g1q3pind-gperf-3.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xz94a4dqjfhlcn6ifjnhllx924drkz70-gperf-3.1
+error: Cannot build '/nix/store/0xi0kq2cgdniw871fg1gwa3iyb34m1w3-gtk-doc-1.33.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/11jiwwish61vnkpgbh6qkqih7lvidldb-gtk-doc-1.33.2
+error: Cannot build '/nix/store/3qyph2rgpi459h5vl7idbq3l5k0vlp0f-help2man-1.49.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fq6b2ikcbkjrw1mgs7v8d67fq77f4vxb-help2man-1.49.3
+error: Cannot build '/nix/store/y6zcf4b4qbfvhafk3wx14kkyxw879qrz-indent-2.2.13.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/791jq4ckagslyippfwi0zl1a2isrga5h-indent-2.2.13
+error: Cannot build '/nix/store/f6dma7fbgbizy8fppkvwccvz9wr591cg-install-shell-files.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hlrlgln7j941d4rcq1nksax38whcch65-install-shell-files
+error: Cannot build '/nix/store/2y36hvkgix2rc82nmyg141d0q7hl3zky-libarchive-3.7.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/af9y74br3sk0siz3k81nqslzhykqp5cd-libarchive-3.7.2-dev
+         /nix/store/d27jkay9921f4l6nq9lg0wacin5mn4gd-libarchive-3.7.2
+         /nix/store/m9pylbsabk3q9grc29qvnyhysnm3810n-libarchive-3.7.2-lib
+error: Cannot build '/nix/store/x2aq1rhx3bhqijzvan6b2q8f851l06z9-libelf-0.8.13.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/187i9341qxbqwzy3yvsxf7r7dwd2lkxn-libelf-0.8.13
+error: Cannot build '/nix/store/lda6j9ax1s3vpr9nhc3ga63bh780zlal-libkrb5-1.20.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0hq2zjc5nwbp9c5pn4gdiwvbx5ifvasc-libkrb5-1.20.2
+         /nix/store/qf66w3v8g7pgx985753fqqkk9lwxsdhc-libkrb5-1.20.2-dev
+error: Cannot build '/nix/store/fi2iw2rnaf6k0mnwnwzm32rfjfwsikhh-libpng-apng-1.6.40.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/g344p41pjj2irryqrapkl9fh460w5g4s-libpng-apng-1.6.40
+         /nix/store/kyimqj4czrv05v34p1983zi6dpysj77s-libpng-apng-1.6.40-man
+         /nix/store/p94zyqj29c2d9w0gy0c7g65sffimkyac-libpng-apng-1.6.40-dev
+error: Cannot build '/nix/store/0c6xvkpv0rldgxlzfr5rg8dzxcy3f2y4-libtool-2.4.7.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ldj73p78pjnmdridbzjvlagj5vjmsc3w-libtool-2.4.7-lib
+         /nix/store/m0bjf3b9zyr7vw00pws4f2k72pxvjcrs-libtool-2.4.7
+error: Cannot build '/nix/store/m70mb3rz4lkpx7sx6h3dgackrw4vx25s-libuv-1.48.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/irf7g18hw8yydx4xdwaa4qsc73smir70-libuv-1.48.0
+         /nix/store/xxwnmvsi01c7d33z5h3ix8agij0w1fnz-libuv-1.48.0-dev
+error: Cannot build '/nix/store/43kslw5m0b63j0iwaf0vdnsl9g1qzlri-libxcrypt-4.4.36.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0p4h4wvgny3hl6ql8m8y2k5mkzwnqafn-libxcrypt-4.4.36-man
+         /nix/store/lxgq8gww8ki1h9k6sm6fx6ps1ppdi347-libxcrypt-4.4.36
+error: Cannot build '/nix/store/lm0f941r7ja1qj0ai6hpnhchfm33nh9r-libxslt-1.1.38.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8lbaql79hx1xarl5a2ddkjkfww1hhpmr-libxslt-1.1.38-doc
+         /nix/store/k5f9dnr7yz9fkwaji3qaj0xqcg00jzvn-libxslt-1.1.38-dev
+         /nix/store/kggha2l4d9wf02ba7j07si5fzvpgq6sc-libxslt-1.1.38
+         /nix/store/lf9ajw9shknz8wh4y8lvcyn3px2sj9pz-libxslt-1.1.38-devdoc
+         /nix/store/xy87b3scn00sfdh2i8ikg15h946fjjb4-libxslt-1.1.38-bin
+error: Cannot build '/nix/store/4b30gy9f4405parr2nzy61708h4rigpx-lzo-2.10.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/w14sawx101g26n0kqspw596n76nq1bxw-lzo-2.10
+error: Cannot build '/nix/store/3bjz9nhj4hzrkrvkr424icildb8zfs74-mailcap-2.1.53.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ikrbn0v13q3ig5hics2db9sc9vmw687a-mailcap-2.1.53
+error: Cannot build '/nix/store/9asyjlrfcaj013a0wr952qi6p74cg209-make-shell-wrapper-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/81if4vrc0rsvva6lr5xhl9nim63c7s73-make-shell-wrapper-hook
+error: Cannot build '/nix/store/18rgbfwc7lar3j3pr43kl0sgqvjpvlzf-meson-1.2.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4ih7haw704p8b8y8ci4lb4mb50m9dqf0-meson-1.2.3
+         /nix/store/6jrm69xa9wi73b2a3m3fdkabgvmgbrbz-meson-1.2.3-dist
+error: Cannot build '/nix/store/cr8z3hmhpqn2bf876h50adzh849n7xwy-ninja-1.11.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/px2dv17cl870m9582amqhyklpwypmlmr-ninja-1.11.1
+error: Cannot build '/nix/store/c2x98d6wqsbcd2xb3xibxrqmngd6b1ni-nix.xcconfig.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cabaalqjrwg7mxlcq88xl9m8klam2mkh-nix.xcconfig
+error: Cannot build '/nix/store/ls95vhmxw8kdg2ah6ygj993xj60g8ck6-nuke-references.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cy26ivh0fxpq4j5yfsy41z6x80qspylf-nuke-references
+error: Cannot build '/nix/store/7d590rhvn08gi79c79xxmjvkjcyfbxg5-pcre2-10.42.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2cskp92aq3zwc1y8y9p7l23079pflqj2-pcre2-10.42
+         /nix/store/b1214hwzfg4yj2q91n5xbr06w1gdg363-pcre2-10.42-dev
+         /nix/store/b88jx56q7419l95rsq40550z0gjjivdk-pcre2-10.42-doc
+         /nix/store/bvi5rmrlbj2zb6dmkgs0xnc4rg79ga28-pcre2-10.42-man
+         /nix/store/dzjjzq6nsnjpkigahl1zlvk5zsl3viri-pcre2-10.42-devdoc
+         /nix/store/h6bwg4bybdckndrclyxpg5fjqrmj8pqs-pcre2-10.42-bin
+error: Cannot build '/nix/store/1137ab165d7873lh24czk0fwp08x4d06-perl-5.38.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/55s72c16xrb3kknvjkyh0fy5mk775630-perl-5.38.2
+         /nix/store/aqr2w1bailkdd1mvs07wykxz5y3pcpr8-perl-5.38.2-devdoc
+         /nix/store/ihpys61sv4apli7yg8iniid836z70y9i-perl-5.38.2-man
+error: Cannot build '/nix/store/ww1d5x85m1l50mpsiv75l0xnih9kqslw-perl-5.38.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/95fhdyi4pa10a52i36rh07yk636n9z48-perl-5.38.2-man
+         /nix/store/xr6z6hbd376wldykmnfz2idpq8f7ahbx-perl-5.38.2-devdoc
+         /nix/store/yfd44a5zv9vxr5hmf3mc8qrv7p04s95x-perl-5.38.2
+error: Cannot build '/nix/store/5cvahbaxf1qv5gnhp82camdpka6mhnqs-perl5.38.2-Authen-SASL-2.1700.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1c1kwaqidq4jssvpd481hvzznwklw82w-perl5.38.2-Authen-SASL-2.1700
+         /nix/store/ank13r0fld1gxqib1ba6pk906z3bmclc-perl5.38.2-Authen-SASL-2.1700-devdoc
+error: Cannot build '/nix/store/p7vxam33n4k64440g1nas9r1686345nl-perl5.38.2-B-COW-0.007.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fl421qrn1k2vl7pq8b98dssm5d2vcsv7-perl5.38.2-B-COW-0.007-devdoc
+         /nix/store/mjj63r7s6av3mpi7gxn25gl4r5cc9fis-perl5.38.2-B-COW-0.007
+error: Cannot build '/nix/store/8k3n0fn5rd14i80cagiccfsfzkpdcq5y-perl5.38.2-CGI-4.59.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/a5pm88k5hzk6p69ydzn4dpy7lb2w5l62-perl5.38.2-CGI-4.59
+         /nix/store/l0hkxgy5fbm97fdc0i9pmw5c7q1hwwn2-perl5.38.2-CGI-4.59-devdoc
+error: Cannot build '/nix/store/d8w8w6f7q87y6qi27abfbbs1pyblg4d4-perl5.38.2-CGI-Fast-2.16.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/qk5ksh9l4ppc28xhlhm3bwqma9xpdh3n-perl5.38.2-CGI-Fast-2.16
+         /nix/store/s7mpg0q304w6d0impxzmz3dmx1y84218-perl5.38.2-CGI-Fast-2.16-devdoc
+error: Cannot build '/nix/store/qmnbs4739n5kmc03rqg7d1bdc4fm0rhg-perl5.38.2-CPAN-Meta-Check-0.018.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/b8sc47jin5rbjvzhdh8nshn9a141zkch-perl5.38.2-CPAN-Meta-Check-0.018-devdoc
+         /nix/store/dgrmyyh2q45kwyfi6scr6pgnlkcm3l4l-perl5.38.2-CPAN-Meta-Check-0.018
+error: Cannot build '/nix/store/g9qd2j4z60mxf0kw3p0r4jp0jly7q9k4-perl5.38.2-Capture-Tiny-0.48.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/v6snscx88fbkqrb08737dsppvsrm6sdz-perl5.38.2-Capture-Tiny-0.48-devdoc
+         /nix/store/vi4g8yziq4zhilhr3432ryfs9jyf765y-perl5.38.2-Capture-Tiny-0.48
+error: Cannot build '/nix/store/6my6jwl4kni3lyp4j06y54ckvw257cxi-perl5.38.2-Class-Inspector-1.36.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/sjbd4h1gvvnhx0nmhrk8h8f571sg6ccs-perl5.38.2-Class-Inspector-1.36-devdoc
+         /nix/store/xvahzz4zphdsz4h83zy7dcjck6kd7bh0-perl5.38.2-Class-Inspector-1.36
+error: Cannot build '/nix/store/vlybxw9c7vjgjhwfiy5pafvagi1sah36-perl5.38.2-Class-Method-Modifiers-2.15.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/as3xlayp06ffza9lp7z9xd00kr68xhdp-perl5.38.2-Class-Method-Modifiers-2.15
+         /nix/store/jxgwy4wxxihyp6zxvwmhgz9s5h8fmck2-perl5.38.2-Class-Method-Modifiers-2.15-devdoc
+error: Cannot build '/nix/store/pkp62c594j1kp7vpg91jjs9sx32frli7-perl5.38.2-Clone-0.46.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wpfxfngjrfilwq1qgqc47d12kmp0sp0x-perl5.38.2-Clone-0.46
+         /nix/store/y9bpxwkh2q16a7cx1zdl4bcm0ifqxw7b-perl5.38.2-Clone-0.46-devdoc
+error: Cannot build '/nix/store/9f8ailrwziqk3h2hd15mc2zf4amzrfk1-perl5.38.2-Devel-Cycle-1.12.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/lmmqw0xafyzc81indndh2zqhz7rwxwfq-perl5.38.2-Devel-Cycle-1.12-devdoc
+         /nix/store/nfaa20y4j3f074h1c1b1irjn4dmjhhsg-perl5.38.2-Devel-Cycle-1.12
+error: Cannot build '/nix/store/8qnqc9gykp6hwr8aw93vk4f4gpbhyqi8-perl5.38.2-Digest-HMAC-1.04.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/32qdjy39c8q1p3ib8p5dr82nainj7vyq-perl5.38.2-Digest-HMAC-1.04-devdoc
+         /nix/store/5i8y5xwnpqgrkql3h58v3rpvkwx81v5c-perl5.38.2-Digest-HMAC-1.04
+error: Cannot build '/nix/store/i117dpvqswan9vd0lb9mfq62dw5bjfi4-perl5.38.2-Encode-Locale-1.05.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4yyl4ryaxcx1kxjhiyzql0llbpkhrp6a-perl5.38.2-Encode-Locale-1.05-devdoc
+         /nix/store/d21xyp6g10w0mh2pd6b7mpji04yw7ylr-perl5.38.2-Encode-Locale-1.05
+error: Cannot build '/nix/store/xmgrjb5kbs4qh39ni52an3rwca9sdbw0-perl5.38.2-Exporter-Tiny-1.006002.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/a0wmxdmgc0s5grcnxg2wysvbriyd2h9v-perl5.38.2-Exporter-Tiny-1.006002
+         /nix/store/z6b1rcy9md1xh3pqk948v7xsgg7prhlc-perl5.38.2-Exporter-Tiny-1.006002-devdoc
+error: Cannot build '/nix/store/zv1p3lbx6jgp2gzfi55bbn1ix4x4a0af-perl5.38.2-ExtUtils-Config-0.008.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/jfbxjcr4n4vic306z8hnalmbg10vjld6-perl5.38.2-ExtUtils-Config-0.008
+         /nix/store/rc7fskifryg6ixipab5f9najrr4hssf9-perl5.38.2-ExtUtils-Config-0.008-devdoc
+error: Cannot build '/nix/store/rmfzg8np7a4hb0rn9jx39nlds7gkc4q4-perl5.38.2-ExtUtils-Helpers-0.026.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dzhhq215zvf0433fdxn46frjwmh3ysma-perl5.38.2-ExtUtils-Helpers-0.026
+         /nix/store/s6z9ykmv57zj4q7af7ga8appsj791r58-perl5.38.2-ExtUtils-Helpers-0.026-devdoc
+error: Cannot build '/nix/store/nrgn4a0gc474xyqwmgcbhspg2k9w742m-perl5.38.2-ExtUtils-InstallPaths-0.012.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/28iphq0nqq40klbd2zn9i3dmf4lrw0qg-perl5.38.2-ExtUtils-InstallPaths-0.012
+         /nix/store/jxhvby4mvbpdj4xvkac3iv9sb0wm3yf0-perl5.38.2-ExtUtils-InstallPaths-0.012-devdoc
+error: Cannot build '/nix/store/q07vf4p47301bd22zh3yxyii6mk9188d-perl5.38.2-FCGI-0.82.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1dl6x834k4w586dk0qzmlzc5pg0lly61-perl5.38.2-FCGI-0.82-devdoc
+         /nix/store/dibig05kxxidjy0cg71wp1yjq7wv8l23-perl5.38.2-FCGI-0.82
+error: Cannot build '/nix/store/kfd5p8852fsm52rb2z528jwmhs8jxzds-perl5.38.2-FCGI-Client-0.09.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/piyyj1wwl1hwwn0nn2mxfrfq1x6f0519-perl5.38.2-FCGI-Client-0.09-devdoc
+         /nix/store/vf5nzxip9h3dywx8816539dcyfpd3068-perl5.38.2-FCGI-Client-0.09
+error: Cannot build '/nix/store/bgb2kn72zzaqkagd72w5yy8c6q46zv93-perl5.38.2-FCGI-ProcManager-0.28.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9v0zfl8dfmim7bfwsz5xkv0lwfshrx22-perl5.38.2-FCGI-ProcManager-0.28
+         /nix/store/jycjgminrpj8mq5s0i1swb58953g83mz-perl5.38.2-FCGI-ProcManager-0.28-devdoc
+error: Cannot build '/nix/store/qlf411sb8mizs7xkq34i03w6lv7wq3iq-perl5.38.2-File-Listing-6.16.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ffah03n5627z7jhdwb0bri5dg308zmpq-perl5.38.2-File-Listing-6.16-devdoc
+         /nix/store/rmvqnphbh5ad2az7jsai6ararim9aikf-perl5.38.2-File-Listing-6.16
+error: Cannot build '/nix/store/c5zlsj72m7wqxg6crk43h2i2jc8cxwdf-perl5.38.2-File-ShareDir-1.118.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/239rzwsc8fdx15yibhwmpfgd0bj6scmq-perl5.38.2-File-ShareDir-1.118
+         /nix/store/l951a1xk496n3s21c4jg3nra4sbvxzly-perl5.38.2-File-ShareDir-1.118-devdoc
+error: Cannot build '/nix/store/03cs5n6a60vj9hbma6lv380namk6ccb6-perl5.38.2-File-ShareDir-Install-0.14.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bzhck265b1xycrgs64z4fhznhivmn816-perl5.38.2-File-ShareDir-Install-0.14
+         /nix/store/kqs2la7f85bv20banbhs7i62xhn12xqw-perl5.38.2-File-ShareDir-Install-0.14-devdoc
+error: Cannot build '/nix/store/mhcmhfvn691nkgzr56qajip2nnjh9clm-perl5.38.2-HTML-Parser-3.81.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/japq2hblbwygbp5r157jbnvd2n1lbcnp-perl5.38.2-HTML-Parser-3.81-devdoc
+         /nix/store/xqkcijvv3xdz8x1sv061zawpg9z357p8-perl5.38.2-HTML-Parser-3.81
+error: Cannot build '/nix/store/k764fw47nn5by1nzf5wnjb5wkacj17cs-perl5.38.2-HTML-TagCloud-0.38.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/mazl50jq1jiz81b2kirnr91c7ri7ic7w-perl5.38.2-HTML-TagCloud-0.38-devdoc
+         /nix/store/zmlgks2aqfgrvl06jdm50jvrqx0nimam-perl5.38.2-HTML-TagCloud-0.38
+error: Cannot build '/nix/store/5m18ziajh645f0qgrbs69j6kf2j39ra4-perl5.38.2-HTML-Tagset-3.20.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ifn4ncf08l69cicqwxhv207sn9bvs494-perl5.38.2-HTML-Tagset-3.20
+         /nix/store/v66vaga19spib20hdj934fxzrb7zq32q-perl5.38.2-HTML-Tagset-3.20-devdoc
+error: Cannot build '/nix/store/dmbwd0g49sg5khf6g3zs2fyd3ah1a16x-perl5.38.2-HTTP-CookieJar-0.014.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/d4a5zgdb9nszgq0bb2qlfky8f0m449bg-perl5.38.2-HTTP-CookieJar-0.014-devdoc
+         /nix/store/v56zp7b8srzxxsp1kpvxn70k7p87hbs1-perl5.38.2-HTTP-CookieJar-0.014
+error: Cannot build '/nix/store/4zh6a23b6w0qdrdcrwchqsbpcbagxfk9-perl5.38.2-HTTP-Cookies-6.10.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0gg2lzk40cax53cwf3mgvwbpbpfykqf1-perl5.38.2-HTTP-Cookies-6.10
+         /nix/store/fq1wghrz0y4wgag7d7h6gvbsp89qd4zh-perl5.38.2-HTTP-Cookies-6.10-devdoc
+error: Cannot build '/nix/store/klws1pdrbzh41z0ajk62c06ip092pkcb-perl5.38.2-HTTP-Date-6.06.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/7mc0sw0d44gksphrpnhd2fzhnjdc9aq4-perl5.38.2-HTTP-Date-6.06-devdoc
+         /nix/store/cqhbk84dqyv157k3i2ld3faxha0j2ih6-perl5.38.2-HTTP-Date-6.06
+error: Cannot build '/nix/store/7cj3rr1mrvmx8zvn2mn2b7j2s10qr6wq-perl5.38.2-HTTP-Message-6.45.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4hzc62k77vi8ai7qkzql64rdnmcrqkv9-perl5.38.2-HTTP-Message-6.45
+         /nix/store/gs5ia4gds9gvqsz09fadcznwdsyp7n5l-perl5.38.2-HTTP-Message-6.45-devdoc
+error: Cannot build '/nix/store/xkp3cwb1hqfwmqkgqrv574hi6r3l5i95-perl5.38.2-HTTP-Negotiate-6.01.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/v4gaccmk4dk5dj6hx17vl7mpaywfqzyp-perl5.38.2-HTTP-Negotiate-6.01
+         /nix/store/zs7iz5jcvv9kpwmr6lh6j059kc9yawn3-perl5.38.2-HTTP-Negotiate-6.01-devdoc
+error: Cannot build '/nix/store/grpw9xkirrjfrv8lfk3clifh404fi660-perl5.38.2-IO-HTML-1.004.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5kr0sqrv3ygjabmng3hr93gykvggifdv-perl5.38.2-IO-HTML-1.004-devdoc
+         /nix/store/sq369cn03ncgzjq0aviq4z6sglb6nvbd-perl5.38.2-IO-HTML-1.004
+error: Cannot build '/nix/store/s2rmli6p2grc31n9dnvx2f73865pdpx8-perl5.38.2-IO-Socket-SSL-2.083.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/g9s79660qx5hf3dgxsvswb630w5vk1af-perl5.38.2-IO-Socket-SSL-2.083-devdoc
+         /nix/store/si7j1zpc3nrgjqbnkkvi2f9sva5wffdx-perl5.38.2-IO-Socket-SSL-2.083
+error: Cannot build '/nix/store/0pljqc3z00pvr6v04mnrp3i817a3apbj-perl5.38.2-LWP-MediaTypes-6.04.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0khwy9bfsblfjxd1i5pk60yp0sl0i7mj-perl5.38.2-LWP-MediaTypes-6.04
+         /nix/store/5ph6hsnpri78cbg3ys3ddizzrscbvh94-perl5.38.2-LWP-MediaTypes-6.04-devdoc
+error: Cannot build '/nix/store/4yidg40vv0vhw58mvq4xffr09znjf53y-perl5.38.2-Module-Build-0.4234.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/agn1vsxa6888pdrjvvamvbdfsf1rdnkh-perl5.38.2-Module-Build-0.4234
+         /nix/store/bcr1964qxq4nq1nqrzm0bzmzw4r80vi4-perl5.38.2-Module-Build-0.4234-devdoc
+error: Cannot build '/nix/store/mi3366jvsipsmzj0nkwm4nrwkr3qj7ir-perl5.38.2-Module-Build-Tiny-0.047.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kvcrm4n0xzga4y2y1xqbc38gl10yycad-perl5.38.2-Module-Build-Tiny-0.047-devdoc
+         /nix/store/qixwgxgprard7xgikrhxn9qv14i6wca5-perl5.38.2-Module-Build-Tiny-0.047
+error: Cannot build '/nix/store/300xb6m7n7wk8n0g0x43pfcdjhib7x74-perl5.38.2-Module-Runtime-0.016.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/aqy9g6pn4zil6rnwx21zb3xzhrl6i9a4-perl5.38.2-Module-Runtime-0.016
+         /nix/store/lbw33clzc9cznm8z7p5vyxaj6slgy439-perl5.38.2-Module-Runtime-0.016-devdoc
+error: Cannot build '/nix/store/jkjfc0zcp38gn00aawpzqq7npbkqqlvv-perl5.38.2-Moo-2.005005.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9rb68qcgw5jbjvypj3s1ny5s7r9d248k-perl5.38.2-Moo-2.005005
+         /nix/store/vc0f5a5d7p5wl6nr5naz8bhglm3l09d6-perl5.38.2-Moo-2.005005-devdoc
+error: Cannot build '/nix/store/2izidy1chbpg385gzalkpgdzzhp0iqn4-perl5.38.2-Mozilla-CA-20230821.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kggmfgqvknzwblp28qyakdv9awbz0ind-perl5.38.2-Mozilla-CA-20230821-devdoc
+         /nix/store/pvwal0k6rag8s1dwjlfwf0rvy1zv28ja-perl5.38.2-Mozilla-CA-20230821
+error: Cannot build '/nix/store/kkfx1n28x11hf43r791cam172aqaahws-perl5.38.2-Net-HTTP-6.23.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/g0cw9s3ypb3fd8rp85qjl1klb3jvb7yj-perl5.38.2-Net-HTTP-6.23-devdoc
+         /nix/store/j2f390lgqfrgxcfjqh3rpn5zns1p8vkb-perl5.38.2-Net-HTTP-6.23
+error: Cannot build '/nix/store/fin2zrf35fkd6ff67z0r6f1nv8hsn32k-perl5.38.2-Net-SMTP-SSL-1.04.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9wsh5g548d9is7g6vz1jnggd6s5h6615-perl5.38.2-Net-SMTP-SSL-1.04
+         /nix/store/sj1dqidkbjkcfy0rzmrrmj44lajky0d7-perl5.38.2-Net-SMTP-SSL-1.04-devdoc
+error: Cannot build '/nix/store/28clzxzx00qjgzlmj0sym6g3qiw9glaj-perl5.38.2-Net-SSLeay-1.92.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/92vz3sp8aflrdzn53gxbcqmav26zwsla-perl5.38.2-Net-SSLeay-1.92
+         /nix/store/nhyxhp2bszlpzwj4c35wwlrwzifpxh68-perl5.38.2-Net-SSLeay-1.92-devdoc
+error: Cannot build '/nix/store/rvrm8rn0assk6qmzyfmz61srpnc9bmkb-perl5.38.2-PadWalker-2.5.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/18x812d14zg70bachgjjzhg7rm05xgnd-perl5.38.2-PadWalker-2.5
+         /nix/store/2zdrr1wv45qgqdsk1qj8v6fah9rd9ry6-perl5.38.2-PadWalker-2.5-devdoc
+error: Cannot build '/nix/store/0pzilgc3xwz13j6qansyy8vl4440qyfn-perl5.38.2-Role-Tiny-2.002004.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cv514f2fv19yqs1n5b0xcxsw02nyhmhr-perl5.38.2-Role-Tiny-2.002004-devdoc
+         /nix/store/l5id6c65vilfp1fnwzadrp3ddxri6257-perl5.38.2-Role-Tiny-2.002004
+error: Cannot build '/nix/store/y6n2k1jlsbqnkjkaqrwhzkbcybcn8q1j-perl5.38.2-Sub-Quote-2.006008.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/sfb8m28cyf3q3hg9vgpf6d98bjj0whcf-perl5.38.2-Sub-Quote-2.006008
+         /nix/store/x40p7cha7vvyimxxm0w2f8kl7nk2fr8y-perl5.38.2-Sub-Quote-2.006008-devdoc
+error: Cannot build '/nix/store/a0p8347pbx25wl8g3ccfk4b6d4xz762l-perl5.38.2-Sub-Uplevel-0.2800.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bl0njcx3670c1yhqnccj1nphm1wckw1r-perl5.38.2-Sub-Uplevel-0.2800-devdoc
+         /nix/store/iq69cm21qw6b0f3kcv54q8xka7z8yrly-perl5.38.2-Sub-Uplevel-0.2800
+error: Cannot build '/nix/store/i7i9d8k6k4i9wmxv49ni69l55fl7nx2f-perl5.38.2-TermReadKey-2.38.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/da19hk32j1r1qsg7bgr3fwlisakgmbhk-perl5.38.2-TermReadKey-2.38
+         /nix/store/jcmav9szmx8qfr3fny56m1vjcxbpalbb-perl5.38.2-TermReadKey-2.38-devdoc
+error: Cannot build '/nix/store/3dfiwqqfqgzln4xbw4gaq87s7r3f77gn-perl5.38.2-Test-Deep-1.204.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/i3951gs9gmlkib34fwlgfj67fxxqbnx9-perl5.38.2-Test-Deep-1.204-devdoc
+         /nix/store/qsbypwqg864jkkl6r4zly7cnddli2ky1-perl5.38.2-Test-Deep-1.204
+error: Cannot build '/nix/store/xsa4wm8lnz5cg1iri2ghyg5s325ilbr9-perl5.38.2-Test-Fatal-0.017.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8yan00q29dccmpbbmkqjz8a34y6fmbxd-perl5.38.2-Test-Fatal-0.017-devdoc
+         /nix/store/s4644jq7njrak7zyl5xg5pml9zp440wy-perl5.38.2-Test-Fatal-0.017
+error: Cannot build '/nix/store/nz50968c9rfmzjrw1vyx3sj27y7ra14y-perl5.38.2-Test-Memory-Cycle-1.06.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3lpxdpkssv493sjxszmdqi50z69vlaji-perl5.38.2-Test-Memory-Cycle-1.06-devdoc
+         /nix/store/nvvqs6nqyapm2dnp09lbakzn4i23bcks-perl5.38.2-Test-Memory-Cycle-1.06
+error: Cannot build '/nix/store/3g9ayc23w5sb6nfg46xc0axmyqg10a6v-perl5.38.2-Test-Needs-0.002010.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8pmgxlc8l17bwd3r92v6hsalfzsqbhxz-perl5.38.2-Test-Needs-0.002010
+         /nix/store/chsp7w63604cagcm3cr2bxwv2ii6rc8p-perl5.38.2-Test-Needs-0.002010-devdoc
+error: Cannot build '/nix/store/rcwn633lrxss7bg1rhywf23z7jj1flpg-perl5.38.2-Test-NoWarnings-1.06.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/m1b8lq9imdc3dqvdwq9wkppkk9l62sd9-perl5.38.2-Test-NoWarnings-1.06-devdoc
+         /nix/store/x96m227a683pa7d0dmimp95wz79dh51l-perl5.38.2-Test-NoWarnings-1.06
+error: Cannot build '/nix/store/89axgkx5m6z4wz7lcf1lcz3j1hzp2w8v-perl5.38.2-Test-Requires-0.11.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2j2xl9h17vvsvz0zvakd0mp5qvi3079b-perl5.38.2-Test-Requires-0.11
+         /nix/store/frzakzny4rw8kh815x9gajp2sd2409cw-perl5.38.2-Test-Requires-0.11-devdoc
+error: Cannot build '/nix/store/qbqs11md0qfzhnbcj6mxzkrbnl8lppix-perl5.38.2-Test-Warn-0.37.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bq92fj701vx2wnwbdcmlxd7lckh9g6zk-perl5.38.2-Test-Warn-0.37-devdoc
+         /nix/store/mhwxk13544l5d2x05xsi0h8vmw5cc4i2-perl5.38.2-Test-Warn-0.37
+error: Cannot build '/nix/store/6p2lmcnbvfhifxdgmyd0dnkkl1w03bk0-perl5.38.2-Test-Warnings-0.032.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bf7fq3d4i8fs9y2rq7qx1jv2jnaba1yn-perl5.38.2-Test-Warnings-0.032
+         /nix/store/glakbn7gznarhsmjij3f9d4894irv9w6-perl5.38.2-Test-Warnings-0.032-devdoc
+error: Cannot build '/nix/store/gd2j0zbskc6x6f8skdi708gl3w1hcrd0-perl5.38.2-TimeDate-2.33.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9fxmb9mrkj1py6wgw5vka1j9f55zgg8l-perl5.38.2-TimeDate-2.33
+         /nix/store/a8wnzgrp4g00dwj75hhhmfypns9a5zyp-perl5.38.2-TimeDate-2.33-devdoc
+error: Cannot build '/nix/store/r71ivkwmb73wh9zr98ln41pgq9xlbdxr-perl5.38.2-Try-Tiny-0.31.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/69xdzq65xsky0ldw9h58cyxg8p1p7nf3-perl5.38.2-Try-Tiny-0.31
+         /nix/store/rqqnsjg366dcj0hwgnw1clg6wkcdgl0w-perl5.38.2-Try-Tiny-0.31-devdoc
+error: Cannot build '/nix/store/s0v6aazqb448f27gyfaqmxgr25091wcy-perl5.38.2-Type-Tiny-2.004000.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9y503k37a80p1wwgf67rp93h9qpnlh3g-perl5.38.2-Type-Tiny-2.004000-devdoc
+         /nix/store/arwlwcvjzqlq7zmvazq7nafr1qrlandy-perl5.38.2-Type-Tiny-2.004000
+error: Cannot build '/nix/store/dz4vzca5prxqbcvid7831mrwxzbv12rg-perl5.38.2-URI-5.21.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1b8gq12yi30v11nq1nzh2r2kavqcgs70-perl5.38.2-URI-5.21
+         /nix/store/h4flmj3lxg5bygysw7qw311pfgfi9pw7-perl5.38.2-URI-5.21-devdoc
+error: Cannot build '/nix/store/vjbkgc2myql8ln04pjzq9drjmkvg6syg-perl5.38.2-WWW-RobotRules-6.02.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9d87dnhnjvvzb09g2f893lzrl2w2h56f-perl5.38.2-WWW-RobotRules-6.02
+         /nix/store/zsndi6r2a006qwwq0n1hp33xziy6cfkp-perl5.38.2-WWW-RobotRules-6.02-devdoc
+error: Cannot build '/nix/store/qwmf8hs8g5ij2pzg686lnsbqcdh3y6xd-perl5.38.2-XML-NamespaceSupport-1.12.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/73gd9bxj8kq63qssjv8khsraimh3iy7l-perl5.38.2-XML-NamespaceSupport-1.12
+         /nix/store/m8sfmknfnw24mjnk9z4llaw5jfjw0rs7-perl5.38.2-XML-NamespaceSupport-1.12-devdoc
+error: Cannot build '/nix/store/566lhnlidcs0ybhi1j04q05bbsx9i0mk-perl5.38.2-XML-Parser-2.46.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hqxaim8hlfxiw3k2gbygyrqgq6p2gvpx-perl5.38.2-XML-Parser-2.46-devdoc
+         /nix/store/qwvnqgi1dz3gg7cfkj8lf9mvk7kn4dbn-perl5.38.2-XML-Parser-2.46
+error: Cannot build '/nix/store/ca6x5y1kxcvkfy9sdl7xrgj81qdybfmm-perl5.38.2-XML-SAX-1.02.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dcrb6jjhq59qr4292nydlv9jv4gn9gmm-perl5.38.2-XML-SAX-1.02-devdoc
+         /nix/store/my2p0m45g8z8jb54x8vka4vdnx2z788w-perl5.38.2-XML-SAX-1.02
+error: Cannot build '/nix/store/ycj73rlr1j6mjshjh0xn49r2pzbhjivf-perl5.38.2-XML-SAX-Base-1.09.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fl1mv9izzg9mcq5pkmsnmbg4j718rniz-perl5.38.2-XML-SAX-Base-1.09
+         /nix/store/r1bgpv9f8r1sfipy4an3dwcz1b3wdvwb-perl5.38.2-XML-SAX-Base-1.09-devdoc
+error: Cannot build '/nix/store/si4q18q0n5hcs1cf2qzcgcs2xwz9vkcb-perl5.38.2-gettext-1.07.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/a35zblc4ahpild824gy50kgwj3flgzc4-perl5.38.2-gettext-1.07-devdoc
+         /nix/store/m59ajs1r3k2a3zvd05srqy67jla2pyc3-perl5.38.2-gettext-1.07
+error: Cannot build '/nix/store/ifpfgzsn46wlxv8fclf7c6x4mz0b18ly-perl5.38.2-libnet-3.15.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/26w62zk0zjs5l2byb25bgjszd2asqsqf-perl5.38.2-libnet-3.15
+         /nix/store/pq25ckwpf1j6pcsn77j11wsllvpg44gp-perl5.38.2-libnet-3.15-devdoc
+error: Cannot build '/nix/store/7anbpk7i72a0ajjc0xabzdwv5jr6ka5g-perl5.38.2-libwww-perl-6.72.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/49mdppj9g9g5ld2bqyj3izc7r6rkm906-perl5.38.2-libwww-perl-6.72-devdoc
+         /nix/store/fqdab9wc2cil5a1p9icj9vbaff1bd95p-perl5.38.2-libwww-perl-6.72
+error: Cannot build '/nix/store/dc2q4ich657nynlx9f2vzrqxawrdb9gr-pkg-config-0.29.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bhw6pmrcfv532zw7chpc4dhvg8xsf4zw-pkg-config-0.29.2
+         /nix/store/mm7r933sgmrq8n7mymx6v293bdxvbslz-pkg-config-0.29.2-doc
+         /nix/store/r6y411xmm078n92h59l22y0rak9i6vwz-pkg-config-0.29.2-man
+error: Cannot build '/nix/store/pdhzj7dkh5xjsbldfxzshhcjpg3ixr7f-pkg-config-wrapper-0.29.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/80hbya2zzgfp0gyqv52w6gkirrignz7c-pkg-config-wrapper-0.29.2-doc
+         /nix/store/cwwjpcxpw34mk64c9gfdca3gr983ifkj-pkg-config-wrapper-0.29.2-man
+         /nix/store/ppafy82ambfip307rbmw1p7g3ky9zhvb-pkg-config-wrapper-0.29.2
+error: Cannot build '/nix/store/pp77f4jyf74r7c2h1ccm9n3nmfsvj1md-ps-adv_cmds-119.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/srg3psl4a8hn11hsm9zcgsaadn1d33nd-ps-adv_cmds-119
+error: Cannot build '/nix/store/4l41fxaals71cg1lkg9n3hhy4h2ia9pv-pypa-build-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hjldk031mrycrsafp5bghfffjd8k1aml-pypa-build-hook.sh
+error: Cannot build '/nix/store/c218nl1v6pxlnnc187hb8mcqi9776s3m-pypa-build-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3qv19q044cr9ki7fh5j9yn0f5dxk1zmn-pypa-build-hook.sh
+error: Cannot build '/nix/store/49zfxa8gqmkla87rp72ldys7dj82rl73-pypa-install-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/gvwi2r623hn787rk3xsyysk68d13vzqc-pypa-install-hook
+error: Cannot build '/nix/store/s6hj5z5radpva86rmvwmc1mwhbx3an5f-pypa-install-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dix75lpk8iwy9sq16apj7i4jki7y9f3n-pypa-install-hook
+error: Cannot build '/nix/store/fl1kw1vxby8123bffrz8rdxyda868d94-pytest-check-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/q7mdq0c70njnmkdmh3xjf7qxlbprj6zl-pytest-check-hook
+error: Cannot build '/nix/store/nqwpmram87hjsz7dk6wvb578hda3ff67-pytest-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fh354sfp0qrzy0i8g8q0hwskival03fi-pytest-hook
+error: Cannot build '/nix/store/r9wyv6j501v5d2ddbmvclbnvy26lm2l2-python-catch-conflicts-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/il7p4hdzsfvz9q38fb0pfmmnzg2v4gzk-python-catch-conflicts-hook
+error: Cannot build '/nix/store/3ybw639cf2skzaw8b8vg974390d1a1wn-python-imports-check-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/g13p2biifvb9h87cpix2zgpxxy3pqy1y-python-imports-check-hook.sh
+error: Cannot build '/nix/store/h3dprhlkglkbf946w8yphx55yr12i7nc-python-namespaces-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fg8w78wncql9fycvxmvy6j8r4m0yzayv-python-namespaces-hook.sh
+error: Cannot build '/nix/store/l0f1nd27fa99gva3n242bz1hwfbda76n-python-output-dist-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/qdgm7z9fx3nsn9c10yvqpv5mydk3xx13-python-output-dist-hook
+error: Cannot build '/nix/store/x311rf6f7w2k0rfrrz5pcajv7dp4ipd7-python-remove-bin-bytecode-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4d6ib02nn1kzbpacsdwlla27p6niwcr7-python-remove-bin-bytecode-hook
+error: Cannot build '/nix/store/19gs7lz6ai7f0prwn7i9fwgy0f3jy768-python-remove-tests-dir-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wf32lflnkf8jvzc7mh9w8sgfj7nbwqj6-python-remove-tests-dir-hook
+error: Cannot build '/nix/store/ci2x0zr5ba0mbzy47yj688jamfy7ipgi-python-setup-hook.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5fb3nh7parzlvpvrc0ryahwvrcmw1a4a-python-setup-hook.sh
+error: Cannot build '/nix/store/vbgwqxg3zfwi1jp466gpr1i8scdp3gph-python3-3.11.8.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/fqcrk0rzb1d3ywj3rlj80m5dp5615wjs-python3-3.11.8
+error: Cannot build '/nix/store/lk6spd9f2ln9ihlfjpwkmns1rx25lpan-python3.11-attrs-23.1.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2r7bv7jlxpwmhmvxrar4fhkcc3dlqf79-python3.11-attrs-23.1.0-dist
+         /nix/store/plzxbz4kj8zza1bsq8lbhrbkhfrxrikr-python3.11-attrs-23.1.0-testout
+         /nix/store/sdm24v633s3x1lgwacljj58dynz05f0b-python3.11-attrs-23.1.0
+error: Cannot build '/nix/store/2jw8hfh3g5gcydk7gd6z3xp4mlv6v5m8-python3.11-bootstrap-build-1.0.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/d2456wzli6qx1v14qycns2an3w2bnlxc-python3.11-bootstrap-build-1.0.3
+error: Cannot build '/nix/store/y6zi8l0ijyfmad8jhgxqqpxblwq7v60q-python3.11-bootstrap-flit-core-3.9.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3dc2b98y6mzp9b5zxf1838gw1idwcxra-python3.11-bootstrap-flit-core-3.9.0
+error: Cannot build '/nix/store/m5gfrhsq6r69jmb6ip3941fpwr2jlm6w-python3.11-bootstrap-installer-0.7.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/f7iiwc735fv55hgkykx7cws7588shl6k-python3.11-bootstrap-installer-0.7.0
+error: Cannot build '/nix/store/qrpzadfvgx102hqg6n8fvi0xbzfwkxgx-python3.11-bootstrap-packaging-23.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/68n19z79k13d4yswb38l1m3k0vgi21ig-python3.11-bootstrap-packaging-23.1
+error: Cannot build '/nix/store/zrpwr6yf71rsc3f52j4giih1cr12sqz9-python3.11-bootstrap-pyproject-hooks-1.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1mw4xl9j7d1ds9nmdb3flqna0b9fk3dw-python3.11-bootstrap-pyproject-hooks-1.0.0
+error: Cannot build '/nix/store/776iil4lgkrkvk8aw207c9mg379081vg-python3.11-bootstrap-tomli-2.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/n2kgmbnr43r25wz46h07j9l3wwm5swzh-python3.11-bootstrap-tomli-2.0.1
+error: Cannot build '/nix/store/27nk1vaxaa4wrb3x6p4j9hs5wx6d6vrf-python3.11-build-1.0.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4p8y46bh7wr5wwab9bn5p9399nvcvs0r-python3.11-build-1.0.3
+         /nix/store/fsdrv80zis11bbnybq25qg7iawi58b0k-python3.11-build-1.0.3-dist
+error: Cannot build '/nix/store/z14yxcgm9vlil99cnx9x44gr43ly5vv4-python3.11-calver-2022.06.26.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/snvgg0xrsf6l83zsjxyidkv3nvvfpdbq-python3.11-calver-2022.06.26
+         /nix/store/yfb584lvs1nn4nq54sdg3kxlvywha534-python3.11-calver-2022.06.26-dist
+error: Cannot build '/nix/store/1n5jzpv68ij73brz0mah46vdhv5gbkbh-python3.11-cython-0.29.36.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9sx4qcbn024ri3x64yxz970zi0xzkfky-python3.11-cython-0.29.36
+         /nix/store/g3i1a9ppd4nmlkgi9qf36w4yw8jwlimj-python3.11-cython-0.29.36-dist
+error: Cannot build '/nix/store/3yxi8fjp3is4an0cnqqf3s6j00sny068-python3.11-editables-0.5.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/nz5c517j00fq7rbwgdgwzcam8vwws79w-python3.11-editables-0.5
+         /nix/store/y83zngq2vacihbi82q4xyl7b12cjs2cb-python3.11-editables-0.5-dist
+error: Cannot build '/nix/store/dql4m0x3zi5a318hh59dlil6l218xfwc-python3.11-flit-core-3.9.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j5y0phjlgrc2gawwy20inaqrmpfhh5zn-python3.11-flit-core-3.9.0
+         /nix/store/mcwsz7idm9v8qm66hbhqx4yd4021aalw-python3.11-flit-core-3.9.0-dist
+error: Cannot build '/nix/store/fayssr6sb6s7a6p4q9qxg2sg6w0d5a6z-python3.11-hatchling-1.18.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/65l2f87q9ixgsr27rm7zb8yjn3arsy2l-python3.11-hatchling-1.18.0
+         /nix/store/py213q7ay9yaczjb475264gbcvz8dddw-python3.11-hatchling-1.18.0-dist
+error: Cannot build '/nix/store/7zgf115hx391mplq7msx66zbwkrshb6k-python3.11-iniconfig-2.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ir2qdpv9p65f3g2lqnh49dipd8iag0zi-python3.11-iniconfig-2.0.0
+         /nix/store/z2aafmkag6j9vs8pry6af08pmsfdlaia-python3.11-iniconfig-2.0.0-dist
+error: Cannot build '/nix/store/iadh2zbih67jdrjqdq5fb4cvy7x81sqm-python3.11-installer-0.7.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dkyd42kv7rriki884lw8vf68pvzdspz5-python3.11-installer-0.7.0-dist
+         /nix/store/g52b4qrrnfjpnjdbjd6yklyvkc0rwad6-python3.11-installer-0.7.0
+error: Cannot build '/nix/store/qv514dcraifafdxlv451kwz6fbqbywsv-python3.11-lxml-4.9.3-3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/r1c26adsm2nx8h5xad79y8q2h5frngsy-python3.11-lxml-4.9.3-3
+         /nix/store/w64a6cir8cv4qrp1lvjixsi5q2x6jd75-python3.11-lxml-4.9.3-3-dist
+error: Cannot build '/nix/store/7n4p0x2zfjzs68d36gmhgsk9s049r5n9-python3.11-packaging-23.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/ayairgbwyw8yh3xs6vbg8pjfhfx7f2dg-python3.11-packaging-23.1
+         /nix/store/yw28vr9vz7k3wnzk28xpq70jyjsmfcxs-python3.11-packaging-23.1-dist
+error: Cannot build '/nix/store/x3k6d26hci65mrhq33qpxzshnj3k0q1l-python3.11-pathspec-0.11.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3f3nz4760db10kpcbxrrdpv1mcmgchi0-python3.11-pathspec-0.11.2
+         /nix/store/cb28iva9s4m8kn9l5wsxl1ag0jlwkagd-python3.11-pathspec-0.11.2-dist
+error: Cannot build '/nix/store/d1fxhgmcv1dlqfvavdlryrc6kbd5i67b-python3.11-pluggy-1.3.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dq4shn641ir7fj2lh3ghn5i9yqqxjx07-python3.11-pluggy-1.3.0
+         /nix/store/m7kwy5winxxn383j4pcpysi0h4x3cz8f-python3.11-pluggy-1.3.0-dist
+error: Cannot build '/nix/store/7jwh0dfs3fbwdpzimakry2p5mswbw0wd-python3.11-py-1.11.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/408i59kmkgchkzqrfyyqifabzl472928-python3.11-py-1.11.0
+         /nix/store/q6mg9f6f5rkvlqiww617pyfcziigy8c2-python3.11-py-1.11.0-dist
+error: Cannot build '/nix/store/wi0splpphnc06j3wa7y7ig3qvx1j13l6-python3.11-pygments-2.16.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/7sbyibwzjsla1xyppa1wvs0rqkax92nm-python3.11-pygments-2.16.1-dist
+         /nix/store/ijkrg6lgwhid61lzzci3iprc7x8mc0qa-python3.11-pygments-2.16.1
+error: Cannot build '/nix/store/ckdcd7bkjl89wzyq5kfgzrxzv38556fb-python3.11-pyproject-hooks-1.0.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dsafw2bzwqp4zshrhjah25klww8j9wwf-python3.11-pyproject-hooks-1.0.0-dist
+         /nix/store/g191i3xplixrh1s21jy2blr9iiqwvbf3-python3.11-pyproject-hooks-1.0.0
+error: Cannot build '/nix/store/k92lmaiy6zpqaafcsvgffpjqp1ly58mv-python3.11-pytest-7.4.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hgb9y2sp6zvfa5mv9a946fmc29whdviz-python3.11-pytest-7.4.3-testout
+         /nix/store/vad8hlvj3078jrf79jn0y3z0703n5s0v-python3.11-pytest-7.4.3-dist
+         /nix/store/w3sfsbj517y554zgn8vb41vqli1yvw0a-python3.11-pytest-7.4.3
+error: Cannot build '/nix/store/qsd72r1g2hxybv5ipar9bpsdvl9p1zri-python3.11-pytest-asyncio-0.21.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/14kcxymj6g3pgwq2wmglqnv8ghcjwd6x-python3.11-pytest-asyncio-0.21.1-dist
+         /nix/store/ii2f4gp8mx75c0f56xkfkfn0v7c8x9gp-python3.11-pytest-asyncio-0.21.1-testout
+         /nix/store/qasa65v4rs6qllbgaw5x7kxbbcgg7y4y-python3.11-pytest-asyncio-0.21.1
+error: Cannot build '/nix/store/mlkl7sgk651ghjk6kh4qr7svb2zwr2h8-python3.11-pytest-mock-3.11.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/aqji5rv26b35faccx3zd4ch4wmh03zy3-python3.11-pytest-mock-3.11.1
+         /nix/store/lgcgp347ix212msmy7xy3wamhlb8ark8-python3.11-pytest-mock-3.11.1-dist
+error: Cannot build '/nix/store/kzb6sfxd8gjsvkxgg4lawiqmcw3j7q76-python3.11-setuptools-68.2.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/4666rpsz4x0f2f2s6j4pdgj9w10lh0ib-python3.11-setuptools-68.2.2
+         /nix/store/jkqm1vgbhg7wx5kbgx8rh7d89wxgpxf9-python3.11-setuptools-68.2.2-dist
+error: Cannot build '/nix/store/3ryjvp9k38a7yfrgr4l4ija4hzxdpfm9-python3.11-setuptools-scm-7.1.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6b5r2mxdlpw8kr1w0kj11yzmbblavijz-python3.11-setuptools-scm-7.1.0
+         /nix/store/kkdr5kbcp53rija7mcskd3j55zy1f562-python3.11-setuptools-scm-7.1.0-dist
+error: Cannot build '/nix/store/h6xhj6brrk9rmma239msrwmbxxnhykk0-python3.11-tomli-2.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/8n2nqx8q9i3habr3rgy2dsk68yai8gvp-python3.11-tomli-2.0.1-dist
+         /nix/store/rl51iq28x9qvrqdhaxgp5y5vw2ql8q3w-python3.11-tomli-2.0.1
+error: Cannot build '/nix/store/ij3akb7pkm1x99vnbn0km05ccqhijx9r-python3.11-trove-classifiers-2023.8.7.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/gkq4dvdrpbw78a05h38sl5b38s0hk08b-python3.11-trove-classifiers-2023.8.7-dist
+         /nix/store/j0gx03vkmiylciga1f5fxrab3nsyig0j-python3.11-trove-classifiers-2023.8.7
+error: Cannot build '/nix/store/37212z8m42678qn5wj1bg7ribsrhc1w5-python3.11-typing-extensions-4.7.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/bfn4glyqncf4fy268w88d6vm1ga86pw1-python3.11-typing-extensions-4.7.1-dist
+         /nix/store/dakpx1hiynhdr02d3ax031rgrsrjjyz2-python3.11-typing-extensions-4.7.1
+error: Cannot build '/nix/store/999f6x53h2y6cwg2lkg2ji7ap9gs7k15-python3.11-wheel-0.41.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kyyfk6wmcrsrl63cdxi8q2wzbl60i2gh-python3.11-wheel-0.41.1
+         /nix/store/lfyrwn81frxk8w9s6sikz23y151kn983-python3.11-wheel-0.41.1-dist
+error: Cannot build '/nix/store/bw7iwvdclaqla4qk5h0m0q3d8zm87ljk-re2c-3.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/m4q0aqjfqnx9q2860dfcxc2hnjyrnc6v-re2c-3.1
+error: Cannot build '/nix/store/bifswyh7z98q5qbvc7a619yas9vrjf1c-readline-8.2p7.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/0i7qxr0qy1adfbp32q67mv3rgz9vyzni-readline-8.2p7-man
+         /nix/store/86wkdjd4dan1fs1x81l2ws7znivda4sp-readline-8.2p7-info
+         /nix/store/a7dq163jsxc8k4vylk9862i37sf2mi31-readline-8.2p7
+         /nix/store/bglqld4dq5ahcyxk36x4yrrf342p9c4v-readline-8.2p7-dev
+         /nix/store/ydigadyhfn9m8a4svj33riiv1zwmk3j8-readline-8.2p7-doc
+error: Cannot build '/nix/store/iiridd8c2l8cwsnyrxmc6x82mpjv4qys-rhash-1.4.4.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/vmz6xhxiwy3xalriawkwjsrw3dcayddj-rhash-1.4.4
+error: Cannot build '/nix/store/9cqz8khsmva9axq4k2cqx6dl42qqc9sd-setuptools-check-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/vlqgh3d35z5yq9sbq5aaamh8l0bbml8m-setuptools-check-hook
+error: Cannot build '/nix/store/9w6ksg4xkg27z4v0rmspvpxqicgf6vim-setuptools-setup-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hwq5avbdr4pw5m0ir7syb1ai1a0dr5mq-setuptools-setup-hook
+error: Cannot build '/nix/store/kv8a177yr4q2gg1ifqh6nadrzk8wb6c1-shared-mime-info-2.4.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/541jzkxy85khzi0nlv314cz6z73rc1q3-shared-mime-info-2.4
+         /nix/store/bi38gdccj04nb2r6l22y0zvjr1bp1hnw-shared-mime-info-2.4-dev
+error: Cannot build '/nix/store/nn33sh7xaw13bm8hrizx3vjjjq3w4d9p-sharutils-4.15.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/zalspll6khgqldskd99gmx0hqmxwdq83-sharutils-4.15.2
+error: Cannot build '/nix/store/aab46h3rbfkmdasvqhly1wm37nyfaffm-signing-utils.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/kh5dji4a1b4r4skkmffzhhjzkgy9977l-signing-utils
+error: Cannot build '/nix/store/4ib8h8wqjqmps50xim0b02h143mg48is-sigtool-0.1.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2bg5knnv3jg6drih025m14vkg331b279-sigtool-0.1.3
+error: Cannot build '/nix/store/fs4ymc9889123ljj2bk7i1xhinr8yzyg-sqlite-3.43.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/758chc92y74krx3fgm9nwrdd8p3ljrzd-sqlite-3.43.2
+         /nix/store/id3nwrsq889vl90g36vs5vvpxf1qxbqh-sqlite-3.43.2-dev
+         /nix/store/xqwdj0nlf696kj505sqf7zylzwmjp1pn-sqlite-3.43.2-bin
+error: Cannot build '/nix/store/36k6zx4vd69rgsnh7jy6ci9g7pj58is4-texinfo-7.0.3.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cgy7k16pfrqwwzps7ac328llhbm3qrf4-texinfo-7.0.3
+error: Cannot build '/nix/store/ygr5ifp6hj8d1jk9fd0094vp5k9m7lw5-tzdata-2024a.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/21ig4bj9dr0qkvq73vh515wc72pjvvk7-tzdata-2024a-man
+         /nix/store/3jlcai86ipdxnzc0hrxj25i6hy468ali-tzdata-2024a-bin
+         /nix/store/fxsyy41vai8y2d4byqjvnc5r9kcn2640-tzdata-2024a
+         /nix/store/yvk7wb2rcxgn91c9jiz5dacgcigrxvwl-tzdata-2024a-dev
+error: Cannot build '/nix/store/wm1lrxpj20vfmp26h8ak0kc8mqk1hlya-unifdef-2.12.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5nhz0vls7bsiaqp3418qycz6q8nisprk-unifdef-2.12
+error: Cannot build '/nix/store/9h4zy6yn8k3y3vpl589brk3rkv80cs6p-unittest-check-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6cqazf7w0gpxvyh0df9nf78f7gb8299j-unittest-check-hook
+error: Cannot build '/nix/store/frfa6p5syq5qm1mv6c65cxspy8izymp0-unzip-6.0.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/d63p8pip232rw8qc42xg3yzpd95b7cl4-unzip-6.0
+error: Cannot build '/nix/store/yjy0rgv74c98bhfszc0p7nkagr2dpmsj-version.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9jkl49ifn7l6vk80cfnf5vdj8zvyzm47-version.patch
+error: Cannot build '/nix/store/a05j8n0idr3pmy6w4fqqrrq2y4addmyl-version.plist.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/blfxnpyyy51qn6rb934g1pzx6bp7nd9l-version.plist
+error: Cannot build '/nix/store/9zf09ijysipiw72czva0fknl69i06fvk-which-2.21.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/f62710vgkgg26mli4v64gndz8kymcx77-which-2.21
+error: Cannot build '/nix/store/ph8c42swj2069ff7cqqrm9q1kyxgqg97-wrap-python-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6bppsq8n94x5nrc5wcg6pci4chl8fvmb-wrap-python-hook
+error: Cannot build '/nix/store/zimb9jz1mls0vi9hjg2979m8ig1sr3sg-xcbuild-0.1.2-pre.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rrhbpwxq0i49hrqzz3rbwwrn97924f31-xcbuild-0.1.2-pre
+error: Cannot build '/nix/store/g869fzc2ixwhac9cx9qq0ggb8k2r403r-xcode-select.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/vk7div5mriz16n8js7kpa3i6xcpql2wx-xcode-select
+error: Cannot build '/nix/store/h9n6d8sjgsa0hcax8nzvjiqc46kz0j6d-xcodebuild-0.1.2-pre.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/s00za6j79sr9psdxizwkfbi99wgdvxn7-xcodebuild-0.1.2-pre
+error: Cannot build '/nix/store/78sl0v1f58ham30vz0s4b0iyn1yq1am5-xcrun.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/mq98p8jxxw79v3r0p76vfdb5lbc0pll5-xcrun
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/hiwvsmnls61im475375bymxv247ffgr0-core-env.sh.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/hhrnbrqjdvj1lh8ycgwr9mrbd2q12aaa-core-env.sh
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/i9rfqc5y71a9gshd6kjnfbyazx006z55-core-bootstrap.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cg74ahx6xc0jjgnxp5zbw1b9wabn45vb-core-bootstrap
+error: Cannot build '/nix/store/py81pk9ybs2n3nnqv7nl7w1zg5qsfh2m-core-rubocop-format.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/nia093c5qbhlnn0j8y44z5khapx49prl-core-rubocop-format
+error: Cannot build '/nix/store/wba0y2m3ac0chcmj01l5ya1dnp6f48ay-core-shell.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6xzkywi8cfa6maxwvp2wfchx3sjf2xff-core-shell
+error: Cannot build '/nix/store/6zh639pc5cjd5lj08ry4h541zbr5m1jw-core-shell.nix.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/3k24hdgjch0r90vdk132pjaich61096z-core-shell.nix
+error: Cannot build '/nix/store/114y2qicwxm4l6vsi3svs7baq8xylsma-core-sidekiq-assignments-dev.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/yy0rfr65z0bxq1lwrq6csc7dgx2zklws-core-sidekiq-assignments-dev
+error: Cannot build '/nix/store/9kswrzsn19ygwxqqhgr6i16kx804m84a-core-sidekiq-dev.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/lirbvbylq7iskbq4ss17q58lrkpp58ba-core-sidekiq-dev
+error: Cannot build '/nix/store/q9q760lgd302va6ki41ylf1vr99mdwv2-core-web-dev.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/01pxw393lx6skwhb0bvlizzndxr9njrp-core-web-dev
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/nn0mk1fyymq5hv14z60q9yrq05afczx9-home-manager-applications.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wp1mym249ppq4a7zw00qcmppc8l9lj85-home-manager-applications
+error: Cannot build '/nix/store/nx0y2pi6y0lj5r2av81j4l3p9b7ncd07-home-manager-fonts.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/c7ilh35bpqw7x4b7dzwc3349mi4r19x4-home-manager-fonts
+error: Cannot build '/nix/store/slg0ivazcg1mpl50xd0c7agz1x78p6h0-home-manager-path.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/qnj73w0naql7n64jzfn181ykvj929qjb-home-manager-path
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/z2wmbjgg3ascg9v5mzx2fk4h45hnl3rz-activation-script.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wbvraaf376l4bxbcbyxkalxd001c342i-activation-script
+error: Cannot build '/nix/store/ai03hifbs633n7jh7npyjzwv5m1d8as1-hm_LibraryFonts.homemanagerfontsversion.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/353avw201vm9idlqigsz4wwz5lrr7lci-hm_LibraryFonts.homemanagerfontsversion
+error: Cannot build '/nix/store/iyyc6w21wdpv1d926kakmihqc17nn7db-home-manager-files.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xlkfr325a8balm8sp4yj7izy1z3r2zsc-home-manager-files
+error: Cannot build '/nix/store/pmm5qzriyq86nfqmw3sfyfpir5m7hpkj-home-manager-generation.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/lnzvbvbasfy61lvq7ycvzsmj5bb487jz-home-manager-generation
+error: Build failed due to failed dependency
 
-       … while evaluating derivation 'home-manager-generation'
-         whose name attribute is located at «github:NixOS/nixpkgs/54170c54449ea4d6725efd30d719c5e505f1c10e?narHash=sha256-t%2BHZK42pB6N%2Bi5RGbuy7Xluez/VvWbembBdvzsc23Ss%3D»/pkgs/stdenv/generic/make-derivation.nix:541:13
-
-       … while evaluating attribute 'buildCommand' of derivation 'home-manager-generation'
-         at «github:NixOS/nixpkgs/54170c54449ea4d6725efd30d719c5e505f1c10e?narHash=sha256-t%2BHZK42pB6N%2Bi5RGbuy7Xluez/VvWbembBdvzsc23Ss%3D»/pkgs/build-support/trivial-builders/default.nix:80:17:
-           79|         enableParallelBuilding = true;
-           80|         inherit buildCommand name;
-             |                 ^
-           81|         passAsFile = [ "buildCommand" ] ++ (derivationArgs.passAsFile or [ ]);
-
-       … while evaluating the option `home.activation.checkFilesChanged.data':
-
-       … while evaluating definitions from `/nix/store/2p2iqnsj891f9nh4hadkxlcmm801immp-source/modules/files.nix':
-
-       … while evaluating the option `home.file."Library/Fonts/.home-manager-fonts-version".onChange':
-
-       … while evaluating definitions from `/nix/store/2p2iqnsj891f9nh4hadkxlcmm801immp-source/modules/targets/darwin/fonts.nix':
-
-       (stack trace truncated; use '--show-trace' to show the full, detailed trace)
-
-       error: Package ‘python3.13-pypdf2-3.0.1’ in /nix/store/m5dr0w2wb9lca77ar3idab31szd6mix7-source/pkgs/development/python-modules/pypdf2/default.nix:32 is marked as insecure, refusing to evaluate.
-
-
-       Known issues:
-        - CVE-2026-27024
-        - CVE-2026-27025
-        - CVE-2026-27628
-        - CVE-2026-27888
-        - CVE-2026-28351
-        - CVE-2026-33699
-
-       You can install it anyway by allowing this package, using the
-       following methods:
-
-       a) To temporarily allow all insecure packages, you can use an environment
-          variable for a single invocation of the nix tools:
-
-            $ export NIXPKGS_ALLOW_INSECURE=1
-
-          Note: When using `nix shell`, `nix build`, `nix develop`, etc with a flake,
-                then pass `--impure` in order to allow use of environment variables.
-
-       b) for `nixos-rebuild` you can add ‘python3.13-pypdf2-3.0.1’ to
-          `nixpkgs.config.permittedInsecurePackages` in the configuration.nix,
-          like so:
-
-            {
-              nixpkgs.config.permittedInsecurePackages = [
-                "python3.13-pypdf2-3.0.1"
-              ];
-            }
-
-       c) For `nix-env`, `nix-build`, `nix-shell` or any other Nix command you can add
-          ‘python3.13-pypdf2-3.0.1’ to `permittedInsecurePackages` in
-          ~/.config/nixpkgs/config.nix, like so:
-
-            {
-              permittedInsecurePackages = [
-                "python3.13-pypdf2-3.0.1"
-              ];
-            }
+~/snowman-config mbp--papershift--alvr 36m 41s                                                                                                                                                                                                                          10:00:48
+❯
