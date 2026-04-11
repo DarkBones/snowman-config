@@ -1,0 +1,277 @@
+❯ nix run nixpkgs#home-manager -- switch --flake .#bas@mbp
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1139.64s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1139.64s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv'.
+       Reason: builder failed with exit code 1.
+       Output paths:
+         /nix/store/23p2rimyf7bgs0k02i0z3wis0krxz9r3-llvm-16.0.6-dev
+         /nix/store/bgd23lbn86i79a0xg7jzdg7kiwydnlxi-llvm-16.0.6-lib
+         /nix/store/mfzpqpln3319rhqzdallwy9m3fnndvx0-llvm-16.0.6
+         /nix/store/wg2p9njvgydm6pk2ypg99b38226slbr3-llvm-16.0.6-python
+       Last 25 log lines:
+       >     Which is: 16
+       >
+       > /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/unittests/TargetParser/Host.cpp:444
+       > Expected equality of these values:
+       >   SystemVersion.getMajor()
+       >     Which is: 26
+       >   HostVersion.getMajor()
+       >     Which is: 16
+       >
+       >
+       > ********************
+       > ********************
+       > Failed Tests (1):
+       >   LLVM-Unit :: TargetParser/./TargetParserTests/HostTest/getMacOSHostVersion
+       >
+       >
+       > Testing Time: 1139.64s
+       >   Skipped          :     7
+       >   Unsupported      :  2065
+       >   Passed           : 51351
+       >   Expectedly Failed:   175
+       >   Failed           :     1
+       > FAILED: CMakeFiles/check-all /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/CMakeFiles/check-all
+       > cd /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build && /nix/store/8zzm4f8ais5p2bwi878a64v028b36xbd-python3-3.11.8-env/bin/python3.11 /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/./bin/llvm-lit -svj10 --no-progress-bar --param polly_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/lit.site.cfg --param polly_unit_site_config=/nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test/Unit/lit.site.cfg /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/tools/polly/test /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/utils/lit /nix/var/nix/builds/nix-92662-1317978145/llvm-src-16.0.6/llvm/build/test
+       > ninja: build stopped: subcommand failed.
+       For full logs, run:
+         nix log /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: Cannot build '/nix/store/2pm8vdvqharndaw41zwd8mv8x26vka7v-cctools-binutils-darwin-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/npkb4nsickdkfya3xkh5s2smcm9mcbb7-cctools-binutils-darwin-16.0.6-973.0.1
+         /nix/store/vp14i8mdqhl87wv0wz5i7sy4yg1g1z3b-cctools-binutils-darwin-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/sbkkqvpy8v0j43kaip6p33cy8gyfcn0x-cctools-binutils-darwin-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/k600bp0iy357j869bcvk4y13w2hcapi6-cctools-binutils-darwin-16.0.6-973.0.1-man
+         /nix/store/ph17z9h470bbdd1r1gwvi8hmy96gpqgv-cctools-binutils-darwin-16.0.6-973.0.1
+error: Cannot build '/nix/store/5inf3lwnzj7sljyd4labjghmwycvsirw-cctools-llvm-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6cphz3ijyi8fql3vjav2aj8gz7scmq8w-cctools-llvm-16.0.6-973.0.1-man
+         /nix/store/ag6ldd5rqbiaxki2a4pcd704ldqdbpxk-cctools-llvm-16.0.6-973.0.1
+         /nix/store/yqw3g503h1c2k08fb5xi4pnnz692r8nj-cctools-llvm-16.0.6-973.0.1-dev
+error: Cannot build '/nix/store/7qfnas55nnhib1rpp1c093296a3f3dbr-cctools-llvm-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/firba2w79n2b12zzrlzd25a5hz4r1l4f-cctools-llvm-16.0.6-973.0.1-man
+         /nix/store/r6mfqkp593n0nz18kbknk5lpxvcl3w5y-cctools-llvm-16.0.6-973.0.1-dev
+         /nix/store/ysr5ryqlf788cskcn1xfwy3rb4rkzwb8-cctools-llvm-16.0.6-973.0.1
+error: Cannot build '/nix/store/krfq09n5q956269ifgic4anl24w1ydlv-clang-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/46synqikf8qn23d0553vszrb7qxnnhng-clang-16.0.6-dev
+         /nix/store/9j5niirh811mjdmxb6848i7427l65dxn-clang-16.0.6
+         /nix/store/hgr5slscxhwz9bmhwlqlczgpwk9pkfb5-clang-16.0.6-lib
+         /nix/store/r8hhnd94cl4rizkqkhv8czixxvq3cyqn-clang-16.0.6-python
+error: Cannot build '/nix/store/jizhsnxym87g60hvvdns6qhdzzg6zf30-clang-at-least-16-LLVMgold-path.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/aycqyz49ky4h93lkk6n2pcj5fh6bhgqg-clang-at-least-16-LLVMgold-path.patch
+error: Cannot build '/nix/store/2h5mccl1yljdz0fn45da992cxsa0vjjk-compiler-rt-libc-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/5bax8i0brdbjrfwalsc28h7m6dm61xmv-compiler-rt-libc-16.0.6-dev
+         /nix/store/w74llp7n777887lc42769953b6171r8z-compiler-rt-libc-16.0.6
+error: Cannot build '/nix/store/fvvdxmfvg4k8cdy1mmbswbc65rx3kxwv-lld-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/f2cg2hx4qc83rzccw7vabanwvpsa1a75-lld-16.0.6
+         /nix/store/sklz26byp4q6fvnlsa64qcjk3g3d6snm-lld-16.0.6-lib
+         /nix/store/z5nr1qq249b1xksi0qql5yns72y15xva-lld-16.0.6-dev
+error: Cannot build '/nix/store/q8181ddc5c1451mdnlsg317sfs6snv55-lld-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1wlismvk6z1nl29xv2w22g5rybjv85mc-lld-16.0.6
+         /nix/store/im1s7qjmsrbax1hwa1cs4s3q99fxl4r2-lld-16.0.6-dev
+         /nix/store/qa6v1qpyx3z6c8hgjnn3pk8vma48w9vw-lld-16.0.6-lib
+error: Cannot build '/nix/store/5kibwbkp1q4xwgwycb3q7anm83n7v659-llvm-binutils-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/x2q3kmqn1i4g21wcq74vz0l7wb40isvx-llvm-binutils-16.0.6
+error: Cannot build '/nix/store/622igy7q7yfx14hdfm7w2i9yl3jskd4p-llvm-binutils-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xmhakfb092bwsqcqhad6ahv04jpnqkfs-llvm-binutils-16.0.6
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/8r4p8ypm2rascmcxg1wqak7sgmlid5gl-bootstrap-stage3-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rn8b98j1y5aa0s38g823bvjp3acj5240-bootstrap-stage3-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/hlc5dqfzj4ckjf2z4j04ix5wbwmhcjga-bootstrap-stage4-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j3mjpq0jbx30p693b8dqja52h8i20mv1-bootstrap-stage4-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/08yc11wxbcbkfcbg4rf2j06pj74jcdwy-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9xxk6f7ckn1p5rdycaixgzg3mszj8828-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/s23bcg1arssvwcc1dxnr77jjbrpyj1yc-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/8a5pclci955cwy23hd3a1jgs62iqk4rd-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/1cqxd75gj0wf42azy3c2mhsbn1k7d8mg-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/yzfd3br1r5xr6hkp745b7s5qmaqwz4vq-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/rq0910zhha5v1mhbn8p8xk61swrfcy9d-cctools-binutils-darwin-wrapper-16.0.6-973.0.1.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/9k59myapvh21rbphg8w0mn2q8ym6dp4i-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+         /nix/store/hlhzd4f9kh99d3wfldkg9zxmqpsrx159-cctools-binutils-darwin-wrapper-16.0.6-973.0.1-man
+error: Cannot build '/nix/store/7368dch892lmj6ak0flplh4b7zls7ccp-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/56ic75005lznxssyi3wf91xwnz3xsnxr-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/bxd3r9k2h09mxqvk8xby698pqxpa2frk-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/740a9ss3vl59frkjcpd4znxzxc32rqnb-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/c841ka06fsvhzj57klri69kcg4imcgsz-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/zd37wb1q58xs35i18pda84rcdmx150n9-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/fqhhyqrbq5c8jliddmi3w2x6k7i511p6-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/2fkcbnap4blj13kgn962kf2jh5dkscwj-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/zw0zgdax4y0ghdj9bm2vg5cbz4azx6na-clang-wrapper-16.0.6.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/rxmmlsgd6k783nfna8ivk9krna2f1r7y-clang-wrapper-16.0.6
+error: Cannot build '/nix/store/rflaf6ywyxpam2q7vn5q2p7a7c0wmig7-perl-5.38.2.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/j3fjmy4jhy9j3cnzciizw51sr1q7wvka-perl-5.38.2
+         /nix/store/kr5mwzb5q1fichz73wggs1swmajhnyw1-perl-5.38.2-man
+         /nix/store/qkah70w49jxj24p0jlahqfh1lj9w6ix8-perl-5.38.2-devdoc
+error: Cannot build '/nix/store/dv2b3zlg9yn8s3spwpbnp1154962jbj7-post-link-sign-hook.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/n2fklzvjq39bxsmvs0aidfmg9wgr0wf8-post-link-sign-hook
+error: Cannot build '/nix/store/861xpfa1fcgl0ivicir5cqrx1ambysbb-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/xqmmzwqimvlyycmxazclmxf21cb4kfd1-stdenv-darwin
+error: Cannot build '/nix/store/dwc77jjskxqignx05ic9842ghnpalqin-stdenv-darwin.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/dd4d2h60s7dggdmrzzc2chm9m4g2wqyq-stdenv-darwin
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/42jiwlxis03wmfjw9gyn1z4xbakzf6p9-001-fix-rpath.patch.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/cbr11p3l7077i2niliy8lqjf1hw37hp9-001-fix-rpath.patch
+error: Cannot build '/nix/store/il38551j86s047h9vcc7hq84bihni1hq-Architectures.xcspec.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         ...
+error: Cannot build '/nix/store/72cr23ba0apj09apfk98lzxxaydhznkr-home-manager-fonts.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/i2m0vravms74cx4qvc20hdyafdrc304k-home-manager-fonts
+error: Cannot build '/nix/store/1kvbv8zc4vd6v0n92i41vnzslssi16bp-home-manager-path.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/wfm7rppy682w0a2i8xz4j5i30waqznb2-home-manager-path
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Build failed due to failed dependency
+error: Cannot build '/nix/store/c51w7dw34f2yyihdhd383h8gylmq7v5f-activation-script.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/p55vay0zb7ld94vbvhscasw1ply446l3-activation-script
+error: Cannot build '/nix/store/xmi0vb729iahfxizfw83dp5b1g833cpv-hm_LibraryFonts.homemanagerfontsversion.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/jd08z5b67pd9dp5kn5plj2pz99vssi9r-hm_LibraryFonts.homemanagerfontsversion
+error: Cannot build '/nix/store/mljmzlp9pinbrqr7yxym72db6wkwzqbh-home-manager-files.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/z0ykbz4vflha1ph8yq6d65sva9ns2jzx-home-manager-files
+error: Cannot build '/nix/store/y37cfd5s65383hihgkyv73czxbv7xj7w-home-manager-generation.drv'.
+       Reason: 1 dependency failed.
+       Output paths:
+         /nix/store/6zixm7ak5wqmr7fc7z7v15l4nh3jadi6-home-manager-generation
+error: Build failed due to failed dependency
+
