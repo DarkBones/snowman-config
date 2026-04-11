@@ -250,18 +250,18 @@
         "type": "github"
       }
     },
-    "home-manager-unstable": {
+    "home-manager-darwin": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs-darwin"
         ]
       },
       "locked": {
-        "lastModified": 1775894317,
-        "narHash": "sha256-pMO5JwJ/0n+q3sIivB2YUPFgbzoL+UbAhFlL9fDTMjo=",
+        "lastModified": 1775900011,
+        "narHash": "sha256-QUGu6CJYFQ5AWVV0n3/FsJyV+1/gj7HSDx68/SX9pwM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f7f6a559c21dfe5e63108ded0d036ae15e6e9d57",
+        "rev": "b0569dc6ec1e6e7fefd8f6897184e4c191cd768e",
         "type": "github"
       },
       "original": {
@@ -394,6 +394,21 @@
       "original": {
         "owner": "NixOS",
         "ref": "nixos-23.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-darwin": {
+      "locked": {
+        "lastModified": 1775900447,
+        "narHash": "sha256-rLN089hEJUrgYPJgXMLMKo4tuf00hQ5yg4gfF5Hn7OY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "dce8722fe16964714c35e56f0ddfc07f9fd8add7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -543,11 +558,12 @@
         "bas-dotfiles": "bas-dotfiles",
         "disko": "disko",
         "home-manager": "home-manager",
-        "home-manager-unstable": "home-manager-unstable",
+        "home-manager-darwin": "home-manager-darwin",
         "nix-openclaw": "nix-openclaw",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-23_11": "nixpkgs-23_11",
+        "nixpkgs-darwin": "nixpkgs-darwin",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "ollama-src": "ollama-src",
         "snowman": "snowman",
