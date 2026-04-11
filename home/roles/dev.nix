@@ -29,6 +29,6 @@ in {
   config = lib.mkIf cfg.enable {
     home.packages = commonPkgs ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
       ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
-      ++ [ neovim pkgs.home-manager ];
+      ++ [ neovim ];
   };
 }
