@@ -78,12 +78,18 @@
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+          config.permittedInsecurePackages = [
+            "python3.13-pypdf2-3.0.1"
+          ];
           overlays = [ llvmDarwinNoCheckOverlay ];
         };
       makePkgsUnstable = system:
         import inputs.nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
+          config.permittedInsecurePackages = [
+            "python3.13-pypdf2-3.0.1"
+          ];
           overlays = [ llvmDarwinNoCheckOverlay ];
         };
 
