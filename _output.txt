@@ -1498,5 +1498,22 @@ error: Cannot build '/nix/store/dlqfq0na9bzjr0f99pvqb28kyn0ij37d-home-manager-ge
          /nix/store/4hx1zqy88d5zqnnxf04z8xdrvz6yq2ya-home-manager-generation
 error: Build failed due to failed dependency
 
-~/snowman-config mbp--papershift--alvr* 37m 7s                                                                        12:31:43
+~/snowman-config mbp--papershift--alvr                                                                                12:33:07
+❯ nix show-config | grep -E "substituters|trusted-public-keys"
+warning: 'show-config' is a deprecated alias for 'config show'
+substituters = https://cache.nixos.org/
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+trusted-substituters =
+
+~/snowman-config mbp--papershift--alvr                                                                                12:33:10
+❯ nix path-info --store https://cache.nixos.org /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv 2>&1
+don't know how to build these paths:
+  /nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv
+error: path '/nix/store/pavgzlpn7hrv4wsbl2sgycjkny1zpjfq-llvm-16.0.6.drv' is not valid
+
+~/snowman-config mbp--papershift--alvr                                                                                12:33:28
+❯ nix --version
+nix (Nix) 2.33.3
+
+~/snowman-config mbp--papershift--alvr                                                                                12:33:59
 ❯
