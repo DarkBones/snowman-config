@@ -5,15 +5,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-23_11.url = "github:NixOS/nixpkgs/nixos-23.11";
-    # nixpkgs master for Darwin - has LLVM 19 which supports macOS 26
-    nixpkgs-darwin.url = "github:NixOS/nixpkgs";
 
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    # Master home-manager for Darwin (macOS 26 support with nixpkgs master)
-    home-manager-darwin.url = "github:nix-community/home-manager";
-    home-manager-darwin.inputs.nixpkgs.follows = "nixpkgs-darwin";
 
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -62,45 +56,20 @@
     let
       lib = nixpkgs.lib;
 
-      # This is YOUR inventory, not snowman's
       inv = import ./inventory.nix;
 
-      # This is you map your dotfile inputs
       dotfilesSources = { bas = inputs.bas-dotfiles; };
 
-      # Standard Snowman setup
-      llvmDarwinNoCheckOverlay = final: prev:
-        lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
-          llvmPackages_16 = prev.llvmPackages_16.overrideScope' (llvmFinal:
-            llvmPrev: {
-              llvm = llvmPrev.llvm.overrideAttrs (_old: {
-                doCheck = false;
-                doInstallCheck = false;
-              });
-            });
-        };
-
-      # Use nixpkgs master for Darwin (has LLVM 19 for macOS 26 support), stable for Linux
       makePkgs = system:
-        let
-          isDarwin = lib.hasSuffix "-darwin" system;
-          selectedNixpkgs = if isDarwin then inputs.nixpkgs-darwin else nixpkgs;
-        in import selectedNixpkgs {
+        import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-          config.permittedInsecurePackages = [
-            "python3.13-pypdf2-3.0.1"
-          ];
-          overlays = [ llvmDarwinNoCheckOverlay ];
         };
+
       makePkgsUnstable = system:
         import inputs.nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
-          config.permittedInsecurePackages = [
-            "python3.13-pypdf2-3.0.1"
-          ];
-          overlays = [ llvmDarwinNoCheckOverlay ];
         };
 
       mkNixosSpecialArgs = name: attrs: {
@@ -110,7 +79,6 @@
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
-        # extraHomeImports = [ ./home/roles ./home/overrides ];
         extraHomeImports = [ ./home/roles ./home/overrides ];
       };
 
@@ -152,15 +120,11 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                # Snowman's inventory path owns integrated HM user assembly.
-                # This layer only overrides NixOS-integrated HM activation.
                 users = lib.genAttrs managedUsers (_: {
                   systemd.user.startServices = lib.mkForce true;
                 });
               };
             })
-
-            # ./modules/snowman.nix
 
             ({ lib, pkgs, ... }: {
               imports = lib.optional (builtins.pathExists hwFile) hwFile;
@@ -183,7 +147,7 @@
               assertions = lib.optionals strictHw [{
                 assertion = builtins.pathExists hwFile;
                 message = ''
-                  ❌ Snowman: Hardware configuration missing for host "${name}"
+                  Snowman: Hardware configuration missing for host "${name}"
                      (hostname "${hostName}").
 
                   Expected file:
@@ -209,9 +173,6 @@
           hostName = host.hostname or name;
         in ./hosts/${hostName}-hardware-configuration.nix;
 
-      # Only hosts that already have a committed hardware configuration.
-      # This keeps `nix flake check` from failing on machines that aren't NixOS
-      # (or on hosts you haven't imported hardware for yet).
       hostsWithHw =
         lib.filterAttrs (name: _: builtins.pathExists (hostHwFile name))
         inv.hosts;
@@ -241,21 +202,17 @@
             else
               lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
               enabledUserRoles;
-            system = host.system or "x86_64-linux";
-            isDarwin = lib.hasSuffix "-darwin" system;
-            # Use master home-manager for Darwin (macOS 26 support)
-            hm = if isDarwin then inputs.home-manager-darwin else inputs.home-manager;
           in [{
             name = cfgName;
-            value = hm.lib.homeManagerConfiguration {
-              pkgs = makePkgs system;
+            value = inputs.home-manager.lib.homeManagerConfiguration {
+              pkgs = makePkgs (host.system or "x86_64-linux");
 
               extraSpecialArgs = {
                 inherit inputs inv sops-nix dotfilesSources disko;
                 name = user;
                 hostRoles =
                   if host ? availableRoles then host.availableRoles else null;
-                pkgsUnstable = makePkgsUnstable system;
+                pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
                 currentHost = hostName;
                 sopsConfigPath = ./.sops.yaml;
                 networkSecretsPath = ./networks/secrets.yml;
