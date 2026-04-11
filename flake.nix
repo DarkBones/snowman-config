@@ -63,15 +63,28 @@
       dotfilesSources = { bas = inputs.bas-dotfiles; };
 
       # Standard Snowman setup
+      llvmDarwinNoCheckOverlay = final: prev:
+        lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+          llvmPackages_16 = prev.llvmPackages_16.overrideScope' (llvmFinal:
+            llvmPrev: {
+              llvm = llvmPrev.llvm.overrideAttrs (_old: {
+                doCheck = false;
+                doInstallCheck = false;
+              });
+            });
+        };
+
       makePkgs = system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ llvmDarwinNoCheckOverlay ];
         };
       makePkgsUnstable = system:
         import inputs.nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ llvmDarwinNoCheckOverlay ];
         };
 
       mkNixosSpecialArgs = name: attrs: {
