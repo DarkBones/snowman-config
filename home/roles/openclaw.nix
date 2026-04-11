@@ -756,7 +756,7 @@ in {
         models.mode = "replace";
 
         agents.defaults.model = {
-          primary = "router/openai/gpt-5.1-codex-mini";
+          primary = "openrouter/openai/gpt-5.2";
           fallbacks = [ ];
         };
 
