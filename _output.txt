@@ -1468,20 +1468,24 @@ error: Build failed due to failed dependency
 
 ---
 
-trace: warning: You are using
+● Now Darwin hosts will use matching versions (unstable nixpkgs + unstable home-manager).
 
-  Home Manager version 25.11 and
-  Nixpkgs version 26.05.
+  For faster iteration, run this on your mbp to check if binaries exist without building:
 
-Using mismatched versions is likely to cause errors and unexpected
-behavior. It is therefore highly recommended to use a release of Home
-Manager that corresponds with your chosen release of Nixpkgs.
+  # First, update the new input
+  nix flake update home-manager-unstable
 
-If you insist then you can disable this warning by adding
+  # Then check what would be built (fast - no actual building)
+  nix build .#homeConfigurations."bas@mbp".activationPackage --dry-run 2>&1 | grep -E "will be built|will
+   be fetched"
 
-  home.enableNixpkgsReleaseCheck = false;
+  # Or to fail immediately if no substitutes exist:
+  nix build .#homeConfigurations."bas@mbp".activationPackage --max-jobs 0 2>&1 | head -50
 
-to your configuration.
+  The --max-jobs 0 option means "only use binary substitutes, don't build anything locally" - it will
+  fail immediately if LLVM needs to be built from source, instead of waiting 40 minutes.
 
-evaluation warning: nixfmt-rfc-style is now the same as pkgs.nixfmt which should be used instead.
-
+  If it still needs to build LLVM, that means there are no binary caches for macOS 26 yet, and you'd need
+   to either:
+  1. Wait for Hydra to build binaries for macOS 26
+  2. Or check if there's a nixpkgs PR that patches LLVM 16 for macOS 26
