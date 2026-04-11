@@ -9,6 +9,10 @@
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Unstable home-manager for Darwin (macOS 26 support)
+    home-manager-unstable.url = "github:nix-community/home-manager";
+    home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
     disko.url = "github:nix-community/disko";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     awww.url = "git+https://codeberg.org/LGFae/awww";
@@ -235,17 +239,21 @@
             else
               lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
               enabledUserRoles;
+            system = host.system or "x86_64-linux";
+            isDarwin = lib.hasSuffix "-darwin" system;
+            # Use unstable home-manager for Darwin (macOS 26 support)
+            hm = if isDarwin then inputs.home-manager-unstable else inputs.home-manager;
           in [{
             name = cfgName;
-            value = inputs.home-manager.lib.homeManagerConfiguration {
-              pkgs = makePkgs host.system or "x86_64-linux";
+            value = hm.lib.homeManagerConfiguration {
+              pkgs = makePkgs system;
 
               extraSpecialArgs = {
                 inherit inputs inv sops-nix dotfilesSources disko;
                 name = user;
                 hostRoles =
                   if host ? availableRoles then host.availableRoles else null;
-                pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
+                pkgsUnstable = makePkgsUnstable system;
                 currentHost = hostName;
                 sopsConfigPath = ./.sops.yaml;
                 networkSecretsPath = ./networks/secrets.yml;
