@@ -74,8 +74,12 @@
             });
         };
 
+      # Use unstable for Darwin (better macOS 26 support), stable for Linux
       makePkgs = system:
-        import nixpkgs {
+        let
+          isDarwin = lib.hasSuffix "-darwin" system;
+          selectedNixpkgs = if isDarwin then inputs.nixpkgs-unstable else nixpkgs;
+        in import selectedNixpkgs {
           inherit system;
           config.allowUnfree = true;
           config.permittedInsecurePackages = [
