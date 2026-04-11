@@ -10,6 +10,17 @@ let
 
   mkScript = name: script: pkgs.writeShellScriptBin name "set -euo pipefail\n${script}";
 
+  # Helper to load .env files (clean, reusable)
+  loadEnvFile = envPath: ''
+    if [ -f "${envPath}" ]; then
+      set -a
+      while IFS='=' read -r key value; do
+        [ -n "$key" ] && [ "''${key:0:1}" != "#" ] && export "$key=$value"
+      done < <(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "${envPath}")
+      set +a
+    fi
+  '';
+
   # Infrastructure management helpers
   mkInfraManager = { name, runtime, port ? 54329, redisPort ? 6381 }:
     mkScript "${name}-ensure-infra" ''
@@ -63,11 +74,7 @@ let
     export POSTGRES_USER="$(whoami)"
     export REDIS_URL="redis://127.0.0.1:6381/0"
 
-    if [ -f "$HOME/Developer/papershift/pulse/.env" ]; then
-      set -a
-      source "$HOME/Developer/papershift/pulse/.env"
-      set +a
-    fi
+    ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
 
     cd "$HOME/Developer/papershift/pulse/backend"
   '';
@@ -161,15 +168,11 @@ in
 
       # Pulse agent
       (mkScript "pulse-agent-dev" ''
-        exec nix develop "${configFlake}#pulse-agent" -c bash -c '
-          if [ -f "$HOME/Developer/papershift/pulse/.env" ]; then
-            set -a
-            source "$HOME/Developer/papershift/pulse/.env"
-            set +a
-          fi
+        exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
+          ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
           cd "$HOME/Developer/papershift/pulse/agent"
           exec uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
-        '
+        AGENT_SCRIPT
       '')
 
       # Pulse WebSocket (requires anycable-go)
