@@ -53,6 +53,9 @@ let
       done < "${pulseRoot}/.env"
     fi
 
+    export BUNDLE_PATH="${pulseRoot}/.bundle/vendor"
+    export BUNDLE_BIN="${pulseRoot}/.bundle/bin"
+
     export PULSE_ROOT="${pulseRoot}"
     export LANG="en_US.UTF-8"
 
@@ -74,6 +77,12 @@ let
 
     export VITE_API_URL="http://127.0.0.1:3000"
     export VITE_CABLE_URL="ws://127.0.0.1:8080/cable"
+
+    # Fix google-protobuf build on macOS by disabling format-security errors
+    export CFLAGS="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
+    export CXXFLAGS="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
+    export NIX_CFLAGS_COMPILE="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
+    export MAKEFLAGS="CFLAGS=-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
   '';
 
   agentPython = pkgs.python3.withPackages (
@@ -104,6 +113,12 @@ let
     pkgs.mkShell {
       nativeBuildInputs = with pkgs; [
         pkg-config
+        autoconf
+        automake
+        libtool
+        cmake
+        clang
+        gnumake
       ];
 
       buildInputs = with pkgs; [
@@ -113,6 +128,8 @@ let
         vips
         zlib
         libffi
+        nghttp2
+        protobuf
       ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
         gcc
       ];
@@ -183,6 +200,7 @@ let
     exec nix-shell "${pulseShellNix}" --command '
       . "${pulseEnv}"
       cd "${backendRoot}"
+      bundle config set build.ds9 --use-system-libraries
       bundle install
       bin/rails db:create
       bin/rails db:prepare
