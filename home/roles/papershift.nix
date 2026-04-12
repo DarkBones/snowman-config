@@ -241,6 +241,16 @@ in
         AGENT_SCRIPT
       '')
 
+      # Pulse agent with debugpy (for neovim DAP)
+      (mkScript "pulse-agent-debug" ''
+        exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
+          ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+          cd "$HOME/Developer/papershift/pulse/agent"
+          echo "[pulse-agent] Starting with debugpy on port 5678 (ready to attach)..."
+          exec python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+        AGENT_SCRIPT
+      '')
+
       # Pulse WebSocket (requires anycable-go)
       (mkScript "pulse-ws-dev" ''
         ${pulseEnsureInfra}/bin/pulse-ensure-infra
@@ -274,6 +284,9 @@ in
         chrome_line=""
         ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
 
+        # Always use debug agent (debugpy on port 5678)
+        agent_cmd="pulse-agent-debug"
+
         cat > "$config_file" <<EOF
         version: "0.5"
         processes:
@@ -282,7 +295,7 @@ in
           api:
             command: pulse-api-dev
           agent:
-            command: pulse-agent-dev
+            command: $agent_cmd
           sidekiq:
             command: pulse-sidekiq-dev
           anycable:
