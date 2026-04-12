@@ -95,7 +95,9 @@ let
     export POSTGRES_USER="$(whoami)"
     export REDIS_URL="redis://127.0.0.1:6381/0"
 
-    # Override WebSocket URL to use port 8081 (8080 is used by process-compose)
+    # Override service URLs for local development
+    export AGENT_URL="http://127.0.0.1:8001"
+    export API_URL="http://127.0.0.1:3000"
     export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
     cd "$HOME/Developer/papershift/pulse/backend"

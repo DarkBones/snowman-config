@@ -8,6 +8,7 @@ let
   mkPkgs = system: import nixpkgs {
     inherit system;
     config.allowUnfree = true;
+    config.allowUnsupportedSystem = true;
   };
 
   mkCorePkgs = system: import nixpkgs-23_11 {
@@ -67,24 +68,8 @@ forSystems (system:
         export PULSE_ROOT="$HOME/Developer/papershift/pulse"
         export LANG="en_US.UTF-8"
 
-        # Load .env from pulse root
-        if [ -f "$HOME/Developer/papershift/pulse/.env" ]; then
-          while IFS= read -r line || [ -n "$line" ]; do
-            case "$line" in
-              ""|"#"*) continue ;;
-            esac
-
-            key="''${line%%=*}"
-            value="''${line#*=}"
-            key="$(printf '%s' "$key" | tr -d '[:space:]')"
-            value="$(printf '%s' "$value" | sed 's/^[[:space:]]*//')"
-            value="$(printf '%s' "$value" | sed -e "s/^'//" -e "s/'$//" -e 's/^"//' -e 's/"$//')"
-
-            if [ -n "$key" ]; then
-              export "$key=$value"
-            fi
-          done < "$HOME/Developer/papershift/pulse/.env"
-        fi
+        # Note: .env is loaded by wrapper scripts with proper parsing
+        # No need to load here to avoid double-loading
 
         cd "$HOME/Developer/papershift/pulse/backend"
       '';
@@ -112,22 +97,19 @@ forSystems (system:
     pulse-agent = pkgs.mkShell {
       packages = [
         (pkgs.python3.withPackages (ps: with ps; [
-          fastapi httpx langchain markdown2 openai
-          "openai-agents" pypdf "python-docx" "python-dotenv"
-          uvicorn debugpy
-        ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ "weaviate-client" ]))
+          fastapi httpx langdetect langchain langchain-core
+          langchain-text-splitters markdown2 openai
+          openai-agents pypdf python-docx python-dotenv
+          uvicorn debugpy weaviate-client
+        ]))
       ];
 
       shellHook = ''
         export PULSE_ROOT="$HOME/Developer/papershift/pulse"
         export LANG="en_US.UTF-8"
 
-        # Load .env from pulse root
-        if [ -f "$HOME/Developer/papershift/pulse/.env" ]; then
-          set -a
-          source "$HOME/Developer/papershift/pulse/.env"
-          set +a
-        fi
+        # Note: .env is loaded by the wrapper script with proper parsing
+        # No need to load here to avoid double-loading
 
         cd "$HOME/Developer/papershift/pulse/agent"
       '';
