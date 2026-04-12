@@ -57,10 +57,10 @@ let
     mkScript name (
       lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n" +
       ''
-        exec nix develop "${configFlake}#${shell}" -c bash -c '
+        exec nix develop "${configFlake}#${shell}" -c bash <<'DEV_SCRIPT'
           ${envSetup}
-          exec ${cmd}
-        '
+          ${cmd}
+        DEV_SCRIPT
       ''
     );
 
@@ -104,35 +104,35 @@ in
         name = "pulse-shell";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
-        cmd = "${pkgs.zsh}/bin/zsh -i";
+        cmd = "exec ${pkgs.zsh}/bin/zsh -i";
         ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-backend-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
-        cmd = "bin/rails s";
+        cmd = "exec bin/rails s";
         ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-api-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
-        cmd = "./lib/scripts/entrypoint.sh && exec bin/web";
+        cmd = "./lib/scripts/entrypoint.sh\nexec bin/web";
         ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-anycable-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup + "\nexport ANYCABLE_RPC_HOST=0.0.0.0:50051";
-        cmd = "bin/anycable";
+        cmd = "exec bin/anycable";
         ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
         name = "pulse-sidekiq-dev";
         shell = "pulse-backend";
         envSetup = pulseEnvSetup;
-        cmd = "bin/worker";
+        cmd = "exec bin/worker";
         ensureInfra = pulseEnsureInfra;
       })
       (mkDevShell {
@@ -148,13 +148,13 @@ in
         name = "pulse-frontend-shell";
         shell = "pulse-frontend";
         envSetup = "cd $HOME/Developer/papershift/pulse/frontend";
-        cmd = "${pkgs.zsh}/bin/zsh -i";
+        cmd = "exec ${pkgs.zsh}/bin/zsh -i";
       })
       (mkDevShell {
         name = "pulse-frontend-dev";
         shell = "pulse-frontend";
         envSetup = "cd $HOME/Developer/papershift/pulse/frontend";
-        cmd = "pnpm dev";
+        cmd = "exec pnpm dev";
       })
       (mkScript "pulse-frontend-bootstrap" ''
         mkdir -p "$HOME/.local/share/pnpm" "$HOME/.cache"
@@ -190,7 +190,45 @@ in
       (mkScript "pulse-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${pulseRuntime}/postgres stop -m fast || true")
       (mkScript "pulse-redis-stop" "[ -f ${pulseRuntime}/redis.pid ] && kill $(cat ${pulseRuntime}/redis.pid) 2>/dev/null || true")
 
+      # Process orchestrator (works on all platforms)
+      (mkScript "pulse-dev" ''
+        config_file="$(mktemp)"
+        trap 'rm -f "$config_file"' EXIT
+
+        # Add websocket if anycable-go is available
+        ws_line=""
+        command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
+
+        # Add chrome only on Linux (requires chromium)
+        chrome_line=""
+        ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
+
+        cat > "$config_file" <<EOF
+        version: "0.5"
+        processes:
+          frontend:
+            command: pulse-frontend-dev
+          api:
+            command: pulse-api-dev
+          agent:
+            command: pulse-agent-dev
+          sidekiq:
+            command: pulse-sidekiq-dev
+          anycable:
+            command: pulse-anycable-dev
+        ''${chrome_line}''${ws_line}
+        EOF
+        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+      '')
+
     ] ++ lib.optionals pkgs.stdenv.isLinux [
+      # Chrome dev server (Linux only - requires chromium)
+      (mkScript "pulse-chrome-dev" ''
+        mkdir -p "${pulseRuntime}/chrome"
+        exec ${pkgs.chromium}/bin/chromium --headless --disable-gpu --no-first-run \
+          --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 \
+          --user-data-dir="${pulseRuntime}/chrome"
+      '')
       # Core backend (Linux only)
       coreEnsureInfra
 
@@ -255,39 +293,7 @@ in
       (mkScript "core-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${coreRuntime}/postgres stop -m fast || true")
       (mkScript "core-redis-stop" "[ -f ${coreRuntime}/redis.pid ] && kill $(cat ${coreRuntime}/redis.pid) 2>/dev/null || true")
 
-      # Process orchestrators
-      (mkScript "pulse-dev" ''
-        config_file="$(mktemp)"
-        trap 'rm -f "$config_file"' EXIT
-        ws_line=""
-        command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
-        cat > "$config_file" <<EOF
-        version: "0.5"
-        processes:
-          frontend:
-            command: pulse-frontend-dev
-          api:
-            command: pulse-api-dev
-          agent:
-            command: pulse-agent-dev
-          chrome:
-            command: pulse-chrome-dev
-          sidekiq:
-            command: pulse-sidekiq-dev
-          anycable:
-            command: pulse-anycable-dev
-        $ws_line
-        EOF
-        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-      '')
-
-      (mkScript "pulse-chrome-dev" ''
-        mkdir -p "${pulseRuntime}/chrome"
-        exec ${pkgs.chromium}/bin/chromium --headless --disable-gpu --no-first-run \
-          --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 \
-          --user-data-dir="${pulseRuntime}/chrome"
-      '')
-
+      # Core orchestrator (Linux only)
       (mkScript "core-dev" ''
         config_file="$(mktemp)"
         trap 'rm -f "$config_file"' EXIT
