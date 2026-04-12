@@ -771,18 +771,13 @@ in {
           provider = "elevenlabs";
           maxTextLength = 4000;
           timeoutMs = 30000;
-          elevenlabs = {
-            baseUrl = "https://api.elevenlabs.io";
-            voiceId = "WQ6Xb0Hj95La1FFC6b16";
-            modelId = "eleven_v3";
-            applyTextNormalization = "auto";
-            languageCode = "en";
-            voiceSettings = {
-              stability = 0.5;
-              similarityBoost = 0.75;
-              style = 0.0;
-              useSpeakerBoost = true;
-              speed = 1.0;
+          providers = {
+            elevenlabs = {
+              apiKey = {
+                source = "env";
+                provider = "default";
+                id = "ELEVENLABS_API_KEY";
+              };
             };
           };
         };
