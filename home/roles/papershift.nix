@@ -15,8 +15,25 @@ let
     if [ -f "${envPath}" ]; then
       set -a
       while IFS='=' read -r key value; do
-        [ -n "$key" ] && [ "''${key:0:1}" != "#" ] && export "$key=$value"
-      done < <(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "${envPath}")
+        if [ -n "$key" ] && [ "''${key:0:1}" != "#" ]; then
+          # Strip whitespace from key
+          key="''${key#"''${key%%[![:space:]]*}"}"  # leading whitespace
+          key="''${key%"''${key##*[![:space:]]}"}"  # trailing whitespace
+
+          # Strip comments from value
+          value="''${value%%#*}"
+
+          # Strip leading/trailing whitespace and quotes from value
+          value="''${value#"''${value%%[![:space:]]*}"}"  # leading whitespace
+          value="''${value%"''${value##*[![:space:]]}"}"  # trailing whitespace
+          value="''${value#\'}"  # leading single quote
+          value="''${value%\'}"  # trailing single quote
+          value="''${value#\"}"  # leading double quote
+          value="''${value%\"}"  # trailing double quote
+
+          export "$key=$value"
+        fi
+      done < <(grep -E '^[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=' "${envPath}")
       set +a
     fi
   '';
@@ -66,6 +83,10 @@ let
 
   # Pulse environment setup (reusable)
   pulseEnvSetup = ''
+    # Load .env first
+    ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+
+    # Override with local development settings (after .env so these take precedence)
     export PGHOST="$HOME/.local/state/pulse/postgres-socket"
     export PGPORT="54329"
     export PGUSER="$(whoami)"
@@ -74,7 +95,8 @@ let
     export POSTGRES_USER="$(whoami)"
     export REDIS_URL="redis://127.0.0.1:6381/0"
 
-    ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+    # Override WebSocket URL to use port 8081 (8080 is used by process-compose)
+    export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
     cd "$HOME/Developer/papershift/pulse/backend"
   '';
@@ -84,6 +106,42 @@ let
     export PGPORT="54329"
     cd "$HOME/Developer/papershift/shift_app"
   '';
+
+  # anycable-go binary (not in nixpkgs, fetch from GitHub releases)
+  anycable-go = pkgs.stdenv.mkDerivation rec {
+    pname = "anycable-go";
+    version = "1.5.6";
+
+    src = let
+      platform = if pkgs.stdenv.isDarwin then
+        (if pkgs.stdenv.isAarch64 then "darwin-arm64" else "darwin-amd64")
+      else
+        "linux-amd64";
+    in pkgs.fetchurl {
+      url = "https://github.com/anycable/anycable-go/releases/download/v${version}/anycable-go-${platform}";
+      hash = if pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64 then
+        "sha256-Y4DWpMlkc1/TTtDfaHc8oFCS0+OUrK10/AavNI/7ajY="
+      else if pkgs.stdenv.isDarwin then
+        "sha256-PLACEHOLDER-DARWIN-AMD64"  # Add if needed
+      else
+        "sha256-2pGD7up4atlcBFz7rBolT+03jphz5W4XXYpepICi//I=";
+    };
+
+    dontUnpack = true;
+    dontBuild = true;
+
+    installPhase = ''
+      runHook preInstall
+      install -D -m755 $src $out/bin/anycable-go
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "AnyCable Go WebSocket server";
+      homepage = "https://github.com/anycable/anycable-go";
+      platforms = pkgs.lib.platforms.unix;
+    };
+  };
 
 in
 {
@@ -97,7 +155,7 @@ in
       eslint prettier prettierd
 
       # Infrastructure
-      postgresql redis pulseEnsureInfra
+      postgresql redis pulseEnsureInfra anycable-go
 
       # Pulse backend
       (mkDevShell {
@@ -147,13 +205,19 @@ in
       (mkDevShell {
         name = "pulse-frontend-shell";
         shell = "pulse-frontend";
-        envSetup = "cd $HOME/Developer/papershift/pulse/frontend";
+        envSetup = ''
+          export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
+          cd $HOME/Developer/papershift/pulse/frontend
+        '';
         cmd = "exec ${pkgs.zsh}/bin/zsh -i";
       })
       (mkDevShell {
         name = "pulse-frontend-dev";
         shell = "pulse-frontend";
-        envSetup = "cd $HOME/Developer/papershift/pulse/frontend";
+        envSetup = ''
+          export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
+          cd $HOME/Developer/papershift/pulse/frontend
+        '';
         cmd = "exec pnpm dev";
       })
       (mkScript "pulse-frontend-bootstrap" ''
@@ -182,8 +246,13 @@ in
           echo "[pulse] anycable-go not installed; skipping websocket server" >&2
           exit 1
         fi
-        exec anycable-go --host 0.0.0.0 --port 8080 --path /cable \
-          --redis_url "redis://127.0.0.1:6381/0" --rpc_host 127.0.0.1:50051
+
+        # Load .env to get ANYCABLE_JWT_SECRET and other config
+        ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+
+        exec anycable-go --host 0.0.0.0 --port 8081 --path /cable \
+          --redis_url "redis://127.0.0.1:6381/0" --rpc_host 127.0.0.1:50051 \
+          --jwt_id_key jid --jwt_id_enforce --secret "$ANYCABLE_JWT_SECRET" --presets broker --log_level debug
       '')
 
       # Pulse infrastructure control

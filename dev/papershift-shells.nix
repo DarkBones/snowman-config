@@ -58,7 +58,7 @@ forSystems (system:
         export ANYCABLE_RPC_HOST="127.0.0.1:50051"
 
         export VITE_API_URL="http://127.0.0.1:3000"
-        export VITE_CABLE_URL="ws://127.0.0.1:8080/cable"
+        export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
         # Bundler config
         export BUNDLE_PATH="$HOME/Developer/papershift/pulse/.bundle/vendor"
@@ -101,6 +101,9 @@ forSystems (system:
         export PNPM_STORE_DIR="$PNPM_HOME/store"
         export XDG_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}"
         export XDG_CACHE_HOME="''${XDG_CACHE_HOME:-$HOME/.cache}"
+
+        # Override WebSocket URL (process-compose uses 8080, so we use 8081)
+        export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
         cd "$HOME/Developer/papershift/pulse/frontend"
       '';
