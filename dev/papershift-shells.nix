@@ -4,6 +4,7 @@
 
 let
   forSystems = f: nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-linux" ] f;
+  inherit (nixpkgs.lib) concatStringsSep;
 
   mkPkgs = system: import nixpkgs {
     inherit system;
@@ -21,6 +22,54 @@ forSystems (system:
   let
     pkgs = mkPkgs system;
     corePkgs = mkCorePkgs system;
+    mkExports = attrs:
+      concatStringsSep "\n" (builtins.map (name: ''export ${name}="${attrs.${name}}"'' ) (builtins.attrNames attrs));
+    mkShellHook =
+      exports: cwd: extra:
+      ''
+        ${mkExports exports}
+      ''
+      + (if extra == "" then "" else "\n${extra}\n")
+      + ''
+        cd "${cwd}"
+      '';
+
+    pulseRoot = "$HOME/Developer/papershift/pulse";
+    pulseCommonExports = {
+      PULSE_ROOT = pulseRoot;
+      LANG = "en_US.UTF-8";
+    };
+
+    pulseBackendStateDir = "$HOME/.local/state/pulse";
+    pulseBackendCommonExports = pulseCommonExports // {
+      PGDATA = "${pulseBackendStateDir}/postgres";
+      PGHOST = "${pulseBackendStateDir}/postgres-socket";
+      PGPORT = "54329";
+      PGUSER = "$USER";
+      POSTGRES_HOST = "${pulseBackendStateDir}/postgres-socket";
+      POSTGRES_PORT = "54329";
+      POSTGRES_USER = "$USER";
+    };
+
+    pulseFrontendCommonExports = pulseCommonExports // {
+      PNPM_HOME = "$HOME/.local/share/pnpm";
+      PNPM_STORE_DIR = "$PNPM_HOME/store";
+      XDG_DATA_HOME = "\${XDG_DATA_HOME:-$HOME/.local/share}";
+      XDG_CACHE_HOME = "\${XDG_CACHE_HOME:-$HOME/.cache}";
+    };
+
+    coreStateDir = "$HOME/.local/state/core";
+    coreBackendCommonExports = {
+      SHIFT_APP_ROOT = "$HOME/Developer/papershift/shift_app";
+      LANG = "en_US.UTF-8";
+      PGDATA = "${coreStateDir}/postgres";
+      PGHOST = "${coreStateDir}/postgres-socket";
+      PGPORT = "54329";
+      PGUSER = "$USER";
+      PGPASS = "";
+      POSTGRESQL_HOST = "${coreStateDir}/postgres-socket";
+      POSTGRESQL_PORT = "54329";
+    };
   in
   {
     pulse-backend = pkgs.mkShell {
@@ -33,22 +82,12 @@ forSystems (system:
         pkg-config autoconf automake libtool cmake clang gnumake
       ];
 
-      shellHook = ''
+      shellHook = mkShellHook pulseBackendCommonExports "${pulseRoot}/backend" ''
         # Fix google-protobuf and ds9 build on macOS
         export CFLAGS="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
         export CXXFLAGS="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
         export NIX_CFLAGS_COMPILE="-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
         export MAKEFLAGS="CFLAGS=-Wno-error=format-security -Wno-error=incompatible-pointer-types-discards-qualifiers"
-
-        # Postgres/Redis config
-        export PGDATA="$HOME/.local/state/pulse/postgres"
-        export PGHOST="$HOME/.local/state/pulse/postgres-socket"
-        export PGPORT="54329"
-        export PGUSER="$USER"
-
-        export POSTGRES_HOST="$HOME/.local/state/pulse/postgres-socket"
-        export POSTGRES_PORT="54329"
-        export POSTGRES_USER="$USER"
 
         export REDIS_URL="redis://127.0.0.1:6381/0"
 
@@ -62,35 +101,20 @@ forSystems (system:
         export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
         # Bundler config
-        export BUNDLE_PATH="$HOME/Developer/papershift/pulse/.bundle/vendor"
-        export BUNDLE_BIN="$HOME/Developer/papershift/pulse/.bundle/bin"
-
-        export PULSE_ROOT="$HOME/Developer/papershift/pulse"
-        export LANG="en_US.UTF-8"
+        export BUNDLE_PATH="${pulseRoot}/.bundle/vendor"
+        export BUNDLE_BIN="${pulseRoot}/.bundle/bin"
 
         # Note: .env is loaded by wrapper scripts with proper parsing
         # No need to load here to avoid double-loading
-
-        cd "$HOME/Developer/papershift/pulse/backend"
       '';
     };
 
     pulse-frontend = pkgs.mkShell {
       packages = with pkgs; [ nodejs_22 pnpm git zsh ];
 
-      shellHook = ''
-        export PULSE_ROOT="$HOME/Developer/papershift/pulse"
-        export LANG="en_US.UTF-8"
-
-        export PNPM_HOME="$HOME/.local/share/pnpm"
-        export PNPM_STORE_DIR="$PNPM_HOME/store"
-        export XDG_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}"
-        export XDG_CACHE_HOME="''${XDG_CACHE_HOME:-$HOME/.cache}"
-
+      shellHook = mkShellHook pulseFrontendCommonExports "${pulseRoot}/frontend" ''
         # Override WebSocket URL (process-compose uses 8080, so we use 8081)
         export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
-
-        cd "$HOME/Developer/papershift/pulse/frontend"
       '';
     };
 
@@ -104,14 +128,9 @@ forSystems (system:
         ]))
       ];
 
-      shellHook = ''
-        export PULSE_ROOT="$HOME/Developer/papershift/pulse"
-        export LANG="en_US.UTF-8"
-
+      shellHook = mkShellHook pulseCommonExports "${pulseRoot}/agent" ''
         # Note: .env is loaded by the wrapper script with proper parsing
         # No need to load here to avoid double-loading
-
-        cd "$HOME/Developer/papershift/pulse/agent"
       '';
     };
 
@@ -125,21 +144,10 @@ forSystems (system:
       nativeBuildInputs = with corePkgs; [ pkg-config ]
         ++ pkgs.lib.optionals corePkgs.stdenv.isLinux [ gcc ];
 
-      shellHook = ''
-        export SHIFT_APP_ROOT="$HOME/Developer/papershift/shift_app"
-        export LANG="en_US.UTF-8"
-
-        export PGDATA="$HOME/.local/state/core/postgres"
-        export PGHOST="$HOME/.local/state/core/postgres-socket"
-        export PGPORT="54329"
-        export PGUSER="$USER"
-        export PGPASS=""
-
+      shellHook = mkShellHook coreBackendCommonExports "$HOME/Developer/papershift/shift_app" ''
         export POSTGRESQL_DATABASE="shift_app_development"
         export POSTGRESQL_USERNAME="$USER"
         export POSTGRESQL_PASSWORD=""
-        export POSTGRESQL_HOST="$HOME/.local/state/core/postgres-socket"
-        export POSTGRESQL_PORT="54329"
         export POSTGRESQL_POOL="5"
 
         export REDISCLOUD_URL="redis://127.0.0.1:6381/0"
@@ -162,8 +170,6 @@ forSystems (system:
         if [ -n "''${RAILSLTS_KEY_DEV:-}" ] && [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
           export BUNDLE_GEMS__RAILSLTS__COM="$RAILSLTS_KEY_DEV"
         fi
-
-        cd "$HOME/Developer/papershift/shift_app"
       '';
     };
   }
