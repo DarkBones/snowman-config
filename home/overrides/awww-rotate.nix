@@ -29,20 +29,40 @@ in {
 
         echo "[awww-set-random] picked=$pic" >&2
 
-        ${awww}/bin/awww query >&2 || {
-          echo "[awww-set-random] ERROR: awww query failed (daemon not running?)" >&2
-          exit 1
-        }
+        if ! ${awww}/bin/awww query >&2; then
+          echo "[awww-set-random] WARN: awww query failed; restarting daemon" >&2
+          ${pkgs.systemd}/bin/systemctl --user restart awww-daemon.service
+          ${pkgs.coreutils}/bin/sleep 1
+          ${awww}/bin/awww query >&2 || {
+            echo "[awww-set-random] ERROR: awww query failed after daemon restart" >&2
+            exit 1
+          }
+        fi
 
         exec ${awww}/bin/awww img "$pic"
       '';
     in {
       home.packages = [ awwwSetRandom ];
 
+      systemd.user.services.awww-daemon = {
+        Unit = {
+          Description = "Awww wallpaper daemon";
+          After = [ "graphical-session.target" ];
+          PartOf = [ "graphical-session.target" ];
+        };
+        Service = {
+          ExecStart = "${awww}/bin/awww-daemon --no-cache";
+          Restart = "on-failure";
+          RestartSec = 2;
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+
       systemd.user.services.awww-rotate = {
         Unit = {
           Description = "Rotate wallpaper with awww";
-          After = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" "awww-daemon.service" ];
+          Wants = [ "awww-daemon.service" ];
           PartOf = [ "graphical-session.target" ];
         };
         Service = {
