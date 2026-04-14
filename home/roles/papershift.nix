@@ -1,8 +1,9 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, pkgsUnstable, ... }:
 let
   cfg = config.roles.papershift;
   homeDir = config.home.homeDirectory;
   configFlake = "${homeDir}/snowman-config";
+  isDarwin = pkgs.stdenv.isDarwin;
 
   # Runtime directories
   pulseRuntime = "${homeDir}/.local/state/pulse";
@@ -68,6 +69,11 @@ let
 
   pulseEnsureInfra = mkInfraManager { name = "pulse"; runtime = pulseRuntime; };
   coreEnsureInfra = mkInfraManager { name = "core"; runtime = coreRuntime; };
+
+  darwinPkgs = with pkgsUnstable; [
+    slack
+    zoom-us
+  ];
 
   # Generic devShell wrapper
   mkDevShell = { name, shell, envSetup ? "", cmd, ensureInfra ? null }:
@@ -150,7 +156,7 @@ in
   options.roles.papershift.enable = lib.mkEnableOption "Papershift role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
+    home.packages = (with pkgs; [
       # Editor tooling
       ruby_3_4 solargraph rubocop
       typescript typescript-language-server vue-language-server astro-language-server
@@ -393,6 +399,6 @@ in
         EOF
         exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
       '')
-    ];
+    ]) ++ lib.optionals isDarwin darwinPkgs;
   };
 }
