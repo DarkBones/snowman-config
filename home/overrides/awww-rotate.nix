@@ -46,7 +46,7 @@ in
           }
         fi
 
-        exec ${awww}/bin/awww img "$pic"
+        exec ${awww}/bin/awww img --transition-step 255 "$pic"
       '';
     in
     {
