@@ -215,6 +215,7 @@
 
               extraSpecialArgs = {
                 inherit inputs inv sops-nix dotfilesSources disko;
+                osConfig = null;
                 name = user;
                 hostRoles =
                   if host ? availableRoles then host.availableRoles else null;
@@ -245,7 +246,11 @@
                  in {
                  home.username = lib.mkForce actualUsername;
                  home.homeDirectory = lib.mkForce actualHomeDirectory;
-                 roles = finalRoles;
+                 roles = finalRoles // (lib.optionalAttrs (finalRoles ? dotfiles && finalRoles.dotfiles ? dir) {
+                   dotfiles = finalRoles.dotfiles // {
+                     dir = lib.replaceStrings ["~/"] ["${actualHomeDirectory}/"] finalRoles.dotfiles.dir;
+                   };
+                 });
                  })
               ]
                 ++ lib.optional (userCfg ? envFile) userCfg.envFile

@@ -44,27 +44,49 @@ let
     mkScript "${name}-ensure-infra" ''
       mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
 
-      if [ ! -f "${runtime}/postgres/PG_VERSION" ]; then
-        echo "[${name}] initializing postgres"
-        ${pkgs.postgresql}/bin/initdb -D "${runtime}/postgres" >/dev/null
-      fi
+      # Use a lockfile to serialize infrastructure startup across services
+      (
+        ${pkgs.flock}/bin/flock -x 9
 
-      if ! ${pkgs.postgresql}/bin/pg_isready -h "${runtime}/postgres-socket" -p ${toString port} >/dev/null 2>&1; then
-        echo "[${name}] starting postgres"
-        ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" stop -m fast >/dev/null 2>&1 || true
-        rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
-        ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
-          -l "${runtime}/postgres.log" \
-          -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
-          start >/dev/null
-      fi
+        if [ ! -f "${runtime}/postgres/PG_VERSION" ]; then
+          echo "[${name}] initializing postgres"
+          [ -d "${runtime}/postgres" ] && rm -rf "${runtime}/postgres"
+          if ! ${pkgs.postgresql}/bin/initdb -D "${runtime}/postgres" >/dev/null; then
+            echo "[${name}] postgres initialization failed, cleaning up"
+            rm -rf "${runtime}/postgres"
+            exit 1
+          fi
+        fi
 
-      if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
-        echo "[${name}] starting redis"
-        [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
-        ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
-          --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
-      fi
+        if ! ${pkgs.postgresql}/bin/pg_isready -h "${runtime}/postgres-socket" -p ${toString port} >/dev/null 2>&1; then
+          echo "[${name}] starting postgres"
+          ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" stop -m fast >/dev/null 2>&1 || true
+          rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
+          ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
+            -l "${runtime}/postgres.log" \
+            -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
+            start >/dev/null
+          
+          # Wait for socket to appear to ensure next service sees it as ready
+          for i in {1..50}; do
+            [ -S "${runtime}/postgres-socket/.s.PGSQL.${toString port}" ] && break
+            sleep 0.1
+          done
+        fi
+
+        if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
+          echo "[${name}] starting redis"
+          [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
+          ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
+            --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
+          
+          # Wait for redis to be ready
+          for i in {1..50}; do
+            ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1 && break
+            sleep 0.1
+          done
+        fi
+      ) 9>"${runtime}/infra.lock"
     '';
 
   pulseEnsureInfra = mkInfraManager { name = "pulse"; runtime = pulseRuntime; };

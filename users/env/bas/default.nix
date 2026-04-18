@@ -1,8 +1,20 @@
-{ osConfig, lib, pkgs, ... }:
+{ osConfig ? null, lib, pkgs, config, ... }:
 let
+  # Fallback to Home Manager's own sops configuration if osConfig (NixOS) is missing
+  sopsSecrets =
+    if osConfig != null then
+      osConfig.sops.secrets
+    else if (config ? sops && config.sops ? secrets) then
+      config.sops.secrets
+    else
+      { };
+
+  # Always use the Home Manager config for home directory to handle mapped usernames correctly
+  userHome = config.home.homeDirectory;
+
   maybe = name:
-    if lib.hasAttr name osConfig.sops.secrets then
-      osConfig.sops.secrets.${name}.path
+    if lib.hasAttr name sopsSecrets then
+      sopsSecrets.${name}.path
     else
       "";
 
@@ -10,8 +22,8 @@ let
     EDITOR = "nvim";
     LANG = "en_US.UTF-8";
 
-    SNOWMAN_BASE_PATH = "${osConfig.users.users.bas.home}/Developer/snowman";
-    SNOWMAN_CONFIG_PATH = "${osConfig.users.users.bas.home}/snowman-config";
+    SNOWMAN_BASE_PATH = "${userHome}/Developer/snowman";
+    SNOWMAN_CONFIG_PATH = "${userHome}/snowman-config";
 
     # Used by the `snowman` helper to override which body repo flake it targets.
     SNOWMAN_FLAKE = SNOWMAN_CONFIG_PATH;
