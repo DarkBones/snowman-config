@@ -224,7 +224,8 @@
                 networkSecretsPath = ./networks/secrets.yml;
               };
 
-              modules = [
+              modules =
+                [
                 ({ lib, ... }:
                  let
                  system = host.system or "x86_64-linux";
@@ -246,11 +247,13 @@
                  home.homeDirectory = lib.mkForce actualHomeDirectory;
                  roles = finalRoles;
                  })
-
-              inputs.snowman.homeModules.default
-                ./home
-                ./home/roles
-                ./home/overrides
+              ]
+                ++ lib.optional (userCfg ? envFile) userCfg.envFile
+                ++ [
+                inputs.snowman.homeModules.default
+                  ./home
+                  ./home/roles
+                  ./home/overrides
                 ];
             };
           }]) (host.users or (builtins.attrNames inv.users)))
