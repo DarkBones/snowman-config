@@ -222,6 +222,16 @@ rec {
         snowman.enable = true;
         ssh.enable = true;
         openclaw.enable = true;
+        video-editing = {
+          enable = true;
+
+          # If this file exists locally, the role installs DaVinci Resolve.
+          # If it does not exist, the role stays enabled and emits a warning.
+          # Example:
+          # davinciResolve = {
+          #   localZipPath = "/home/bas/.local/share/installers/DaVinci_Resolve_20.3.2_Linux.zip";
+          # };
+        };
 
         dotfiles = {
           enable = true;
