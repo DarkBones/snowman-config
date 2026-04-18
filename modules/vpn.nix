@@ -1,4 +1,10 @@
-{ lib, pkgs, config, networkSecretsPath ? null, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  networkSecretsPath ? null,
+  ...
+}:
 let
   vpnConn = "pia-de-frankfurt";
   piaUserSecret = "pia-username";
@@ -10,10 +16,11 @@ let
   sed = "${pkgs.gnused}/bin/sed";
   cat = "${pkgs.coreutils}/bin/cat";
 
-  secretsFile = if networkSecretsPath != null then
-    networkSecretsPath
-  else
-    throw "modules/vpn.nix: networkSecretsPath not passed via specialArgs";
+  secretsFile =
+    if networkSecretsPath != null then
+      networkSecretsPath
+    else
+      throw "modules/vpn.nix: networkSecretsPath not passed via specialArgs";
 
   setupScript = pkgs.writeShellScript "vpn-ensure-nm-openvpn" ''
     set -euo pipefail
@@ -68,7 +75,8 @@ let
 
     echo "[vpn] ensured profile + credentials for '$conn'"
   '';
-in {
+in
+{
   networking.networkmanager.enable = true;
   networking.networkmanager.plugins = with pkgs; [ networkmanager-openvpn ];
   environment.systemPackages = with pkgs; [ openvpn ];
@@ -78,14 +86,16 @@ in {
     "net.ipv6.conf.default.disable_ipv6" = 1;
   };
 
-  assertions = [{
-    assertion = builtins.pathExists secretsFile;
-    message = ''
-      VPN module enabled but secrets file is missing: ${toString secretsFile}
-      Create it with:
-        sops networks/secrets.yml
-    '';
-  }];
+  assertions = [
+    {
+      assertion = builtins.pathExists secretsFile;
+      message = ''
+        VPN module enabled but secrets file is missing: ${toString secretsFile}
+        Create it with:
+          sops networks/secrets.yml
+      '';
+    }
+  ];
 
   sops.secrets.${piaUserSecret} = {
     sopsFile = secretsFile;
@@ -103,8 +113,14 @@ in {
   systemd.services.vpn-ensure-nm-openvpn = {
     description = "Ensure NetworkManager OpenVPN profile from SOPS";
     wantedBy = [ "multi-user.target" ];
-    after = [ "NetworkManager.service" "sops-nix.service" ];
-    wants = [ "NetworkManager.service" "sops-nix.service" ];
+    after = [
+      "NetworkManager.service"
+      "sops-nix.service"
+    ];
+    wants = [
+      "NetworkManager.service"
+      "sops-nix.service"
+    ];
 
     serviceConfig = {
       Type = "oneshot";

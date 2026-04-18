@@ -1,6 +1,13 @@
-{ lib, pkgs, config, ... }:
-let cfg = config.roles.gaming;
-in {
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
+let
+  cfg = config.roles.gaming;
+in
+{
   options.roles.gaming.enable = lib.mkEnableOption "Gaming (system)";
 
   config = lib.mkIf cfg.enable {

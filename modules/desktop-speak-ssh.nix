@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.snowman.desktopSpeakSsh;
   targetUser = config.users.users.${cfg.user};
@@ -6,8 +11,7 @@ let
   targetHome = config.users.users.${cfg.user}.home;
   speakCommand = "${targetHome}/bin/speak";
   authorizedKeysRuntimeDir = "/run/snowman/ssh";
-  authorizedKeysRuntimeFile =
-    "${authorizedKeysRuntimeDir}/${cfg.sshUser}.authorized_keys";
+  authorizedKeysRuntimeFile = "${authorizedKeysRuntimeDir}/${cfg.sshUser}.authorized_keys";
 
   speakBridgeScript = pkgs.writeText "snowman-desktop-speak-bridge.py" ''
     import argparse
@@ -92,17 +96,19 @@ let
   speakLocalHelper = pkgs.writeShellScriptBin "snowman-desktop-speak-local" ''
     set -euo pipefail
 
-    export PATH=${lib.makeBinPath [
-      pkgs.coreutils
-      pkgs.curl
-      pkgs.ffmpeg
-      pkgs.findutils
-      pkgs.gawk
-      pkgs.gnugrep
-      pkgs.jq
-      pkgs.mpv
-      pkgs.vlc
-    ]}:/run/current-system/sw/bin:$PATH
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.curl
+        pkgs.ffmpeg
+        pkgs.findutils
+        pkgs.gawk
+        pkgs.gnugrep
+        pkgs.jq
+        pkgs.mpv
+        pkgs.vlc
+      ]
+    }:/run/current-system/sw/bin:$PATH
     export HOME=${lib.escapeShellArg targetHome}
     export XDG_RUNTIME_DIR=/run/user/${targetUid}
     export PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native
@@ -127,10 +133,10 @@ let
 
     exec ${lib.escapeShellArg speakCommand} --voice "$voice" "$text"
   '';
-in {
+in
+{
   options.snowman.desktopSpeakSsh = {
-    enable = lib.mkEnableOption
-      "a restricted SSH entrypoint that speaks through the desktop session";
+    enable = lib.mkEnableOption "a restricted SSH entrypoint that speaks through the desktop session";
 
     user = lib.mkOption {
       type = lib.types.str;
@@ -146,7 +152,10 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ speakHelper speakLocalHelper ];
+    environment.systemPackages = [
+      speakHelper
+      speakLocalHelper
+    ];
 
     systemd.tmpfiles.rules = [ "d ${authorizedKeysRuntimeDir} 0755 root root -" ];
 
@@ -173,13 +182,17 @@ in {
       '';
     };
 
-    security.sudo.extraRules = [{
-      users = [ cfg.sshUser ];
-      commands = [{
-        command = "/run/current-system/sw/bin/snowman-desktop-speak-local";
-        options = [ "NOPASSWD" ];
-      }];
-    }];
+    security.sudo.extraRules = [
+      {
+        users = [ cfg.sshUser ];
+        commands = [
+          {
+            command = "/run/current-system/sw/bin/snowman-desktop-speak-local";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
 
     services.openssh.extraConfig = ''
       Match User ${cfg.sshUser}

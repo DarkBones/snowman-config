@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   services.searx = {
     enable = true;
     environmentFile = "/var/lib/searxng/searx.env";
@@ -11,7 +12,10 @@
       };
 
       search = {
-        formats = [ "html" "json" ];
+        formats = [
+          "html"
+          "json"
+        ];
         safe_search = 0;
       };
 

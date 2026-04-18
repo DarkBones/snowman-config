@@ -1,11 +1,17 @@
 { pkgs, inv, ... }:
 let
   rpi4HomeNetwork = inv.hosts.rpi4.network.home;
-in {
+in
+{
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  environment = { systemPackages = with pkgs; [ parted efibootmgr ]; };
+  environment = {
+    systemPackages = with pkgs; [
+      parted
+      efibootmgr
+    ];
+  };
 
   systemd.services.NetworkManager-wait-online.serviceConfig.ExecStart = [
     ""
@@ -17,36 +23,40 @@ in {
       extraConfig = ''
         Defaults: ha !requiretty
       '';
-      extraRules = [{
-        users = [ "ha" ];
-        commands = [
-          {
-            command = "/run/current-system/sw/bin/systemctl suspend";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/systemctl hibernate";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/systemctl lock-session";
-            options = [ "NOPASSWD" ];
-          }
+      extraRules = [
+        {
+          users = [ "ha" ];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/systemctl suspend";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/systemctl hibernate";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/systemctl lock-session";
+              options = [ "NOPASSWD" ];
+            }
 
-          {
-            command =
-              "/run/current-system/sw/bin/systemctl restart sunshine.service";
-            options = [ "NOPASSWD" ];
-          }
-        ];
-      }];
+            {
+              command = "/run/current-system/sw/bin/systemctl restart sunshine.service";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+        }
+      ];
     };
   };
 
   networking = {
     enableIPv6 = false;
 
-    nameservers = [ "1.1.1.1" "8.8.8.8" ]; # TODO: Quad 9
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ]; # TODO: Quad 9
 
     firewall = {
       enable = true;
@@ -73,11 +83,16 @@ in {
       checkReversePath = "loose";
 
       # Trust LAN + Tailscale interfaces
-      trustedInterfaces = [ "wlan0" "tailscale0" ];
+      trustedInterfaces = [
+        "wlan0"
+        "tailscale0"
+      ];
     };
   };
 
-  networking.hosts = { "${rpi4HomeNetwork.ipv4}" = rpi4HomeNetwork.aliases; };
+  networking.hosts = {
+    "${rpi4HomeNetwork.ipv4}" = rpi4HomeNetwork.aliases;
+  };
 
   snowman.reverseProxy.enable = true;
   snowman.desktopNotifySsh.enable = true;

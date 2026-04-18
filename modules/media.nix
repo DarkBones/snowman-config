@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   sabSeedConfig = pkgs.writeText "sabnzbd.ini" ''
     __encoding__ = utf-8
@@ -58,7 +63,8 @@ let
       done
     '';
   };
-in {
+in
+{
   users.groups.media = { };
 
   users.users.bas.extraGroups = [ "media" ];
@@ -144,24 +150,28 @@ in {
   # --- Move completed Audiobooks into /srv/media/Audiobooks ---
   systemd.services.media-move-audiobooks =
     moveCompleted "audiobooks" "/srv/downloads/complete/audiobooks"
-    "/srv/media/Audiobooks";
+      "/srv/media/Audiobooks";
 
   systemd.paths.media-move-audiobooks = {
     description = "Watch SAB completed audiobooks folder";
     wantedBy = [ "multi-user.target" ];
-    pathConfig = { PathChanged = "/srv/downloads/complete/audiobooks"; };
+    pathConfig = {
+      PathChanged = "/srv/downloads/complete/audiobooks";
+    };
   };
-  systemd.paths.media-move-audiobooks.unitConfig.Unit =
-    "media-move-audiobooks.service";
+  systemd.paths.media-move-audiobooks.unitConfig.Unit = "media-move-audiobooks.service";
 
   # --- Move completed Ebooks into /srv/media/Ebooks ---
   systemd.services.media-move-ebooks =
-    moveCompleted "ebooks" "/srv/downloads/complete/ebooks" "/srv/media/Ebooks";
+    moveCompleted "ebooks" "/srv/downloads/complete/ebooks"
+      "/srv/media/Ebooks";
 
   systemd.paths.media-move-ebooks = {
     description = "Watch SAB completed ebooks folder";
     wantedBy = [ "multi-user.target" ];
-    pathConfig = { PathChanged = "/srv/downloads/complete/ebooks"; };
+    pathConfig = {
+      PathChanged = "/srv/downloads/complete/ebooks";
+    };
   };
   systemd.paths.media-move-ebooks.unitConfig.Unit = "media-move-ebooks.service";
 
@@ -170,7 +180,10 @@ in {
     description = "Watch SABnzbd folders and trigger permission repair";
     wantedBy = [ "multi-user.target" ];
     pathConfig = {
-      PathChanged = [ "/srv/downloads/incomplete" "/srv/downloads/complete" ];
+      PathChanged = [
+        "/srv/downloads/incomplete"
+        "/srv/downloads/complete"
+      ];
     };
   };
 

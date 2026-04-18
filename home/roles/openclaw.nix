@@ -1,9 +1,19 @@
-{ lib, pkgs, config, inputs, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  inputs,
+  ...
+}:
 let
   cfg = config.roles.openclaw;
   isLinux = pkgs.stdenv.isLinux;
   documentsDir = "${cfg.documentsRepoDir}/documents";
-  requiredDocumentFiles = [ "AGENTS.md" "SOUL.md" "TOOLS.md" ];
+  requiredDocumentFiles = [
+    "AGENTS.md"
+    "SOUL.md"
+    "TOOLS.md"
+  ];
   optionalDocumentFiles = [
     "IDENTITY.md"
     "USER.md"
@@ -14,17 +24,12 @@ let
   documentFiles = requiredDocumentFiles ++ optionalDocumentFiles;
   workspaceDir = "${config.home.homeDirectory}/.openclaw/workspace";
   whatsappAuthDir = "${config.home.homeDirectory}/.openclaw/whatsapp/main";
-  bundledPluginsSourceDir =
-    "${config.programs.openclaw.package}/lib/openclaw/extensions";
-  bundledPluginsDistDir =
-    "${config.programs.openclaw.package}/lib/openclaw/dist/extensions";
-  bundledPluginsRuntimeDir =
-    "${config.home.homeDirectory}/.openclaw/bundled-plugins-runtime";
+  bundledPluginsSourceDir = "${config.programs.openclaw.package}/lib/openclaw/extensions";
+  bundledPluginsDistDir = "${config.programs.openclaw.package}/lib/openclaw/dist/extensions";
+  bundledPluginsRuntimeDir = "${config.home.homeDirectory}/.openclaw/bundled-plugins-runtime";
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
-  bundledPluginsRuntimeExtensionsDir =
-    "${bundledPluginsRuntimeDistDir}/extensions";
-  openclawScreenshotDir =
-    "${config.home.homeDirectory}/.openclaw/media/screenshots";
+  bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
+  openclawScreenshotDir = "${config.home.homeDirectory}/.openclaw/media/screenshots";
   openclawPlaybackGain = "0.1";
   openclawServicePath = lib.makeBinPath [
     playAudioLocal
@@ -46,7 +51,10 @@ let
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
-    runtimeInputs = with pkgs; [ curl jq ];
+    runtimeInputs = with pkgs; [
+      curl
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -99,7 +107,11 @@ let
 
   telegramSend = pkgs.writeShellApplication {
     name = "telegram-send";
-    runtimeInputs = with pkgs; [ coreutils curl jq ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -133,7 +145,10 @@ let
 
   playAudioLocal = pkgs.writeShellApplication {
     name = "play-audio-local";
-    runtimeInputs = with pkgs; [ coreutils vlc ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      vlc
+    ];
     text = ''
       set -euo pipefail
 
@@ -160,7 +175,12 @@ let
 
   speakLocal = pkgs.writeShellApplication {
     name = "speak-local";
-    runtimeInputs = with pkgs; [ coreutils curl jq vlc ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      jq
+      vlc
+    ];
     text = ''
       set -euo pipefail
 
@@ -210,7 +230,13 @@ let
 
   youtubeWatchHistory = pkgs.writeShellApplication {
     name = "youtube-watch-history";
-    runtimeInputs = with pkgs; [ coreutils findutils gnugrep jq sqlite ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gnugrep
+      jq
+      sqlite
+    ];
     text = ''
             set -euo pipefail
 
@@ -344,7 +370,12 @@ let
 
   youtubeSearchApi = pkgs.writeShellApplication {
     name = "youtube-search-api";
-    runtimeInputs = with pkgs; [ coreutils curl gnugrep jq ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      gnugrep
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -534,7 +565,8 @@ let
       jq '.[0:'"$limit"']' "$tmp_results"
     '';
   };
-in {
+in
+{
   imports = [ inputs.nix-openclaw.homeManagerModules.openclaw ];
 
   options.roles.openclaw = {
@@ -596,8 +628,7 @@ in {
         }
         {
           name = "telegram-send";
-          description =
-            "Send a plain Telegram message through the Telegram Bot API.";
+          description = "Send a plain Telegram message through the Telegram Bot API.";
           mode = "inline";
           body = ''
             Use this skill when sending a normal Telegram message.
@@ -614,8 +645,7 @@ in {
         }
         {
           name = "linux-screenshot";
-          description =
-            "Capture a screenshot from the current Wayland desktop on dorkbones.";
+          description = "Capture a screenshot from the current Wayland desktop on dorkbones.";
           mode = "inline";
           body = ''
             Use the `linux-screenshot` CLI when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
@@ -642,8 +672,7 @@ in {
         }
         {
           name = "speak-local";
-          description =
-            "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
+          description = "Generate speech with OpenClaw TTS and play it through dorkbones speakers.";
           mode = "inline";
           body = ''
             Use this skill when the user wants to hear speech locally on this machine.
@@ -669,8 +698,7 @@ in {
         }
         {
           name = "python-project-env";
-          description =
-            "Set up and use a project-local Python virtualenv for Python work inside the OpenClaw workspace.";
+          description = "Set up and use a project-local Python virtualenv for Python work inside the OpenClaw workspace.";
           mode = "inline";
           body = ''
             Use this skill whenever you need to install Python dependencies or run a Python project inside the OpenClaw workspace.
@@ -697,8 +725,7 @@ in {
         }
         {
           name = "youtube-search-api-skill";
-          description =
-            "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
+          description = "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
           mode = "inline";
           body = ''
             Use this skill to search YouTube directly with the YouTube Data API.
@@ -728,8 +755,7 @@ in {
         }
         {
           name = "youtube-watch-history";
-          description =
-            "Read local browser history and return recently visited YouTube watch URLs from this machine.";
+          description = "Read local browser history and return recently visited YouTube watch URLs from this machine.";
           mode = "inline";
           body = ''
             Use this skill when the task depends on what the user actually watched recently on this machine.
@@ -795,24 +821,36 @@ in {
             {
               id = "auto";
               name = "OpenRouter Auto";
-              input = [ "text" "image" ];
+              input = [
+                "text"
+                "image"
+              ];
             }
             {
               id = "anthropic/claude-sonnet-4";
               name = "Claude Sonnet 4";
-              input = [ "text" "image" ];
+              input = [
+                "text"
+                "image"
+              ];
               reasoning = true;
             }
             {
               id = "openai/gpt-5";
               name = "GPT-5";
-              input = [ "text" "image" ];
+              input = [
+                "text"
+                "image"
+              ];
               reasoning = true;
             }
             {
               id = "openai/gpt-5.1-codex-mini";
               name = "GPT-5.1 Codex Mini";
-              input = [ "text" "image" ];
+              input = [
+                "text"
+                "image"
+              ];
               reasoning = true;
             }
           ];
@@ -853,49 +891,48 @@ in {
       };
     };
 
-    home.activation.openclawEnvFile =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        env_dir="$HOME/.config/openclaw"
-        env_file="$env_dir/openclaw.env"
+    home.activation.openclawEnvFile = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      env_dir="$HOME/.config/openclaw"
+      env_file="$env_dir/openclaw.env"
 
-        mkdir -p "$env_dir"
-        : > "$env_file"
-        chmod 600 "$env_file"
+      mkdir -p "$env_dir"
+      : > "$env_file"
+      chmod 600 "$env_file"
 
-        if [ -r /run/secrets/openclaw_gateway_token ]; then
-          printf 'OPENCLAW_GATEWAY_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_gateway_token)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/openclaw_gateway_token ]; then
+        printf 'OPENCLAW_GATEWAY_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_gateway_token)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/openai_api_key ]; then
-          printf 'OPENAI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openai_api_key)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/openai_api_key ]; then
+        printf 'OPENAI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openai_api_key)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/anthropic_api_key ]; then
-          printf 'ANTHROPIC_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/anthropic_api_key)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/anthropic_api_key ]; then
+        printf 'ANTHROPIC_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/anthropic_api_key)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/openrouter_api_key ]; then
-          printf 'OPENROUTER_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openrouter_api_key)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/openrouter_api_key ]; then
+        printf 'OPENROUTER_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/openrouter_api_key)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/elevenlabs_api_key ]; then
-          printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
-          printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/elevenlabs_api_key ]; then
+        printf 'ELEVENLABS_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
+        printf 'XI_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/elevenlabs_api_key)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/youtube_api_key ]; then
-          printf 'YOUTUBE_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/youtube_api_key)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/youtube_api_key ]; then
+        printf 'YOUTUBE_API_KEY=%s\n' "$(tr -d '\n' < /run/secrets/youtube_api_key)" >> "$env_file"
+      fi
 
-        if [ -r /run/secrets/openclaw_telegram_bot_token ]; then
-          printf 'TELEGRAM_BOT_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_telegram_bot_token)" >> "$env_file"
-        fi
+      if [ -r /run/secrets/openclaw_telegram_bot_token ]; then
+        printf 'TELEGRAM_BOT_TOKEN=%s\n' "$(tr -d '\n' < /run/secrets/openclaw_telegram_bot_token)" >> "$env_file"
+      fi
 
-        printf 'SEARXNG_BASE_URL=%s\n' "http://127.0.0.1:8888" >> "$env_file"
-      '';
+      printf 'SEARXNG_BASE_URL=%s\n' "http://127.0.0.1:8888" >> "$env_file"
+    '';
 
-    home.activation.openclawDocuments =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] (''
+    home.activation.openclawDocuments = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+      ''
         documents_dir="${documentsDir}"
         workspace_dir="${workspaceDir}"
 
@@ -906,12 +943,14 @@ in {
         fi
 
         mkdir -p "$workspace_dir"
-      '' + lib.concatMapStrings (name: ''
+      ''
+      + lib.concatMapStrings (name: ''
         if [ ! -f "$documents_dir/${name}" ]; then
           echo "Missing OpenClaw document: $documents_dir/${name}" >&2
           exit 1
         fi
-      '') requiredDocumentFiles + lib.concatMapStrings (name: ''
+      '') requiredDocumentFiles
+      + lib.concatMapStrings (name: ''
         target="$workspace_dir/${name}"
         source="$documents_dir/${name}"
 
@@ -925,148 +964,145 @@ in {
         else
           rm -f "$target"
         fi
-      '') documentFiles);
+      '') documentFiles
+    );
 
-    home.activation.openclawLocalSkills =
-      lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-                skills_dir="${workspaceDir}/skills"
+    home.activation.openclawLocalSkills = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+              skills_dir="${workspaceDir}/skills"
 
-                for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send youtube-search-api-skill youtube-watch-history; do
-                  skill_file="$skills_dir/$skill_name/SKILL.md"
-                  [ -L "$skill_file" ] || continue
+              for skill_name in goplaces linux-screenshot searxng-search speak-local telegram-send youtube-search-api-skill youtube-watch-history; do
+                skill_file="$skills_dir/$skill_name/SKILL.md"
+                [ -L "$skill_file" ] || continue
 
-                  source_file="$(readlink -f "$skill_file")"
-                  rm -f "$skill_file"
-                  cp "$source_file" "$skill_file"
-                  chmod 644 "$skill_file"
-                done
+                source_file="$(readlink -f "$skill_file")"
+                rm -f "$skill_file"
+                cp "$source_file" "$skill_file"
+                chmod 644 "$skill_file"
+              done
 
-                mkdir -p "$skills_dir/linux-screenshot"
-                cat > "$skills_dir/linux-screenshot/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec linux-screenshot "$@"
-        EOF
-                chmod 755 "$skills_dir/linux-screenshot/run.sh"
+              mkdir -p "$skills_dir/linux-screenshot"
+              cat > "$skills_dir/linux-screenshot/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec linux-screenshot "$@"
+      EOF
+              chmod 755 "$skills_dir/linux-screenshot/run.sh"
 
-                mkdir -p "$skills_dir/searxng-search"
-                cat > "$skills_dir/searxng-search/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec searxng-search "$@"
-        EOF
-                chmod 755 "$skills_dir/searxng-search/run.sh"
+              mkdir -p "$skills_dir/searxng-search"
+              cat > "$skills_dir/searxng-search/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec searxng-search "$@"
+      EOF
+              chmod 755 "$skills_dir/searxng-search/run.sh"
 
-                mkdir -p "$skills_dir/goplaces"
-                cat > "$skills_dir/goplaces/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec goplaces "$@"
-        EOF
-                chmod 755 "$skills_dir/goplaces/run.sh"
+              mkdir -p "$skills_dir/goplaces"
+              cat > "$skills_dir/goplaces/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec goplaces "$@"
+      EOF
+              chmod 755 "$skills_dir/goplaces/run.sh"
 
-                mkdir -p "$skills_dir/telegram-send"
-                cat > "$skills_dir/telegram-send/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec telegram-send "$@"
-        EOF
-                chmod 755 "$skills_dir/telegram-send/run.sh"
+              mkdir -p "$skills_dir/telegram-send"
+              cat > "$skills_dir/telegram-send/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec telegram-send "$@"
+      EOF
+              chmod 755 "$skills_dir/telegram-send/run.sh"
 
-                mkdir -p "$skills_dir/speak-local"
-                cat > "$skills_dir/speak-local/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec speak-local "$@"
-        EOF
-                chmod 755 "$skills_dir/speak-local/run.sh"
+              mkdir -p "$skills_dir/speak-local"
+              cat > "$skills_dir/speak-local/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec speak-local "$@"
+      EOF
+              chmod 755 "$skills_dir/speak-local/run.sh"
 
-                mkdir -p "$skills_dir/youtube-search-api-skill"
-                cat > "$skills_dir/youtube-search-api-skill/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec youtube-search-api "$@"
-        EOF
-                chmod 755 "$skills_dir/youtube-search-api-skill/run.sh"
+              mkdir -p "$skills_dir/youtube-search-api-skill"
+              cat > "$skills_dir/youtube-search-api-skill/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec youtube-search-api "$@"
+      EOF
+              chmod 755 "$skills_dir/youtube-search-api-skill/run.sh"
 
-                mkdir -p "$skills_dir/youtube-watch-history"
-                cat > "$skills_dir/youtube-watch-history/run.sh" <<'EOF'
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec youtube-watch-history "$@"
-        EOF
-                chmod 755 "$skills_dir/youtube-watch-history/run.sh"
-      '';
+              mkdir -p "$skills_dir/youtube-watch-history"
+              cat > "$skills_dir/youtube-watch-history/run.sh" <<'EOF'
+      #!/usr/bin/env bash
+      set -euo pipefail
+      exec youtube-watch-history "$@"
+      EOF
+              chmod 755 "$skills_dir/youtube-watch-history/run.sh"
+    '';
 
-    home.activation.openclawWhatsApp =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p "${whatsappAuthDir}"
-      '';
+    home.activation.openclawWhatsApp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "${whatsappAuthDir}"
+    '';
 
-    home.activation.openclawMediaDirs =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p "${openclawScreenshotDir}"
-      '';
+    home.activation.openclawMediaDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "${openclawScreenshotDir}"
+    '';
 
-    home.activation.openclawBundledPlugins =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        source_dir="${bundledPluginsSourceDir}"
-        package_root="${config.programs.openclaw.package}/lib/openclaw"
-        dist_root="${bundledPluginsRuntimeDistDir}"
-        dist_dir="${bundledPluginsRuntimeExtensionsDir}"
-        runtime_dir="${bundledPluginsRuntimeDir}"
+    home.activation.openclawBundledPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      source_dir="${bundledPluginsSourceDir}"
+      package_root="${config.programs.openclaw.package}/lib/openclaw"
+      dist_root="${bundledPluginsRuntimeDistDir}"
+      dist_dir="${bundledPluginsRuntimeExtensionsDir}"
+      runtime_dir="${bundledPluginsRuntimeDir}"
 
-        if [ -e "$runtime_dir" ]; then
-          chmod -R u+w "$runtime_dir" || true
+      if [ -e "$runtime_dir" ]; then
+        chmod -R u+w "$runtime_dir" || true
+      fi
+      rm -rf "$runtime_dir"
+      mkdir -p "$dist_root"
+      cp -r --no-preserve=mode "$package_root/dist/." "$dist_root/"
+      chmod -R u+w "$runtime_dir"
+      ln -sfn "$package_root/node_modules" "$runtime_dir/node_modules"
+
+      for plugin_dir in "$dist_dir"/*; do
+        [ -d "$plugin_dir" ] || continue
+
+        plugin_name="$(basename "$plugin_dir")"
+        source_plugin_dir="$source_dir/$plugin_name"
+        runtime_plugin_dir="$dist_dir/$plugin_name"
+        manifest="$source_plugin_dir/openclaw.plugin.json"
+        runtime_index="$plugin_dir/index.js"
+        runtime_setup="$plugin_dir/setup-entry.js"
+
+        [ -f "$manifest" ] || continue
+        [ -f "$runtime_index" ] || continue
+
+        mkdir -p "$runtime_plugin_dir"
+        cp "$manifest" "$runtime_plugin_dir/openclaw.plugin.json"
+
+        if [ -f "$runtime_setup" ]; then
+          cat > "$runtime_plugin_dir/package.json" <<EOF
+      {
+        "name": "@openclaw/$plugin_name-runtime",
+        "private": true,
+        "type": "module",
+        "openclaw": {
+          "extensions": ["./index.js"],
+          "setupEntry": "./setup-entry.js"
+        }
+      }
+      EOF
+        else
+          cat > "$runtime_plugin_dir/package.json" <<EOF
+      {
+        "name": "@openclaw/$plugin_name-runtime",
+        "private": true,
+        "type": "module",
+        "openclaw": {
+          "extensions": ["./index.js"]
+        }
+      }
+      EOF
         fi
-        rm -rf "$runtime_dir"
-        mkdir -p "$dist_root"
-        cp -r --no-preserve=mode "$package_root/dist/." "$dist_root/"
-        chmod -R u+w "$runtime_dir"
-        ln -sfn "$package_root/node_modules" "$runtime_dir/node_modules"
-
-        for plugin_dir in "$dist_dir"/*; do
-          [ -d "$plugin_dir" ] || continue
-
-          plugin_name="$(basename "$plugin_dir")"
-          source_plugin_dir="$source_dir/$plugin_name"
-          runtime_plugin_dir="$dist_dir/$plugin_name"
-          manifest="$source_plugin_dir/openclaw.plugin.json"
-          runtime_index="$plugin_dir/index.js"
-          runtime_setup="$plugin_dir/setup-entry.js"
-
-          [ -f "$manifest" ] || continue
-          [ -f "$runtime_index" ] || continue
-
-          mkdir -p "$runtime_plugin_dir"
-          cp "$manifest" "$runtime_plugin_dir/openclaw.plugin.json"
-
-          if [ -f "$runtime_setup" ]; then
-            cat > "$runtime_plugin_dir/package.json" <<EOF
-        {
-          "name": "@openclaw/$plugin_name-runtime",
-          "private": true,
-          "type": "module",
-          "openclaw": {
-            "extensions": ["./index.js"],
-            "setupEntry": "./setup-entry.js"
-          }
-        }
-        EOF
-          else
-            cat > "$runtime_plugin_dir/package.json" <<EOF
-        {
-          "name": "@openclaw/$plugin_name-runtime",
-          "private": true,
-          "type": "module",
-          "openclaw": {
-            "extensions": ["./index.js"]
-          }
-        }
-        EOF
-          fi
-        done
-      '';
+      done
+    '';
 
     systemd.user.services.openclaw-gateway.Service.EnvironmentFile =
       "-${config.home.homeDirectory}/.config/openclaw/openclaw.env";

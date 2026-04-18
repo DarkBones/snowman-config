@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.snowman.desktopNotifySsh;
 
@@ -176,14 +181,19 @@ let
   notifyLocalHelper = pkgs.writeShellScriptBin "snowman-desktop-notify-local" ''
     set -euo pipefail
 
-    export PATH=${lib.makeBinPath [ pkgs.python3 pkgs.libnotify ]}:$PATH
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.python3
+        pkgs.libnotify
+      ]
+    }:$PATH
 
     exec python3 ${notifyLocalScript}
   '';
-in {
+in
+{
   options.snowman.desktopNotifySsh = {
-    enable = lib.mkEnableOption
-      "a restricted SSH entrypoint that emits swaync desktop notifications";
+    enable = lib.mkEnableOption "a restricted SSH entrypoint that emits swaync desktop notifications";
 
     user = lib.mkOption {
       type = lib.types.str;
@@ -199,15 +209,22 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ notifyHelper notifyLocalHelper ];
+    environment.systemPackages = [
+      notifyHelper
+      notifyLocalHelper
+    ];
 
-    security.sudo.extraRules = [{
-      users = [ cfg.sshUser ];
-      commands = [{
-        command = "/run/current-system/sw/bin/snowman-desktop-notify-local";
-        options = [ "NOPASSWD" ];
-      }];
-    }];
+    security.sudo.extraRules = [
+      {
+        users = [ cfg.sshUser ];
+        commands = [
+          {
+            command = "/run/current-system/sw/bin/snowman-desktop-notify-local";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
 
     services.openssh.extraConfig = ''
       Match User ${cfg.sshUser}

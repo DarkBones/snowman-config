@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+{
   time.timeZone = "Europe/Berlin";
 
   networking = {
@@ -8,16 +9,26 @@
     interfaces.end0.useDHCP = true;
     interfaces.wlan0.useDHCP = false;
 
-    nameservers =
-      [ "1.1.1.1" "8.8.8.8" "2606:4700:4700::1111" "2606:4700:4700::1001" ];
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+      "2606:4700:4700::1111"
+      "2606:4700:4700::1001"
+    ];
 
     firewall = {
       enable = true;
       allowPing = true;
-      allowedTCPPorts = [ 22 8123 ];
+      allowedTCPPorts = [
+        22
+        8123
+      ];
       allowedUDPPorts = [ 5353 ];
       checkReversePath = "loose";
-      trustedInterfaces = [ "end0" "tailscale0" ];
+      trustedInterfaces = [
+        "end0"
+        "tailscale0"
+      ];
     };
 
     wireless.enable = lib.mkForce false;
@@ -33,11 +44,10 @@
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (python-final: python-prev: {
 
-          pyrate-limiter = python-prev.pyrate-limiter.overridePythonAttrs
-            (oldAttrs: {
-              # Skip tests that depend on high-precision timing/latency
-              doCheck = false;
-            });
+          pyrate-limiter = python-prev.pyrate-limiter.overridePythonAttrs (oldAttrs: {
+            # Skip tests that depend on high-precision timing/latency
+            doCheck = false;
+          });
 
           psycopg = python-prev.psycopg.overridePythonAttrs (oldAttrs: {
             # Skip tests because the temporary Postgres DB fails to start in time

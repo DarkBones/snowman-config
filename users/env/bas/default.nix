@@ -1,4 +1,10 @@
-{ osConfig ? null, lib, pkgs, config, ... }:
+{
+  osConfig ? null,
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   # Fallback to Home Manager's own sops configuration if osConfig (NixOS) is missing
   sopsSecrets =
@@ -12,11 +18,7 @@ let
   # Always use the Home Manager config for home directory to handle mapped usernames correctly
   userHome = config.home.homeDirectory;
 
-  maybe = name:
-    if lib.hasAttr name sopsSecrets then
-      sopsSecrets.${name}.path
-    else
-      "";
+  maybe = name: if lib.hasAttr name sopsSecrets then sopsSecrets.${name}.path else "";
 
   vars = rec {
     EDITOR = "nvim";
@@ -35,26 +37,25 @@ let
     GEMINI_API_KEY_SECRET_PATH = maybe "gemini_api_key";
     YOUTUBE_API_KEY_SECRET_PATH = maybe "youtube_api_key";
     OPENCLAW_GATEWAY_TOKEN_SECRET_PATH = maybe "openclaw_gateway_token";
-    OPENCLAW_TELEGRAM_BOT_TOKEN_SECRET_PATH =
-      maybe "openclaw_telegram_bot_token";
+    OPENCLAW_TELEGRAM_BOT_TOKEN_SECRET_PATH = maybe "openclaw_telegram_bot_token";
     NZB_GEEK_USERNAME_SECRET_PATH = maybe "nzb_geek_username";
     NZB_GEEK_KEY_SECRET_PATH = maybe "nzb_geek_key";
     HA_TOKEN_SECRET_PATH = maybe "home_assistant_long_lived_token";
   };
-in {
+in
+{
   home.sessionVariables = vars;
   systemd.user.sessionVariables = lib.mkIf pkgs.stdenv.isLinux vars;
 
-  home.activation.installHomeAssistantToken =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      token_path="${vars.HA_TOKEN_SECRET_PATH}"
-      target_dir="$HOME/.config/home-assistant"
-      target_file="$target_dir/ha-token"
+  home.activation.installHomeAssistantToken = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    token_path="${vars.HA_TOKEN_SECRET_PATH}"
+    target_dir="$HOME/.config/home-assistant"
+    target_file="$target_dir/ha-token"
 
-      if [ -n "$token_path" ] && [ -r "$token_path" ]; then
-        mkdir -p "$target_dir"
-        cp "$token_path" "$target_file"
-        chmod 600 "$target_file"
-      fi
-    '';
+    if [ -n "$token_path" ] && [ -r "$token_path" ]; then
+      mkdir -p "$target_dir"
+      cp "$token_path" "$target_file"
+      chmod 600 "$target_file"
+    fi
+  '';
 }

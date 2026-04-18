@@ -1,4 +1,5 @@
-{ lib, pkgs, ... }: {
+{ lib, pkgs, ... }:
+{
   systemd.tmpfiles.rules = [
     "L+ /bin/bash - - - - ${pkgs.bash}/bin/bash"
   ];

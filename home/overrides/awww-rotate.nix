@@ -1,9 +1,16 @@
-{ lib, config, pkgs, inputs, ... }:
-let wallpaperDir = "${config.home.homeDirectory}/wallpapers";
-in {
-  config =
-    lib.mkIf (pkgs.stdenv.isLinux && (config.roles.hyprland.enable or false))
-    (let
+{
+  lib,
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
+let
+  wallpaperDir = "${config.home.homeDirectory}/wallpapers";
+in
+{
+  config = lib.mkIf (pkgs.stdenv.isLinux && (config.roles.hyprland.enable or false)) (
+    let
       awww = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
 
       awwwSetRandom = pkgs.writeShellScriptBin "awww-set-random" ''
@@ -41,7 +48,8 @@ in {
 
         exec ${awww}/bin/awww img "$pic"
       '';
-    in {
+    in
+    {
       home.packages = [ awwwSetRandom ];
 
       systemd.user.services.awww-daemon = {
@@ -61,7 +69,10 @@ in {
       systemd.user.services.awww-rotate = {
         Unit = {
           Description = "Rotate wallpaper with awww";
-          After = [ "graphical-session.target" "awww-daemon.service" ];
+          After = [
+            "graphical-session.target"
+            "awww-daemon.service"
+          ];
           Wants = [ "awww-daemon.service" ];
           PartOf = [ "graphical-session.target" ];
         };
@@ -80,5 +91,6 @@ in {
         };
         Install.WantedBy = [ "timers.target" ];
       };
-    });
+    }
+  );
 }

@@ -1,4 +1,5 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
   # Kill SDDM
   services.displayManager.sddm.enable = lib.mkForce false;
 
@@ -16,5 +17,8 @@
 
   programs.hyprland.enable = true;
 
-  boot.kernelParams = [ "quiet" "loglevel=3" ];
+  boot.kernelParams = [
+    "quiet"
+    "loglevel=3"
+  ];
 }

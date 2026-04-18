@@ -1,4 +1,5 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+{
   systemd.tmpfiles.rules = [
     "d /var/lib/openclaw-dashboard 0750 root nginx -"
   ];

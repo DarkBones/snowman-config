@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   programs.hyprland = {
     enable = true;
     withUWSM = true;
@@ -30,7 +31,10 @@
   # --- Thunar (File Manager) ---
   programs.thunar = {
     enable = true;
-    plugins = with pkgs.xfce; [ thunar-archive-plugin thunar-volman ];
+    plugins = with pkgs.xfce; [
+      thunar-archive-plugin
+      thunar-volman
+    ];
   };
   services.gvfs.enable = true;
   services.tumbler.enable = true;

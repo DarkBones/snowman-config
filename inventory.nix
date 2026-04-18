@@ -15,14 +15,22 @@ rec {
       mutableUsers = false;
       profiles = [ "qemu-guest" ];
       users = [ "bas" ];
-      availableRoles = [ "bas" "ssh" ];
+      availableRoles = [
+        "bas"
+        "ssh"
+      ];
     };
 
     dorkbones = {
       hostname = "dorkbones";
       system = "x86_64-linux";
       mutableUsers = false;
-      users = [ "bas" "ha" "notify" "speak" ];
+      users = [
+        "bas"
+        "ha"
+        "notify"
+        "speak"
+      ];
       hardware.boot.firmware = "efi";
       compatibility = true;
 
@@ -48,14 +56,17 @@ rec {
         ./modules/plex.nix
         ./modules/audiobookshelf.nix
         ./modules/vpn.nix
-        ({ ... }: {
-          roles.gaming.enable = true;
-          roles.alvr.enable = true;
-          services.openclawLocal.enable = true;
-          services.openclawLocal.proactiveResearch.enable = true;
-          snowman.desktopNotifySsh.enable = true;
-          snowman.desktopSpeakSsh.enable = true;
-        })
+        (
+          { ... }:
+          {
+            roles.gaming.enable = true;
+            roles.alvr.enable = true;
+            services.openclawLocal.enable = true;
+            services.openclawLocal.proactiveResearch.enable = true;
+            snowman.desktopNotifySsh.enable = true;
+            snowman.desktopSpeakSsh.enable = true;
+          }
+        )
       ];
 
       # wifi = {
@@ -80,10 +91,19 @@ rec {
       compatibility = true;
       network.home = {
         ipv4 = "192.168.178.63";
-        aliases = [ "ha" "pihole" ];
+        aliases = [
+          "ha"
+          "pihole"
+        ];
       };
 
-      availableRoles = [ "bas" "secrets" "dev" "dotfiles" "ssh" ];
+      availableRoles = [
+        "bas"
+        "secrets"
+        "dev"
+        "dotfiles"
+        "ssh"
+      ];
       users = [ "bas" ];
 
       extraModules = [
@@ -148,7 +168,11 @@ rec {
     bas = {
       uid = 1000;
       homeManaged = true;
-      groups = [ "wheel" "media" "adbusers" ];
+      groups = [
+        "wheel"
+        "media"
+        "adbusers"
+      ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
       sshPubKeyFiles = [
@@ -235,13 +259,11 @@ rec {
             ".zen/profiles.ini" = "zen/profiles.ini";
             ".zen/bas/user.js" = "zen/shared/user.js";
             ".zen/bas/chrome" = "zen/shared/chrome";
-            ".zen/bas/zen-keyboard-shortcuts.json" =
-              "zen/shared/zen-keyboard-shortcuts.json";
+            ".zen/bas/zen-keyboard-shortcuts.json" = "zen/shared/zen-keyboard-shortcuts.json";
             ".zen/bas/zen-themes.json" = "zen/shared/zen-themes.json";
             ".zen/private/user.js" = "zen/shared/user.js";
             ".zen/private/chrome" = "zen/shared/chrome";
-            ".zen/private/zen-keyboard-shortcuts.json" =
-              "zen/shared/zen-keyboard-shortcuts.json";
+            ".zen/private/zen-keyboard-shortcuts.json" = "zen/shared/zen-keyboard-shortcuts.json";
             ".zen/private/zen-themes.json" = "zen/shared/zen-themes.json";
           };
         };
@@ -254,8 +276,10 @@ rec {
       shell = "bash";
       isSystemUser = true;
 
-      sshPubKeyFiles =
-        [ ./users/keys/ha-rpi.pub ./users/keys/bas-dorkbones.pub ];
+      sshPubKeyFiles = [
+        ./users/keys/ha-rpi.pub
+        ./users/keys/bas-dorkbones.pub
+      ];
       roles = { };
     };
 

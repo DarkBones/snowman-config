@@ -7,7 +7,8 @@ let
     subPackages = [ "." ];
     vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
   });
-in {
+in
+{
   services.ollama = {
     enable = true;
     package = ollamaFromGitHub;
@@ -33,7 +34,10 @@ in {
     serviceConfig = {
       MemoryHigh = "20G";
       MemoryMax = "24G";
-      SupplementaryGroups = [ "render" "video" ];
+      SupplementaryGroups = [
+        "render"
+        "video"
+      ];
     };
   };
 }

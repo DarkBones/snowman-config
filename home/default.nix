@@ -1,21 +1,31 @@
-{ config, lib, pkgs, dotfilesSources, name, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  dotfilesSources,
+  name,
+  ...
+}:
+{
   home.username = lib.mkDefault "bas";
 
   # Linux vs macOS default home dir
-  home.homeDirectory = lib.mkDefault (if pkgs.stdenv.isDarwin then
-    "/Users/${config.home.username}"
-  else
-    "/home/${config.home.username}");
+  home.homeDirectory = lib.mkDefault (
+    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}"
+  );
 
   home.stateVersion = lib.mkDefault "25.05";
 
-  imports = [ ./roles ./overrides ];
+  imports = [
+    ./roles
+    ./overrides
+  ];
 
   roles.dotfiles.enable = lib.mkDefault true;
 
   programs.home-manager.enable = true;
 
-  # On standalone Home Manager (especially macOS), session variables like $ROLES 
+  # On standalone Home Manager (especially macOS), session variables like $ROLES
   # are often not sourced automatically if HM doesn't manage the shell.
   # We use .zshenv as a "clean" injection point that shouldn't conflict with dotfiles.
   home.file.".zshenv" = {
@@ -39,5 +49,4 @@
     '';
     force = true;
   };
-  }
-
+}

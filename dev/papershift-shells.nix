@@ -6,24 +6,35 @@ let
   forSystems = f: nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-linux" ] f;
   inherit (nixpkgs.lib) concatStringsSep;
 
-  mkPkgs = system: import nixpkgs {
-    inherit system;
-    config.allowUnfree = true;
-    config.allowUnsupportedSystem = true;
-  };
+  mkPkgs =
+    system:
+    import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      config.allowUnsupportedSystem = true;
+    };
 
-  mkCorePkgs = system: import nixpkgs-23_11 {
-    inherit system;
-    config.allowUnfree = true;
-    config.permittedInsecurePackages = [ "ruby-2.7.8" "openssl-1.1.1w" ];
-  };
+  mkCorePkgs =
+    system:
+    import nixpkgs-23_11 {
+      inherit system;
+      config.allowUnfree = true;
+      config.permittedInsecurePackages = [
+        "ruby-2.7.8"
+        "openssl-1.1.1w"
+      ];
+    };
 in
-forSystems (system:
+forSystems (
+  system:
   let
     pkgs = mkPkgs system;
     corePkgs = mkCorePkgs system;
-    mkExports = attrs:
-      concatStringsSep "\n" (builtins.map (name: ''export ${name}="${attrs.${name}}"'' ) (builtins.attrNames attrs));
+    mkExports =
+      attrs:
+      concatStringsSep "\n" (
+        builtins.map (name: ''export ${name}="${attrs.${name}}"'') (builtins.attrNames attrs)
+      );
     mkShellHook =
       exports: cwd: extra:
       ''
@@ -74,12 +85,28 @@ forSystems (system:
   {
     pulse-backend = pkgs.mkShell {
       buildInputs = with pkgs; [
-        libyaml openssl postgresql vips zlib libffi nghttp2 protobuf
-        ruby_3_4 nodejs_22 pnpm redis
+        libyaml
+        openssl
+        postgresql
+        vips
+        zlib
+        libffi
+        nghttp2
+        protobuf
+        ruby_3_4
+        nodejs_22
+        pnpm
+        redis
       ];
 
       nativeBuildInputs = with pkgs; [
-        pkg-config autoconf automake libtool cmake clang gnumake
+        pkg-config
+        autoconf
+        automake
+        libtool
+        cmake
+        clang
+        gnumake
       ];
 
       shellHook = mkShellHook pulseBackendCommonExports "${pulseRoot}/backend" ''
@@ -110,7 +137,12 @@ forSystems (system:
     };
 
     pulse-frontend = pkgs.mkShell {
-      packages = with pkgs; [ nodejs_22 pnpm git zsh ];
+      packages = with pkgs; [
+        nodejs_22
+        pnpm
+        git
+        zsh
+      ];
 
       shellHook = mkShellHook pulseFrontendCommonExports "${pulseRoot}/frontend" ''
         # Override WebSocket URL (process-compose uses 8080, so we use 8081)
@@ -120,12 +152,25 @@ forSystems (system:
 
     pulse-agent = pkgs.mkShell {
       packages = [
-        (pkgs.python3.withPackages (ps: with ps; [
-          fastapi httpx langdetect langchain langchain-core
-          langchain-text-splitters markdown2 openai
-          openai-agents pypdf python-docx python-dotenv
-          uvicorn debugpy weaviate-client
-        ]))
+        (pkgs.python3.withPackages (
+          ps: with ps; [
+            fastapi
+            httpx
+            langdetect
+            langchain
+            langchain-core
+            langchain-text-splitters
+            markdown2
+            openai
+            openai-agents
+            pypdf
+            python-docx
+            python-dotenv
+            uvicorn
+            debugpy
+            weaviate-client
+          ]
+        ))
       ];
 
       shellHook = mkShellHook pulseCommonExports "${pulseRoot}/agent" ''
@@ -136,13 +181,23 @@ forSystems (system:
 
     core-backend = corePkgs.mkShell {
       buildInputs = with corePkgs; [
-        imagemagick libffi libxml2 libxslt libyaml
-        openssl postgresql shared-mime-info zlib
-        ruby_2_7 nodejs redis
+        imagemagick
+        libffi
+        libxml2
+        libxslt
+        libyaml
+        openssl
+        postgresql
+        shared-mime-info
+        zlib
+        ruby_2_7
+        nodejs
+        redis
       ];
 
-      nativeBuildInputs = with corePkgs; [ pkg-config ]
-        ++ pkgs.lib.optionals corePkgs.stdenv.isLinux [ gcc ];
+      nativeBuildInputs =
+        with corePkgs;
+        [ pkg-config ] ++ pkgs.lib.optionals corePkgs.stdenv.isLinux [ gcc ];
 
       shellHook = mkShellHook coreBackendCommonExports "$HOME/Developer/papershift/shift_app" ''
         export POSTGRESQL_DATABASE="shift_app_development"

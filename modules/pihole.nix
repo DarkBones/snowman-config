@@ -1,16 +1,27 @@
-{ lib, inv, currentHost, ... }:
+{
+  lib,
+  inv,
+  currentHost,
+  ...
+}:
 let
   lan = lib.attrByPath [ "hosts" currentHost "network" "home" ] null inv;
-in {
+in
+{
   services.resolved.enable = lib.mkForce false;
 
   networking = {
-    nameservers = [ "127.0.0.1" "1.1.1.1" ];
+    nameservers = [
+      "127.0.0.1"
+      "1.1.1.1"
+    ];
     firewall.allowedTCPPorts = [ 80 ];
-    interfaces.end0.ipv6.addresses = [{
-      address = "fdca:f21d:f446:0::53";
-      prefixLength = 64;
-    }];
+    interfaces.end0.ipv6.addresses = [
+      {
+        address = "fdca:f21d:f446:0::53";
+        prefixLength = 64;
+      }
+    ];
   };
 
   services.pihole-ftl = {
@@ -19,8 +30,12 @@ in {
 
     settings = {
       dns = {
-        upstreams =
-          [ "1.1.1.1" "1.0.0.1" "2606:4700:4700::1111" "2606:4700:4700::1001" ];
+        upstreams = [
+          "1.1.1.1"
+          "1.0.0.1"
+          "2606:4700:4700::1111"
+          "2606:4700:4700::1001"
+        ];
         listeningMode = "LOCAL";
         interface = "end0";
       };

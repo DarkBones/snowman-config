@@ -1,20 +1,28 @@
-{ lib, config, pkgs, pkgsUnstable, inputs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  pkgsUnstable,
+  inputs,
+  ...
+}:
 let
   cfg = config.roles.hyprland;
 
   draculaIcons = pkgs.fetchzip {
-    url =
-      "https://github.com/m4thewz/dracula-icons/archive/refs/heads/master.zip";
+    url = "https://github.com/m4thewz/dracula-icons/archive/refs/heads/master.zip";
     sha256 = "sha256-JUjC6oalD7teSzzdMqLTXn7eJTZQbPP/oDeLBC7bG6E=";
     stripRoot = true;
   };
 
   awww = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
-in {
+in
+{
   options.roles.hyprland.enable = lib.mkEnableOption "Hyprland role";
 
   config = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
-    home.packages = with pkgsUnstable;
+    home.packages =
+      with pkgsUnstable;
       [
         waybar
         libnotify
@@ -42,7 +50,8 @@ in {
         xsettingsd
         file-roller
         imv
-      ] ++ [ awww ];
+      ]
+      ++ [ awww ];
 
     services.xsettingsd.enable = true;
 
@@ -54,10 +63,9 @@ in {
     };
 
     home.file.".icons/Dracula".source = draculaIcons;
-    home.activation.ensureScreenshotDir =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p "$HOME/Pictures/Screenshots"
-      '';
+    home.activation.ensureScreenshotDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$HOME/Pictures/Screenshots"
+    '';
     home.sessionVariables.HYPRSHOT_DIR = "$HOME/Pictures/Screenshots";
   };
 

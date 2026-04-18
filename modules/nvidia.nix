@@ -1,14 +1,22 @@
-{ config, ... }: {
+{ config, ... }:
+{
   nixpkgs.config.allowUnfree = true;
 
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  boot.initrd.kernelModules =
-    [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.initrd.kernelModules = [
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_uvm"
+    "nvidia_drm"
+  ];
 
   boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.beta ];
 
-  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia_drm.fbdev=1" ];
+  boot.kernelParams = [
+    "nvidia_drm.modeset=1"
+    "nvidia_drm.fbdev=1"
+  ];
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";

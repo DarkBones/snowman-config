@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.services.openclawLocal;
 
@@ -13,8 +18,7 @@ let
   whatsappAuthDir = "${stateDir}/whatsapp/main";
   bundledPluginsRuntimeDir = "${stateDir}/bundled-plugins-runtime";
   bundledPluginsRuntimeDistDir = "${bundledPluginsRuntimeDir}/dist";
-  bundledPluginsRuntimeExtensionsDir =
-    "${bundledPluginsRuntimeDistDir}/extensions";
+  bundledPluginsRuntimeExtensionsDir = "${bundledPluginsRuntimeDistDir}/extensions";
   openclawScreenshotDir = "${stateDir}/media/screenshots";
   repoDir = cfg.repoDir;
   documentsDir = "${repoDir}/documents";
@@ -22,7 +26,11 @@ let
   customScriptsDir = "${repoDir}/custom/scripts";
   openclawConfigPath = "${stateDir}/openclaw.json";
   syncStampPath = "${stateDir}/.sync-stamp";
-  requiredDocumentFiles = [ "AGENTS.md" "SOUL.md" "TOOLS.md" ];
+  requiredDocumentFiles = [
+    "AGENTS.md"
+    "SOUL.md"
+    "TOOLS.md"
+  ];
   optionalDocumentFiles = [
     "IDENTITY.md"
     "USER.md"
@@ -42,7 +50,10 @@ let
 
   searxngSearch = pkgs.writeShellApplication {
     name = "searxng-search";
-    runtimeInputs = with pkgs; [ curl jq ];
+    runtimeInputs = with pkgs; [
+      curl
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -95,7 +106,11 @@ let
 
   telegramSend = pkgs.writeShellApplication {
     name = "telegram-send";
-    runtimeInputs = with pkgs; [ coreutils curl jq ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -129,7 +144,10 @@ let
 
   openclawSync = pkgs.writeShellApplication {
     name = "openclaw-sync";
-    runtimeInputs = with pkgs; [ coreutils systemd ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      systemd
+    ];
     text = ''
       set -euo pipefail
 
@@ -146,7 +164,11 @@ let
 
   openclawSyncStatus = pkgs.writeShellApplication {
     name = "openclaw-sync-status";
-    runtimeInputs = with pkgs; [ coreutils findutils gnugrep ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gnugrep
+    ];
     text = ''
       set -euo pipefail
 
@@ -204,7 +226,13 @@ let
 
   youtubeWatchHistory = pkgs.writeShellApplication {
     name = "youtube-watch-history";
-    runtimeInputs = with pkgs; [ coreutils findutils gnugrep jq sqlite ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      gnugrep
+      jq
+      sqlite
+    ];
     text = ''
             set -euo pipefail
 
@@ -338,7 +366,12 @@ let
 
   youtubeSearchApi = pkgs.writeShellApplication {
     name = "youtube-search-api";
-    runtimeInputs = with pkgs; [ coreutils curl gnugrep jq ];
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      gnugrep
+      jq
+    ];
     text = ''
       set -euo pipefail
 
@@ -664,8 +697,7 @@ let
     }
     {
       name = "telegram-send";
-      description =
-        "Send a plain Telegram message through the Telegram Bot API.";
+      description = "Send a plain Telegram message through the Telegram Bot API.";
       command = "telegram-send";
       body = ''
         Use this skill when sending a normal Telegram message.
@@ -682,8 +714,7 @@ let
     }
     {
       name = "linux-screenshot";
-      description =
-        "Capture a screenshot from the current Wayland desktop on dorkbones.";
+      description = "Capture a screenshot from the current Wayland desktop on dorkbones.";
       command = "linux-screenshot";
       body = ''
         Use the `linux-screenshot` CLI when the user asks what is on the screen, asks you to inspect the desktop UI, or explicitly requests a screenshot from this machine.
@@ -710,8 +741,7 @@ let
     }
     {
       name = "youtube-search-api-skill";
-      description =
-        "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
+      description = "Search YouTube directly through the YouTube Data API and return structured results for videos, Shorts, channels, or playlists.";
       command = "youtube-search-api";
       body = ''
         Use this skill to search YouTube directly with the YouTube Data API.
@@ -741,8 +771,7 @@ let
     }
     {
       name = "youtube-watch-history";
-      description =
-        "Read local browser history and return recently visited YouTube watch URLs from this machine.";
+      description = "Read local browser history and return recently visited YouTube watch URLs from this machine.";
       command = "youtube-watch-history";
       body = ''
         Use this skill when the task depends on what the user actually watched recently on this machine.
@@ -765,137 +794,153 @@ let
     }
   ];
 
-  skillFiles = builtins.listToAttrs (map (skill: {
-    name = skill.name;
-    value = pkgs.writeText "openclaw-skill-${skill.name}.md" ''
-      ---
-      name: ${skill.name}
-      description: ${skill.description}
-      ---
+  skillFiles = builtins.listToAttrs (
+    map (skill: {
+      name = skill.name;
+      value = pkgs.writeText "openclaw-skill-${skill.name}.md" ''
+        ---
+        name: ${skill.name}
+        description: ${skill.description}
+        ---
 
-      ${skill.body}
-    '';
-  }) skills);
+        ${skill.body}
+      '';
+    }) skills
+  );
 
-  openclawConfigTemplate = pkgs.writeText "openclaw-system-template.json"
-    (builtins.toJSON {
-    agents.defaults = {
-      workspace = workspaceDir;
-      model = {
-        primary = "router/openai/gpt-5.1-codex-mini";
-        fallbacks = [ ];
+  openclawConfigTemplate = pkgs.writeText "openclaw-system-template.json" (
+    builtins.toJSON {
+      agents.defaults = {
+        workspace = workspaceDir;
+        model = {
+          primary = "router/openai/gpt-5.1-codex-mini";
+          fallbacks = [ ];
+        };
+        imageModel = {
+          primary = "openai/gpt-5-mini";
+          fallbacks = [ "anthropic/claude-opus-4-5" ];
+        };
       };
-      imageModel = {
-        primary = "openai/gpt-5-mini";
-        fallbacks = [ "anthropic/claude-opus-4-5" ];
-      };
-    };
 
-    messages.tts = {
-      auto = "tagged";
-      mode = "final";
-      provider = "elevenlabs";
-      maxTextLength = 4000;
-      timeoutMs = 30000;
-      providers = {
-        elevenlabs = {
-          apiKey = {
-            source = "env";
-            provider = "default";
-            id = "ELEVENLABS_API_KEY";
+      messages.tts = {
+        auto = "tagged";
+        mode = "final";
+        provider = "elevenlabs";
+        maxTextLength = 4000;
+        timeoutMs = 30000;
+        providers = {
+          elevenlabs = {
+            apiKey = {
+              source = "env";
+              provider = "default";
+              id = "ELEVENLABS_API_KEY";
+            };
           };
         };
       };
-    };
 
-    tools.exec = {
-      host = "gateway";
-      security = "allowlist";
-      ask = "on-miss";
-      pathPrepend = [
-        "${speakLocalCommand}/bin"
-        "${linuxScreenshot}/bin"
-        "${youtubeSearchApi}/bin"
-        "${youtubeWatchHistory}/bin"
-        "${searxngSearch}/bin"
-        "${telegramSend}/bin"
-        "${pkgs.openssh}/bin"
-        "/run/current-system/sw/bin"
-      ];
-    };
-
-    models = {
-      mode = "replace";
-      providers.router = {
-        api = "openai-completions";
-        baseUrl = "https://openrouter.ai/api/v1";
-        auth = "api-key";
-        apiKey = {
-          source = "env";
-          provider = "default";
-          id = "OPENROUTER_API_KEY";
-        };
-        models = [
-          {
-            id = "auto";
-            name = "OpenRouter Auto";
-            input = [ "text" "image" ];
-          }
-          {
-            id = "anthropic/claude-sonnet-4";
-            name = "Claude Sonnet 4";
-            input = [ "text" "image" ];
-            reasoning = true;
-          }
-          {
-            id = "openai/gpt-5";
-            name = "GPT-5";
-            input = [ "text" "image" ];
-            reasoning = true;
-          }
-          {
-            id = "openai/gpt-5.1-codex-mini";
-            name = "GPT-5.1 Codex Mini";
-            input = [ "text" "image" ];
-            reasoning = true;
-          }
+      tools.exec = {
+        host = "gateway";
+        security = "allowlist";
+        ask = "on-miss";
+        pathPrepend = [
+          "${speakLocalCommand}/bin"
+          "${linuxScreenshot}/bin"
+          "${youtubeSearchApi}/bin"
+          "${youtubeWatchHistory}/bin"
+          "${searxngSearch}/bin"
+          "${telegramSend}/bin"
+          "${pkgs.openssh}/bin"
+          "/run/current-system/sw/bin"
         ];
       };
-    };
 
-    gateway = {
-      mode = "local";
-      auth.mode = "token";
-      controlUi = {
-        allowedOrigins = [ "http://openclaw" ];
-        allowInsecureAuth = true;
-        dangerouslyDisableDeviceAuth = true;
+      models = {
+        mode = "replace";
+        providers.router = {
+          api = "openai-completions";
+          baseUrl = "https://openrouter.ai/api/v1";
+          auth = "api-key";
+          apiKey = {
+            source = "env";
+            provider = "default";
+            id = "OPENROUTER_API_KEY";
+          };
+          models = [
+            {
+              id = "auto";
+              name = "OpenRouter Auto";
+              input = [
+                "text"
+                "image"
+              ];
+            }
+            {
+              id = "anthropic/claude-sonnet-4";
+              name = "Claude Sonnet 4";
+              input = [
+                "text"
+                "image"
+              ];
+              reasoning = true;
+            }
+            {
+              id = "openai/gpt-5";
+              name = "GPT-5";
+              input = [
+                "text"
+                "image"
+              ];
+              reasoning = true;
+            }
+            {
+              id = "openai/gpt-5.1-codex-mini";
+              name = "GPT-5.1 Codex Mini";
+              input = [
+                "text"
+                "image"
+              ];
+              reasoning = true;
+            }
+          ];
+        };
       };
-    };
 
-    channels.whatsapp = {
-      enabled = true;
-      defaultAccount = "main";
-      accounts.main = {
+      gateway = {
+        mode = "local";
+        auth.mode = "token";
+        controlUi = {
+          allowedOrigins = [ "http://openclaw" ];
+          allowInsecureAuth = true;
+          dangerouslyDisableDeviceAuth = true;
+        };
+      };
+
+      channels.whatsapp = {
         enabled = true;
-        name = "main";
-        authDir = whatsappAuthDir;
+        defaultAccount = "main";
+        accounts.main = {
+          enabled = true;
+          name = "main";
+          authDir = whatsappAuthDir;
+          allowFrom = [ "*" ];
+          dmPolicy = "open";
+          groupPolicy = "disabled";
+          sendReadReceipts = false;
+        };
+      };
+
+      channels.telegram = {
+        enabled = true;
+        tokenFile = telegramTokenPath;
         allowFrom = [ "*" ];
         dmPolicy = "open";
         groupPolicy = "disabled";
-        sendReadReceipts = false;
       };
-    };
-
-    channels.telegram = {
-      enabled = true;
-      tokenFile = telegramTokenPath;
-      allowFrom = [ "*" ];
-      dmPolicy = "open";
-      groupPolicy = "disabled";
-    };
-    });
-in {
+    }
+  );
+in
+{
   options.services.openclawLocal = {
     enable = lib.mkEnableOption "hardened local OpenClaw gateway service";
 
@@ -1241,7 +1286,10 @@ in {
       description = "OpenClaw gateway";
       wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
-      after = [ "network-online.target" "openclaw-prepare.service" ];
+      after = [
+        "network-online.target"
+        "openclaw-prepare.service"
+      ];
       requires = [ "openclaw-prepare.service" ];
       serviceConfig = {
         User = "openclaw";
@@ -1256,8 +1304,7 @@ in {
           "PATH=${openclawServicePath}:/run/current-system/sw/bin"
         ];
         EnvironmentFile = "-${stateDir}/openclaw.env";
-        ExecStart =
-          "${pkgs.openclaw-gateway}/bin/openclaw gateway --port 18789";
+        ExecStart = "${pkgs.openclaw-gateway}/bin/openclaw gateway --port 18789";
         Restart = "always";
         RestartSec = "1s";
         UMask = "0077";
@@ -1283,111 +1330,122 @@ in {
         AmbientCapabilities = [ "" ];
         BindReadOnlyPaths = [ "${repoDir}:${repoMountDir}" ];
         BindPaths = [ cfg.sharedDir ];
-        RestrictAddressFamilies =
-          [ "AF_UNIX" "AF_INET" "AF_INET6" "AF_NETLINK" ];
-        ReadWritePaths = [ stateDir cfg.sharedDir ];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+          "AF_NETLINK"
+        ];
+        ReadWritePaths = [
+          stateDir
+          cfg.sharedDir
+        ];
       };
     };
 
-    systemd.services.openclaw-proactive-research-hourly =
-      lib.mkIf cfg.proactiveResearch.enable {
-        description = "OpenClaw proactive research hourly monitor";
-        after = [ "network-online.target" "openclaw-prepare.service" ];
-        requires = [ "openclaw-prepare.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "openclaw";
-          Group = "openclaw";
-          WorkingDirectory = proactiveResearchSkillDir;
-          Environment = [
-            "HOME=${stateDir}"
-            "OPENCLAW_STATE_DIR=${stateDir}"
-            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
-          ];
-          EnvironmentFile = "-${stateDir}/openclaw.env";
-          ExecStart =
-            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency hourly";
-          UMask = "0077";
-        };
-        unitConfig = {
-          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
-        };
+    systemd.services.openclaw-proactive-research-hourly = lib.mkIf cfg.proactiveResearch.enable {
+      description = "OpenClaw proactive research hourly monitor";
+      after = [
+        "network-online.target"
+        "openclaw-prepare.service"
+      ];
+      requires = [ "openclaw-prepare.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "openclaw";
+        Group = "openclaw";
+        WorkingDirectory = proactiveResearchSkillDir;
+        Environment = [
+          "HOME=${stateDir}"
+          "OPENCLAW_STATE_DIR=${stateDir}"
+          "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+        ];
+        EnvironmentFile = "-${stateDir}/openclaw.env";
+        ExecStart = "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency hourly";
+        UMask = "0077";
       };
+      unitConfig = {
+        ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+      };
+    };
 
-    systemd.services.openclaw-proactive-research-daily =
-      lib.mkIf cfg.proactiveResearch.enable {
-        description = "OpenClaw proactive research daily monitor";
-        after = [ "network-online.target" "openclaw-prepare.service" ];
-        requires = [ "openclaw-prepare.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "openclaw";
-          Group = "openclaw";
-          WorkingDirectory = proactiveResearchSkillDir;
-          Environment = [
-            "HOME=${stateDir}"
-            "OPENCLAW_STATE_DIR=${stateDir}"
-            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
-          ];
-          EnvironmentFile = "-${stateDir}/openclaw.env";
-          ExecStart =
-            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency daily";
-          UMask = "0077";
-        };
-        unitConfig = {
-          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
-        };
+    systemd.services.openclaw-proactive-research-daily = lib.mkIf cfg.proactiveResearch.enable {
+      description = "OpenClaw proactive research daily monitor";
+      after = [
+        "network-online.target"
+        "openclaw-prepare.service"
+      ];
+      requires = [ "openclaw-prepare.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "openclaw";
+        Group = "openclaw";
+        WorkingDirectory = proactiveResearchSkillDir;
+        Environment = [
+          "HOME=${stateDir}"
+          "OPENCLAW_STATE_DIR=${stateDir}"
+          "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+        ];
+        EnvironmentFile = "-${stateDir}/openclaw.env";
+        ExecStart = "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency daily";
+        UMask = "0077";
       };
+      unitConfig = {
+        ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+      };
+    };
 
-    systemd.services.openclaw-proactive-research-weekly =
-      lib.mkIf cfg.proactiveResearch.enable {
-        description = "OpenClaw proactive research weekly monitor";
-        after = [ "network-online.target" "openclaw-prepare.service" ];
-        requires = [ "openclaw-prepare.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "openclaw";
-          Group = "openclaw";
-          WorkingDirectory = proactiveResearchSkillDir;
-          Environment = [
-            "HOME=${stateDir}"
-            "OPENCLAW_STATE_DIR=${stateDir}"
-            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
-          ];
-          EnvironmentFile = "-${stateDir}/openclaw.env";
-          ExecStart =
-            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency weekly";
-          UMask = "0077";
-        };
-        unitConfig = {
-          ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
-        };
+    systemd.services.openclaw-proactive-research-weekly = lib.mkIf cfg.proactiveResearch.enable {
+      description = "OpenClaw proactive research weekly monitor";
+      after = [
+        "network-online.target"
+        "openclaw-prepare.service"
+      ];
+      requires = [ "openclaw-prepare.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "openclaw";
+        Group = "openclaw";
+        WorkingDirectory = proactiveResearchSkillDir;
+        Environment = [
+          "HOME=${stateDir}"
+          "OPENCLAW_STATE_DIR=${stateDir}"
+          "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+        ];
+        EnvironmentFile = "-${stateDir}/openclaw.env";
+        ExecStart = "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/monitor.py --frequency weekly";
+        UMask = "0077";
       };
+      unitConfig = {
+        ConditionPathExists = "${proactiveResearchScriptsDir}/monitor.py";
+      };
+    };
 
-    systemd.services.openclaw-proactive-research-digest =
-      lib.mkIf cfg.proactiveResearch.enable {
-        description = "OpenClaw proactive research weekly digest";
-        after = [ "network-online.target" "openclaw-prepare.service" ];
-        requires = [ "openclaw-prepare.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = "openclaw";
-          Group = "openclaw";
-          WorkingDirectory = proactiveResearchSkillDir;
-          Environment = [
-            "HOME=${stateDir}"
-            "OPENCLAW_STATE_DIR=${stateDir}"
-            "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
-          ];
-          EnvironmentFile = "-${stateDir}/openclaw.env";
-          ExecStart =
-            "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/digest.py --send";
-          UMask = "0077";
-        };
-        unitConfig = {
-          ConditionPathExists = "${proactiveResearchScriptsDir}/digest.py";
-        };
+    systemd.services.openclaw-proactive-research-digest = lib.mkIf cfg.proactiveResearch.enable {
+      description = "OpenClaw proactive research weekly digest";
+      after = [
+        "network-online.target"
+        "openclaw-prepare.service"
+      ];
+      requires = [ "openclaw-prepare.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "openclaw";
+        Group = "openclaw";
+        WorkingDirectory = proactiveResearchSkillDir;
+        Environment = [
+          "HOME=${stateDir}"
+          "OPENCLAW_STATE_DIR=${stateDir}"
+          "PATH=${openclawServicePath}:${pkgs.python3}/bin:/run/current-system/sw/bin"
+        ];
+        EnvironmentFile = "-${stateDir}/openclaw.env";
+        ExecStart = "${pkgs.python3}/bin/python3 ${proactiveResearchScriptsDir}/digest.py --send";
+        UMask = "0077";
       };
+      unitConfig = {
+        ConditionPathExists = "${proactiveResearchScriptsDir}/digest.py";
+      };
+    };
 
     systemd.timers = lib.mkIf cfg.proactiveResearch.enable {
       openclaw-proactive-research-hourly = {
@@ -1431,7 +1489,10 @@ in {
       };
     };
 
-    environment.systemPackages =
-      [ openclawSync openclawSyncStatus speakLocalCommand ];
+    environment.systemPackages = [
+      openclawSync
+      openclawSyncStatus
+      speakLocalCommand
+    ];
   };
 }

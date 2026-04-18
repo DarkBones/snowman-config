@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.roles.searxng;
 
@@ -37,7 +42,8 @@ let
 
     exec env SEARXNG_SETTINGS_PATH="${settingsFile}" ${pkgs.searxng}/bin/searxng-run
   '';
-in {
+in
+{
   options.roles.searxng.enable = lib.mkEnableOption "SearXNG role";
 
   config = lib.mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
@@ -51,8 +57,7 @@ in {
         RunAtLoad = true;
         KeepAlive = true;
         EnvironmentVariables = {
-          PATH =
-            "${config.home.profileDirectory}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          PATH = "${config.home.profileDirectory}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
         };
         StandardOutPath = "${homeDir}/Library/Logs/searxng.log";
         StandardErrorPath = "${homeDir}/Library/Logs/searxng.err.log";

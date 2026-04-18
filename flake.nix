@@ -51,140 +51,183 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, sops-nix, snowman, disko, zen-browser
-    , stylix, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      sops-nix,
+      snowman,
+      disko,
+      zen-browser,
+      stylix,
+      ...
+    }@inputs:
     let
       lib = nixpkgs.lib;
 
       inv = import ./inventory.nix;
 
-      dotfilesSources = { bas = inputs.bas-dotfiles; };
+      dotfilesSources = {
+        bas = inputs.bas-dotfiles;
+      };
 
-      makePkgs = system:
+      makePkgs =
+        system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
         };
 
-      makePkgsUnstable = system:
+      makePkgsUnstable =
+        system:
         import inputs.nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
         };
 
       mkNixosSpecialArgs = name: attrs: {
-        inherit inputs home-manager inv sops-nix dotfilesSources disko;
+        inherit
+          inputs
+          home-manager
+          inv
+          sops-nix
+          dotfilesSources
+          disko
+          ;
         pkgsUnstable = makePkgsUnstable attrs.system;
         modulesPath = "${nixpkgs}/nixos/modules";
         currentHost = name;
         sopsConfigPath = ./.sops.yaml;
         networkSecretsPath = ./networks/secrets.yml;
-        extraHomeImports = [ ./home/roles ./home/overrides ];
+        extraHomeImports = [
+          ./home/roles
+          ./home/overrides
+        ];
       };
 
-      mkHost = name: attrs:
-        { strictHw ? true, }:
+      mkHost =
+        name: attrs:
+        {
+          strictHw ? true,
+        }:
         let
           host = inv.hosts.${name};
           hostName = host.hostname or name;
           hwFile = ./hosts/${hostName}-hardware-configuration.nix;
-          hostRoles =
-            if host ? availableRoles then host.availableRoles else null;
-          managedUsers = builtins.filter
-            (user: (inv.users.${user}.homeManaged or false))
-            (attrs.users or [ ]);
+          hostRoles = if host ? availableRoles then host.availableRoles else null;
+          managedUsers = builtins.filter (user: (inv.users.${user}.homeManaged or false)) (
+            attrs.users or [ ]
+          );
 
           hasRole = role: hostRoles == null || lib.elem role hostRoles;
-        in lib.nixosSystem {
+        in
+        lib.nixosSystem {
           system = attrs.system;
           specialArgs = mkNixosSpecialArgs name attrs;
-          modules = (lib.optionals (hasRole "desktop") [
-            inputs.stylix.nixosModules.stylix
-            ./modules/stylix.nix
-          ]) ++ [
-            ({ inputs, ... }: {
-              nixpkgs.overlays = [ inputs.nix-openclaw.overlays.default ];
-            })
-            snowman.nixosModules.default
-            home-manager.nixosModules.home-manager
-            ({ currentHost, inv, ... }: {
-              home-manager.extraSpecialArgs = {
-                inherit inputs inv currentHost;
-                hostRoles = if inv.hosts.${currentHost} ? availableRoles then
-                  inv.hosts.${currentHost}.availableRoles
-                else
-                  null;
-              };
-            })
-            ({ lib, ... }: {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users = lib.genAttrs managedUsers (_: {
-                  systemd.user.startServices = lib.mkForce true;
-                });
-              };
-            })
+          modules =
+            (lib.optionals (hasRole "desktop") [
+              inputs.stylix.nixosModules.stylix
+              ./modules/stylix.nix
+            ])
+            ++ [
+              (
+                { inputs, ... }:
+                {
+                  nixpkgs.overlays = [ inputs.nix-openclaw.overlays.default ];
+                }
+              )
+              snowman.nixosModules.default
+              home-manager.nixosModules.home-manager
+              (
+                { currentHost, inv, ... }:
+                {
+                  home-manager.extraSpecialArgs = {
+                    inherit inputs inv currentHost;
+                    hostRoles =
+                      if inv.hosts.${currentHost} ? availableRoles then inv.hosts.${currentHost}.availableRoles else null;
+                  };
+                }
+              )
+              (
+                { lib, ... }:
+                {
+                  home-manager = {
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
+                    users = lib.genAttrs managedUsers (_: {
+                      systemd.user.startServices = lib.mkForce true;
+                    });
+                  };
+                }
+              )
 
-            ({ lib, pkgs, ... }: {
-              imports = lib.optional (builtins.pathExists hwFile) hwFile;
-              home-manager.backupCommand = pkgs.writeShellScript "hm-backup" ''
-                set -euo pipefail
+              (
+                { lib, pkgs, ... }:
+                {
+                  imports = lib.optional (builtins.pathExists hwFile) hwFile;
+                  home-manager.backupCommand = pkgs.writeShellScript "hm-backup" ''
+                    set -euo pipefail
 
-                target="$1"
-                stamp="$(${pkgs.coreutils}/bin/date +%Y%m%d-%H%M%S)"
-                backup="''${target}.backup-''${stamp}"
-                i=0
+                    target="$1"
+                    stamp="$(${pkgs.coreutils}/bin/date +%Y%m%d-%H%M%S)"
+                    backup="''${target}.backup-''${stamp}"
+                    i=0
 
-                while [ -e "$backup" ]; do
-                  i=$((i + 1))
-                  backup="''${target}.backup-''${stamp}-''${i}"
-                done
+                    while [ -e "$backup" ]; do
+                      i=$((i + 1))
+                      backup="''${target}.backup-''${stamp}-''${i}"
+                    done
 
-                exec ${pkgs.coreutils}/bin/mv "$target" "$backup"
-              '';
+                    exec ${pkgs.coreutils}/bin/mv "$target" "$backup"
+                  '';
 
-              assertions = lib.optionals strictHw [{
-                assertion = builtins.pathExists hwFile;
-                message = ''
-                  Snowman: Hardware configuration missing for host "${name}"
-                     (hostname "${hostName}").
+                  assertions = lib.optionals strictHw [
+                    {
+                      assertion = builtins.pathExists hwFile;
+                      message = ''
+                        Snowman: Hardware configuration missing for host "${name}"
+                           (hostname "${hostName}").
 
-                  Expected file:
-                    hosts/${hostName}-hardware-configuration.nix
+                        Expected file:
+                          hosts/${hostName}-hardware-configuration.nix
 
-                  Fix:
-                    On the machine this NixOS install is running on, execute:
+                        Fix:
+                          On the machine this NixOS install is running on, execute:
 
-                      ./bin/snowman-import-hardware ${name}
+                            ./bin/snowman-import-hardware ${name}
 
-                    Then re-run:
+                          Then re-run:
 
-                      sudo nixos-rebuild switch --flake .#${name}
-                '';
-              }];
-            })
-          ] ++ (attrs.extraModules or [ ]);
+                            sudo nixos-rebuild switch --flake .#${name}
+                      '';
+                    }
+                  ];
+                }
+              )
+            ]
+            ++ (attrs.extraModules or [ ]);
         };
 
-      hostHwFile = name:
+      hostHwFile =
+        name:
         let
           host = inv.hosts.${name};
           hostName = host.hostname or name;
-        in ./hosts/${hostName}-hardware-configuration.nix;
+        in
+        ./hosts/${hostName}-hardware-configuration.nix;
 
-      hostsWithHw =
-        lib.filterAttrs (name: _: builtins.pathExists (hostHwFile name))
-        inv.hosts;
+      hostsWithHw = lib.filterAttrs (name: _: builtins.pathExists (hostHwFile name)) inv.hosts;
 
-    in {
-      nixosConfigurations =
-        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = false; })
-        hostsWithHw;
+    in
+    {
+      nixosConfigurations = lib.mapAttrs (
+        name: attrs: mkHost name attrs { strictHw = false; }
+      ) hostsWithHw;
 
-      nixosConfigurationsAll =
-        lib.mapAttrs (name: attrs: mkHost name attrs { strictHw = true; })
-        inv.hosts;
+      nixosConfigurationsAll = lib.mapAttrs (
+        name: attrs: mkHost name attrs { strictHw = true; }
+      ) inv.hosts;
 
       # Dev shells for Papershift development (imported from dev/papershift-shells.nix)
       devShells = import ./dev/papershift-shells.nix {
@@ -192,86 +235,98 @@
         nixpkgs-23_11 = inputs.nixpkgs-23_11;
       };
 
-      homeConfigurations = lib.listToAttrs (lib.concatMap (hostName:
-        let host = inv.hosts.${hostName};
-        in lib.concatMap (user:
+      homeConfigurations = lib.listToAttrs (
+        lib.concatMap (
+          hostName:
           let
-            cfgName = "${user}@${hostName}";
-            localAccountNames = host.localAccountNames or { };
-            actualUsername = if builtins.hasAttr user localAccountNames then
-              localAccountNames.${user}
-            else
-              user;
-            cfgNameActual = "${actualUsername}@${hostName}";
-            userCfg = inv.users.${user};
-            userRoles = userCfg.roles or { };
-            enabledUserRoles =
-              lib.filterAttrs (_: roleCfg: roleCfg ? enable && roleCfg.enable)
-              userRoles;
-            hostRoleFilter = host.availableRoles or null;
-            finalRoles = if hostRoleFilter == null then
-              enabledUserRoles
-            else
-              lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
-              enabledUserRoles;
-            value = inputs.home-manager.lib.homeManagerConfiguration {
-              pkgs = makePkgs (host.system or "x86_64-linux");
+            host = inv.hosts.${hostName};
+          in
+          lib.concatMap (
+            user:
+            let
+              cfgName = "${user}@${hostName}";
+              localAccountNames = host.localAccountNames or { };
+              actualUsername =
+                if builtins.hasAttr user localAccountNames then localAccountNames.${user} else user;
+              cfgNameActual = "${actualUsername}@${hostName}";
+              userCfg = inv.users.${user};
+              userRoles = userCfg.roles or { };
+              enabledUserRoles = lib.filterAttrs (_: roleCfg: roleCfg ? enable && roleCfg.enable) userRoles;
+              hostRoleFilter = host.availableRoles or null;
+              finalRoles =
+                if hostRoleFilter == null then
+                  enabledUserRoles
+                else
+                  lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter) enabledUserRoles;
+              value = inputs.home-manager.lib.homeManagerConfiguration {
+                pkgs = makePkgs (host.system or "x86_64-linux");
 
-              extraSpecialArgs = {
-                inherit inputs inv sops-nix dotfilesSources disko;
-                osConfig = null;
-                name = user;
-                hostRoles =
-                  if host ? availableRoles then host.availableRoles else null;
-                pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
-                currentHost = hostName;
-                sopsConfigPath = ./.sops.yaml;
-                networkSecretsPath = ./networks/secrets.yml;
+                extraSpecialArgs = {
+                  inherit
+                    inputs
+                    inv
+                    sops-nix
+                    dotfilesSources
+                    disko
+                    ;
+                  osConfig = null;
+                  name = user;
+                  hostRoles = if host ? availableRoles then host.availableRoles else null;
+                  pkgsUnstable = makePkgsUnstable (host.system or "x86_64-linux");
+                  currentHost = hostName;
+                  sopsConfigPath = ./.sops.yaml;
+                  networkSecretsPath = ./networks/secrets.yml;
+                };
+
+                modules = [
+                  (
+                    { lib, ... }:
+                    let
+                      system = host.system or "x86_64-linux";
+                      isDarwin = lib.hasSuffix "darwin" system;
+
+                      localAccountNames = host.localAccountNames or { };
+
+                      actualUsername =
+                        if builtins.hasAttr user localAccountNames then localAccountNames.${user} else user;
+
+                      actualHomeDirectory = if isDarwin then "/Users/${actualUsername}" else "/home/${actualUsername}";
+                    in
+                    {
+                      home.username = lib.mkForce actualUsername;
+                      home.homeDirectory = lib.mkForce actualHomeDirectory;
+                      roles =
+                        finalRoles
+                        // (lib.optionalAttrs (finalRoles ? dotfiles && finalRoles.dotfiles ? dir) {
+                          dotfiles = finalRoles.dotfiles // {
+                            sourceKey = "bas";
+                            dir = lib.replaceStrings [ "~/" ] [ "${actualHomeDirectory}/" ] finalRoles.dotfiles.dir;
+                          };
+                        });
+                    }
+                  )
+                ]
+                ++ lib.optional (userCfg ? envFile) userCfg.envFile
+                ++ [
+                  inputs.snowman.homeModules.default
+                  ./home
+                  ./home/roles
+                  ./home/overrides
+                ];
               };
-
-              modules = [
-                ({ lib, ... }:
-                  let
-                    system = host.system or "x86_64-linux";
-                    isDarwin = lib.hasSuffix "darwin" system;
-
-                    localAccountNames = host.localAccountNames or { };
-
-                    actualUsername = if builtins.hasAttr user localAccountNames
-                    then localAccountNames.${user}
-                    else user;
-
-                    actualHomeDirectory = if isDarwin then
-                      "/Users/${actualUsername}"
-                    else
-                      "/home/${actualUsername}";
-                  in {
-                    home.username = lib.mkForce actualUsername;
-                    home.homeDirectory = lib.mkForce actualHomeDirectory;
-                    roles = finalRoles // (lib.optionalAttrs
-                      (finalRoles ? dotfiles && finalRoles.dotfiles ? dir) {
-                        dotfiles = finalRoles.dotfiles // {
-                          sourceKey = "bas";
-                          dir = lib.replaceStrings [ "~/" ]
-                            [ "${actualHomeDirectory}/" ]
-                            finalRoles.dotfiles.dir;
-                        };
-                      });
-                  })
-              ] ++ lib.optional (userCfg ? envFile) userCfg.envFile ++ [
-                inputs.snowman.homeModules.default
-                ./home
-                ./home/roles
-                ./home/overrides
-              ];
-            };
-          in [{
-            name = cfgName;
-            inherit value;
-          }] ++ (lib.optional (cfgName != cfgNameActual) {
-            name = cfgNameActual;
-            inherit value;
-          })) (host.users or (builtins.attrNames inv.users)))
-        (builtins.attrNames inv.hosts));
+            in
+            [
+              {
+                name = cfgName;
+                inherit value;
+              }
+            ]
+            ++ (lib.optional (cfgName != cfgNameActual) {
+              name = cfgNameActual;
+              inherit value;
+            })
+          ) (host.users or (builtins.attrNames inv.users))
+        ) (builtins.attrNames inv.hosts)
+      );
     };
 }

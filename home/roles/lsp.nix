@@ -1,10 +1,19 @@
-{ lib, pkgs, pkgsUnstable, config, ... }:
-let cfg = config.roles.lsp;
-in {
+{
+  lib,
+  pkgs,
+  pkgsUnstable,
+  config,
+  ...
+}:
+let
+  cfg = config.roles.lsp;
+in
+{
   options.roles.lsp.enable = lib.mkEnableOption "Lsp role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs;
+    home.packages =
+      with pkgs;
       [
         beautysh
         lua-language-server
@@ -21,6 +30,7 @@ in {
         shfmt
         vscode-langservers-extracted
         prettierd
-      ] ++ [ pkgsUnstable.nodejs_24 ];
+      ]
+      ++ [ pkgsUnstable.nodejs_24 ];
   };
 }

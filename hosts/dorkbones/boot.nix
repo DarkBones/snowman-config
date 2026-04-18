@@ -1,4 +1,10 @@
-{ config, lib, pkgs, dotfilesSources, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  dotfilesSources,
+  ...
+}:
 
 let
   isDev = config.snowman.dotfiles.isDev;
@@ -28,7 +34,8 @@ let
 
     test -f "$out/theme.txt"
   '';
-in {
+in
+{
   boot.loader.systemd-boot.enable = lib.mkForce false;
 
   boot.loader.grub = {

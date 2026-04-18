@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+{
   services.home-assistant = {
     enable = true;
     configDir = "/var/lib/home-assistant";

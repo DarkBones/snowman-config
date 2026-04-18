@@ -1,7 +1,8 @@
 { pkgs, lib, ... }:
 let
   dataDir = "/var/lib/taskserver";
-in {
+in
+{
   services.taskserver = {
     enable = true;
     dataDir = dataDir;

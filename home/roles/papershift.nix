@@ -1,4 +1,10 @@
-{ lib, config, pkgs, pkgsUnstable, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  pkgsUnstable,
+  ...
+}:
 let
   cfg = config.roles.papershift;
   homeDir = config.home.homeDirectory;
@@ -40,7 +46,13 @@ let
   '';
 
   # Infrastructure management helpers
-  mkInfraManager = { name, runtime, port ? 54329, redisPort ? 6381 }:
+  mkInfraManager =
+    {
+      name,
+      runtime,
+      port ? 54329,
+      redisPort ? 6381,
+    }:
     mkScript "${name}-ensure-infra" ''
       mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
 
@@ -89,8 +101,14 @@ let
       ) 9>"${runtime}/infra.lock"
     '';
 
-  pulseEnsureInfra = mkInfraManager { name = "pulse"; runtime = pulseRuntime; };
-  coreEnsureInfra = mkInfraManager { name = "core"; runtime = coreRuntime; };
+  pulseEnsureInfra = mkInfraManager {
+    name = "pulse";
+    runtime = pulseRuntime;
+  };
+  coreEnsureInfra = mkInfraManager {
+    name = "core";
+    runtime = coreRuntime;
+  };
 
   darwinPkgs = with pkgsUnstable; [
     slack
@@ -98,10 +116,17 @@ let
   ];
 
   # Generic devShell wrapper
-  mkDevShell = { name, shell, envSetup ? "", cmd, ensureInfra ? null }:
+  mkDevShell =
+    {
+      name,
+      shell,
+      envSetup ? "",
+      cmd,
+      ensureInfra ? null,
+    }:
     mkScript name (
-      lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n" +
-      ''
+      lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n"
+      + ''
         exec nix develop "${configFlake}#${shell}" -c bash <<'DEV_SCRIPT'
           ${envSetup}
           ${cmd}
@@ -142,20 +167,24 @@ let
     pname = "anycable-go";
     version = "1.5.6";
 
-    src = let
-      platform = if pkgs.stdenv.isDarwin then
-        (if pkgs.stdenv.isAarch64 then "darwin-arm64" else "darwin-amd64")
-      else
-        "linux-amd64";
-    in pkgs.fetchurl {
-      url = "https://github.com/anycable/anycable-go/releases/download/v${version}/anycable-go-${platform}";
-      hash = if pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64 then
-        "sha256-Y4DWpMlkc1/TTtDfaHc8oFCS0+OUrK10/AavNI/7ajY="
-      else if pkgs.stdenv.isDarwin then
-        "sha256-PLACEHOLDER-DARWIN-AMD64"  # Add if needed
-      else
-        "sha256-2pGD7up4atlcBFz7rBolT+03jphz5W4XXYpepICi//I=";
-    };
+    src =
+      let
+        platform =
+          if pkgs.stdenv.isDarwin then
+            (if pkgs.stdenv.isAarch64 then "darwin-arm64" else "darwin-amd64")
+          else
+            "linux-amd64";
+      in
+      pkgs.fetchurl {
+        url = "https://github.com/anycable/anycable-go/releases/download/v${version}/anycable-go-${platform}";
+        hash =
+          if pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64 then
+            "sha256-Y4DWpMlkc1/TTtDfaHc8oFCS0+OUrK10/AavNI/7ajY="
+          else if pkgs.stdenv.isDarwin then
+            "sha256-PLACEHOLDER-DARWIN-AMD64" # Add if needed
+          else
+            "sha256-2pGD7up4atlcBFz7rBolT+03jphz5W4XXYpepICi//I=";
+      };
 
     dontUnpack = true;
     dontBuild = true;
@@ -178,249 +207,265 @@ in
   options.roles.papershift.enable = lib.mkEnableOption "Papershift role";
 
   config = lib.mkIf cfg.enable {
-    home.packages = (with pkgs; [
-      # Editor tooling
-      ruby_3_4 solargraph rubocop
-      typescript typescript-language-server vue-language-server astro-language-server
-      eslint prettier prettierd
+    home.packages =
+      (
+        with pkgs;
+        [
+          # Editor tooling
+          ruby_3_4
+          solargraph
+          rubocop
+          typescript
+          typescript-language-server
+          vue-language-server
+          astro-language-server
+          eslint
+          prettier
+          prettierd
 
-      # Infrastructure
-      postgresql redis pulseEnsureInfra anycable-go
+          # Infrastructure
+          postgresql
+          redis
+          pulseEnsureInfra
+          anycable-go
 
-      # Pulse backend
-      (mkDevShell {
-        name = "pulse-shell";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup;
-        cmd = "exec ${pkgs.zsh}/bin/zsh -i";
-        ensureInfra = pulseEnsureInfra;
-      })
-      (mkDevShell {
-        name = "pulse-backend-dev";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup;
-        cmd = "exec bin/rails s";
-        ensureInfra = pulseEnsureInfra;
-      })
-      (mkDevShell {
-        name = "pulse-api-dev";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup;
-        cmd = "./lib/scripts/entrypoint.sh\nexec bin/web";
-        ensureInfra = pulseEnsureInfra;
-      })
-      (mkDevShell {
-        name = "pulse-anycable-dev";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup + "\nexport ANYCABLE_RPC_HOST=0.0.0.0:50051";
-        cmd = "exec bin/anycable";
-        ensureInfra = pulseEnsureInfra;
-      })
-      (mkDevShell {
-        name = "pulse-sidekiq-dev";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup;
-        cmd = "exec bin/worker";
-        ensureInfra = pulseEnsureInfra;
-      })
-      (mkDevShell {
-        name = "pulse-bootstrap";
-        shell = "pulse-backend";
-        envSetup = pulseEnvSetup;
-        cmd = "bundle config set build.ds9 --use-system-libraries && bundle install && bin/rails db:create db:prepare";
-        ensureInfra = pulseEnsureInfra;
-      })
+          # Pulse backend
+          (mkDevShell {
+            name = "pulse-shell";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = "exec ${pkgs.zsh}/bin/zsh -i";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-backend-dev";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = "exec bin/rails s";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-api-dev";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = "./lib/scripts/entrypoint.sh\nexec bin/web";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-anycable-dev";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup + "\nexport ANYCABLE_RPC_HOST=0.0.0.0:50051";
+            cmd = "exec bin/anycable";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-sidekiq-dev";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = "exec bin/worker";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-bootstrap";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = "bundle config set build.ds9 --use-system-libraries && bundle install && bin/rails db:create db:prepare";
+            ensureInfra = pulseEnsureInfra;
+          })
 
-      # Pulse frontend
-      (mkDevShell {
-        name = "pulse-frontend-shell";
-        shell = "pulse-frontend";
-        envSetup = ''
-          export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
-          cd $HOME/Developer/papershift/pulse/frontend
-        '';
-        cmd = "exec ${pkgs.zsh}/bin/zsh -i";
-      })
-      (mkDevShell {
-        name = "pulse-frontend-dev";
-        shell = "pulse-frontend";
-        envSetup = ''
-          export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
-          cd $HOME/Developer/papershift/pulse/frontend
-        '';
-        cmd = "exec pnpm dev";
-      })
-      (mkScript "pulse-frontend-bootstrap" ''
-        mkdir -p "$HOME/.local/share/pnpm" "$HOME/.cache"
-        exec nix develop "${configFlake}#pulse-frontend" -c bash -c '
-          export PNPM_HOME="$HOME/.local/share/pnpm"
-          export PNPM_STORE_DIR="$HOME/.local/share/pnpm/store"
-          cd "$HOME/Developer/papershift/pulse/frontend"
-          exec env NPM_CONFIG_USERCONFIG=/dev/null pnpm install
-        '
-      '')
+          # Pulse frontend
+          (mkDevShell {
+            name = "pulse-frontend-shell";
+            shell = "pulse-frontend";
+            envSetup = ''
+              export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
+              cd $HOME/Developer/papershift/pulse/frontend
+            '';
+            cmd = "exec ${pkgs.zsh}/bin/zsh -i";
+          })
+          (mkDevShell {
+            name = "pulse-frontend-dev";
+            shell = "pulse-frontend";
+            envSetup = ''
+              export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
+              cd $HOME/Developer/papershift/pulse/frontend
+            '';
+            cmd = "exec pnpm dev";
+          })
+          (mkScript "pulse-frontend-bootstrap" ''
+            mkdir -p "$HOME/.local/share/pnpm" "$HOME/.cache"
+            exec nix develop "${configFlake}#pulse-frontend" -c bash -c '
+              export PNPM_HOME="$HOME/.local/share/pnpm"
+              export PNPM_STORE_DIR="$HOME/.local/share/pnpm/store"
+              cd "$HOME/Developer/papershift/pulse/frontend"
+              exec env NPM_CONFIG_USERCONFIG=/dev/null pnpm install
+            '
+          '')
 
-      # Pulse agent
-      (mkScript "pulse-agent-dev" ''
-        exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
-          ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
-          cd "$HOME/Developer/papershift/pulse/agent"
-          exec uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
-        AGENT_SCRIPT
-      '')
+          # Pulse agent
+          (mkScript "pulse-agent-dev" ''
+            exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
+              ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+              cd "$HOME/Developer/papershift/pulse/agent"
+              exec uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+            AGENT_SCRIPT
+          '')
 
-      # Pulse agent with debugpy (for neovim DAP)
-      (mkScript "pulse-agent-debug" ''
-        exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
-          ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
-          cd "$HOME/Developer/papershift/pulse/agent"
-          echo "[pulse-agent] Starting with debugpy on port 5678 (ready to attach)..."
-          exec python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8001
-        AGENT_SCRIPT
-      '')
+          # Pulse agent with debugpy (for neovim DAP)
+          (mkScript "pulse-agent-debug" ''
+            exec nix develop "${configFlake}#pulse-agent" -c bash <<'AGENT_SCRIPT'
+              ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+              cd "$HOME/Developer/papershift/pulse/agent"
+              echo "[pulse-agent] Starting with debugpy on port 5678 (ready to attach)..."
+              exec python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+            AGENT_SCRIPT
+          '')
 
-      # Pulse WebSocket (requires anycable-go)
-      (mkScript "pulse-ws-dev" ''
-        ${pulseEnsureInfra}/bin/pulse-ensure-infra
-        if ! command -v anycable-go >/dev/null 2>&1; then
-          echo "[pulse] anycable-go not installed; skipping websocket server" >&2
-          exit 1
-        fi
+          # Pulse WebSocket (requires anycable-go)
+          (mkScript "pulse-ws-dev" ''
+            ${pulseEnsureInfra}/bin/pulse-ensure-infra
+            if ! command -v anycable-go >/dev/null 2>&1; then
+              echo "[pulse] anycable-go not installed; skipping websocket server" >&2
+              exit 1
+            fi
 
-        # Load .env to get ANYCABLE_JWT_SECRET and other config
-        ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
+            # Load .env to get ANYCABLE_JWT_SECRET and other config
+            ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
 
-        exec anycable-go --host 0.0.0.0 --port 8081 --path /cable \
-          --redis_url "redis://127.0.0.1:6381/0" --rpc_host 127.0.0.1:50051 \
-          --jwt_id_key jid --jwt_id_enforce --secret "$ANYCABLE_JWT_SECRET" --presets broker --log_level debug
-      '')
+            exec anycable-go --host 0.0.0.0 --port 8081 --path /cable \
+              --redis_url "redis://127.0.0.1:6381/0" --rpc_host 127.0.0.1:50051 \
+              --jwt_id_key jid --jwt_id_enforce --secret "$ANYCABLE_JWT_SECRET" --presets broker --log_level debug
+          '')
 
-      # Pulse infrastructure control
-      (mkScript "pulse-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${pulseRuntime}/postgres stop -m fast || true")
-      (mkScript "pulse-redis-stop" "[ -f ${pulseRuntime}/redis.pid ] && kill $(cat ${pulseRuntime}/redis.pid) 2>/dev/null || true")
+          # Pulse infrastructure control
+          (mkScript "pulse-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${pulseRuntime}/postgres stop -m fast || true")
+          (mkScript "pulse-redis-stop" "[ -f ${pulseRuntime}/redis.pid ] && kill $(cat ${pulseRuntime}/redis.pid) 2>/dev/null || true")
 
-      # Process orchestrator (works on all platforms)
-      (mkScript "pulse-dev" ''
-        config_file="$(mktemp)"
-        trap 'rm -f "$config_file"' EXIT
+          # Process orchestrator (works on all platforms)
+          (mkScript "pulse-dev" ''
+            config_file="$(mktemp)"
+            trap 'rm -f "$config_file"' EXIT
 
-        # Add websocket if anycable-go is available
-        ws_line=""
-        command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
+            # Add websocket if anycable-go is available
+            ws_line=""
+            command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
 
-        # Add chrome only on Linux (requires chromium)
-        chrome_line=""
-        ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
+            # Add chrome only on Linux (requires chromium)
+            chrome_line=""
+            ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
 
-        # Always use debug agent (debugpy on port 5678)
-        agent_cmd="pulse-agent-debug"
+            # Always use debug agent (debugpy on port 5678)
+            agent_cmd="pulse-agent-debug"
 
-        cat > "$config_file" <<EOF
-        version: "0.5"
-        processes:
-          frontend:
-            command: pulse-frontend-dev
-          api:
-            command: pulse-api-dev
-          agent:
-            command: $agent_cmd
-          sidekiq:
-            command: pulse-sidekiq-dev
-          anycable:
-            command: pulse-anycable-dev
-        ''${chrome_line}''${ws_line}
-        EOF
-        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-      '')
+            cat > "$config_file" <<EOF
+            version: "0.5"
+            processes:
+              frontend:
+                command: pulse-frontend-dev
+              api:
+                command: pulse-api-dev
+              agent:
+                command: $agent_cmd
+              sidekiq:
+                command: pulse-sidekiq-dev
+              anycable:
+                command: pulse-anycable-dev
+            ''${chrome_line}''${ws_line}
+            EOF
+            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+          '')
 
-    ] ++ lib.optionals pkgs.stdenv.isLinux [
-      # Chrome dev server (Linux only - requires chromium)
-      (mkScript "pulse-chrome-dev" ''
-        mkdir -p "${pulseRuntime}/chrome"
-        exec ${pkgs.chromium}/bin/chromium --headless --disable-gpu --no-first-run \
-          --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 \
-          --user-data-dir="${pulseRuntime}/chrome"
-      '')
-      # Core backend (Linux only)
-      coreEnsureInfra
+        ]
+        ++ lib.optionals pkgs.stdenv.isLinux [
+          # Chrome dev server (Linux only - requires chromium)
+          (mkScript "pulse-chrome-dev" ''
+            mkdir -p "${pulseRuntime}/chrome"
+            exec ${pkgs.chromium}/bin/chromium --headless --disable-gpu --no-first-run \
+              --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 \
+              --user-data-dir="${pulseRuntime}/chrome"
+          '')
+          # Core backend (Linux only)
+          coreEnsureInfra
 
-      (mkScript "core-shell" ''
-        ${coreEnsureInfra}/bin/core-ensure-infra
-        exec nix develop "${configFlake}#core-backend" -c bash -c '
-          ${coreEnvSetup}
-          exec ${pkgs.zsh}/bin/zsh -i
-        '
-      '')
+          (mkScript "core-shell" ''
+            ${coreEnsureInfra}/bin/core-ensure-infra
+            exec nix develop "${configFlake}#core-backend" -c bash -c '
+              ${coreEnvSetup}
+              exec ${pkgs.zsh}/bin/zsh -i
+            '
+          '')
 
-      (mkScript "core-bootstrap" ''
-        ${coreEnsureInfra}/bin/core-ensure-infra
-        exec nix develop "${configFlake}#core-backend" -c bash -c '
-          if [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
-            echo "[core] missing RailsLTS auth" >&2
-            exit 1
-          fi
-          ${coreEnvSetup}
-          bundle config set gems.railslts.com "$BUNDLE_GEMS__RAILSLTS__COM"
-          bundle install
-          bundle exec rails db:create db:migrate
-        '
-      '')
+          (mkScript "core-bootstrap" ''
+            ${coreEnsureInfra}/bin/core-ensure-infra
+            exec nix develop "${configFlake}#core-backend" -c bash -c '
+              if [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
+                echo "[core] missing RailsLTS auth" >&2
+                exit 1
+              fi
+              ${coreEnvSetup}
+              bundle config set gems.railslts.com "$BUNDLE_GEMS__RAILSLTS__COM"
+              bundle install
+              bundle exec rails db:create db:migrate
+            '
+          '')
 
-      (mkScript "core-web-dev" ''
-        ${coreEnsureInfra}/bin/core-ensure-infra
-        exec nix develop "${configFlake}#core-backend" -c bash -c '
-          ${coreEnvSetup}
-          exec bundle exec rails server -b 0.0.0.0 -p 3000
-        '
-      '')
+          (mkScript "core-web-dev" ''
+            ${coreEnsureInfra}/bin/core-ensure-infra
+            exec nix develop "${configFlake}#core-backend" -c bash -c '
+              ${coreEnvSetup}
+              exec bundle exec rails server -b 0.0.0.0 -p 3000
+            '
+          '')
 
-      (mkScript "core-sidekiq-dev" ''
-        ${coreEnsureInfra}/bin/core-ensure-infra
-        exec nix develop "${configFlake}#core-backend" -c bash -c '
-          ${coreEnvSetup}
-          exec bundle exec sidekiq -C config/sidekiq_all.yml
-        '
-      '')
+          (mkScript "core-sidekiq-dev" ''
+            ${coreEnsureInfra}/bin/core-ensure-infra
+            exec nix develop "${configFlake}#core-backend" -c bash -c '
+              ${coreEnvSetup}
+              exec bundle exec sidekiq -C config/sidekiq_all.yml
+            '
+          '')
 
-      (mkScript "core-sidekiq-assignments-dev" ''
-        ${coreEnsureInfra}/bin/core-ensure-infra
-        exec nix develop "${configFlake}#core-backend" -c bash -c '
-          ${coreEnvSetup}
-          exec bundle exec sidekiq -C config/sidekiq_assignments.yml
-        '
-      '')
+          (mkScript "core-sidekiq-assignments-dev" ''
+            ${coreEnsureInfra}/bin/core-ensure-infra
+            exec nix develop "${configFlake}#core-backend" -c bash -c '
+              ${coreEnvSetup}
+              exec bundle exec sidekiq -C config/sidekiq_assignments.yml
+            '
+          '')
 
-      (mkScript "core-rubocop-format" ''
-        [ "$#" -ne 1 ] && { echo "usage: core-rubocop-format <file>" >&2; exit 2; }
-        tmpfile="$(mktemp)"
-        trap 'rm -f "$tmpfile"' EXIT
-        cat > "$tmpfile"
-        exec nix develop "${configFlake}#core-backend" -c bash -c "
-          ${coreEnvSetup}
-          bundle exec rubocop -a --except Style/NegatedIf,Style/IfUnlessModifier,Style/GuardClause \
-            -f quiet --stderr --stdin '$1' < '$tmpfile'
-        "
-      '')
+          (mkScript "core-rubocop-format" ''
+            [ "$#" -ne 1 ] && { echo "usage: core-rubocop-format <file>" >&2; exit 2; }
+            tmpfile="$(mktemp)"
+            trap 'rm -f "$tmpfile"' EXIT
+            cat > "$tmpfile"
+            exec nix develop "${configFlake}#core-backend" -c bash -c "
+              ${coreEnvSetup}
+              bundle exec rubocop -a --except Style/NegatedIf,Style/IfUnlessModifier,Style/GuardClause \
+                -f quiet --stderr --stdin '$1' < '$tmpfile'
+            "
+          '')
 
-      (mkScript "core-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${coreRuntime}/postgres stop -m fast || true")
-      (mkScript "core-redis-stop" "[ -f ${coreRuntime}/redis.pid ] && kill $(cat ${coreRuntime}/redis.pid) 2>/dev/null || true")
+          (mkScript "core-pg-stop" "${pkgs.postgresql}/bin/pg_ctl -D ${coreRuntime}/postgres stop -m fast || true")
+          (mkScript "core-redis-stop" "[ -f ${coreRuntime}/redis.pid ] && kill $(cat ${coreRuntime}/redis.pid) 2>/dev/null || true")
 
-      # Core orchestrator (Linux only)
-      (mkScript "core-dev" ''
-        config_file="$(mktemp)"
-        trap 'rm -f "$config_file"' EXIT
-        cat > "$config_file" <<EOF
-        version: "0.5"
-        processes:
-          web:
-            command: core-web-dev
-          sidekiq:
-            command: core-sidekiq-dev
-          sidekiq_assignments:
-            command: core-sidekiq-assignments-dev
-        EOF
-        exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-      '')
-    ]) ++ lib.optionals isDarwin darwinPkgs;
+          # Core orchestrator (Linux only)
+          (mkScript "core-dev" ''
+            config_file="$(mktemp)"
+            trap 'rm -f "$config_file"' EXIT
+            cat > "$config_file" <<EOF
+            version: "0.5"
+            processes:
+              web:
+                command: core-web-dev
+              sidekiq:
+                command: core-sidekiq-dev
+              sidekiq_assignments:
+                command: core-sidekiq-assignments-dev
+            EOF
+            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+          '')
+        ]
+      )
+      ++ lib.optionals isDarwin darwinPkgs;
   };
 }
