@@ -122,6 +122,10 @@ rec {
       system = "aarch64-darwin";
       users = [ "bas" ];
 
+      localAccountNames = {
+        bas = "Bas";
+      };
+
       availableRoles = [
         "bas"
         "desktop"

@@ -225,13 +225,33 @@
               };
 
               modules = [
-                ({ ... }: { roles = finalRoles; })
+                ({ lib, ... }:
+                 let
+                 system = host.system or "x86_64-linux";
+                 isDarwin = lib.hasSuffix "darwin" system;
 
-                inputs.snowman.homeModules.default
+                 localAccountNames = host.localAccountNames or { };
+
+                 actualUsername =
+                 if builtins.hasAttr user localAccountNames
+                 then localAccountNames.${user}
+                 else user;
+
+                 actualHomeDirectory =
+                 if isDarwin
+                 then "/Users/${actualUsername}"
+                 else "/home/${actualUsername}";
+                 in {
+                 home.username = lib.mkForce actualUsername;
+                 home.homeDirectory = lib.mkForce actualHomeDirectory;
+                 roles = finalRoles;
+                 })
+
+              inputs.snowman.homeModules.default
                 ./home
                 ./home/roles
                 ./home/overrides
-              ];
+                ];
             };
           }]) (host.users or (builtins.attrNames inv.users)))
         (builtins.attrNames inv.hosts));
