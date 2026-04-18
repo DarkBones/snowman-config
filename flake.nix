@@ -197,6 +197,12 @@
         in lib.concatMap (user:
           let
             cfgName = "${user}@${hostName}";
+            localAccountNames = host.localAccountNames or { };
+            actualUsername = if builtins.hasAttr user localAccountNames then
+              localAccountNames.${user}
+            else
+              user;
+            cfgNameActual = "${actualUsername}@${hostName}";
             userCfg = inv.users.${user};
             userRoles = userCfg.roles or { };
             enabledUserRoles =
@@ -208,8 +214,6 @@
             else
               lib.filterAttrs (roleName: _: lib.elem roleName hostRoleFilter)
               enabledUserRoles;
-          in [{
-            name = cfgName;
             value = inputs.home-manager.lib.homeManagerConfiguration {
               pkgs = makePkgs (host.system or "x86_64-linux");
 
@@ -225,43 +229,49 @@
                 networkSecretsPath = ./networks/secrets.yml;
               };
 
-              modules =
-                [
+              modules = [
                 ({ lib, ... }:
-                 let
-                 system = host.system or "x86_64-linux";
-                 isDarwin = lib.hasSuffix "darwin" system;
+                  let
+                    system = host.system or "x86_64-linux";
+                    isDarwin = lib.hasSuffix "darwin" system;
 
-                 localAccountNames = host.localAccountNames or { };
+                    localAccountNames = host.localAccountNames or { };
 
-                 actualUsername =
-                 if builtins.hasAttr user localAccountNames
-                 then localAccountNames.${user}
-                 else user;
+                    actualUsername = if builtins.hasAttr user localAccountNames
+                    then localAccountNames.${user}
+                    else user;
 
-                 actualHomeDirectory =
-                 if isDarwin
-                 then "/Users/${actualUsername}"
-                 else "/home/${actualUsername}";
-                 in {
-                 home.username = lib.mkForce actualUsername;
-                 home.homeDirectory = lib.mkForce actualHomeDirectory;
-                 roles = finalRoles // (lib.optionalAttrs (finalRoles ? dotfiles && finalRoles.dotfiles ? dir) {
-                   dotfiles = finalRoles.dotfiles // {
-                     dir = lib.replaceStrings ["~/"] ["${actualHomeDirectory}/"] finalRoles.dotfiles.dir;
-                   };
-                 });
-                 })
-              ]
-                ++ lib.optional (userCfg ? envFile) userCfg.envFile
-                ++ [
+                    actualHomeDirectory = if isDarwin then
+                      "/Users/${actualUsername}"
+                    else
+                      "/home/${actualUsername}";
+                  in {
+                    home.username = lib.mkForce actualUsername;
+                    home.homeDirectory = lib.mkForce actualHomeDirectory;
+                    roles = finalRoles // (lib.optionalAttrs
+                      (finalRoles ? dotfiles && finalRoles.dotfiles ? dir) {
+                        dotfiles = finalRoles.dotfiles // {
+                          sourceKey = "bas";
+                          dir = lib.replaceStrings [ "~/" ]
+                            [ "${actualHomeDirectory}/" ]
+                            finalRoles.dotfiles.dir;
+                        };
+                      });
+                  })
+              ] ++ lib.optional (userCfg ? envFile) userCfg.envFile ++ [
                 inputs.snowman.homeModules.default
-                  ./home
-                  ./home/roles
-                  ./home/overrides
-                ];
+                ./home
+                ./home/roles
+                ./home/overrides
+              ];
             };
-          }]) (host.users or (builtins.attrNames inv.users)))
+          in [{
+            name = cfgName;
+            inherit value;
+          }] ++ (lib.optional (cfgName != cfgNameActual) {
+            name = cfgNameActual;
+            inherit value;
+          })) (host.users or (builtins.attrNames inv.users)))
         (builtins.attrNames inv.hosts));
     };
 }
