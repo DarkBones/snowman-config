@@ -56,13 +56,8 @@ let
       ensureRole ? null,
       ensurePassword ? null,
     }:
-    mkScript "${name}-ensure-infra" ''
-      mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
-
-      # Use a lockfile to serialize infrastructure startup across services
-      (
-        ${pkgs.flock}/bin/flock -x 9
-
+    let
+      infraScript = pkgs.writeShellScript "${name}-infra-body" ''
         if [ ! -f "${runtime}/postgres/PG_VERSION" ]; then
           echo "[${name}] initializing postgres"
           [ -d "${runtime}/postgres" ] && rm -rf "${runtime}/postgres"
@@ -81,7 +76,7 @@ let
             -l "${runtime}/postgres.log" \
             -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=${listenAddresses}" \
             start >/dev/null
-          
+
           # Wait for socket to appear to ensure next service sees it as ready
           for i in {1..50}; do
             [ -S "${runtime}/postgres-socket/.s.PGSQL.${toString port}" ] && break
@@ -115,14 +110,20 @@ let
           [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
           ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
             --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
-          
+
           # Wait for redis to be ready
           for i in {1..50}; do
             ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1 && break
             sleep 0.1
           done
         fi
-      ) 9>"${runtime}/infra.lock"
+      '';
+    in
+    mkScript "${name}-ensure-infra" ''
+      mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
+
+      # Use a lockfile to serialize infrastructure startup across services
+      ${pkgs.flock}/bin/flock -x -o "${runtime}/infra.lock" ${infraScript}
     '';
 
   pulseEnsureInfra = mkInfraManager {
