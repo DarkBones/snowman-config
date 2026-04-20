@@ -130,7 +130,6 @@ rec {
         "searxng"
         "snowman"
         "ssh"
-        "papershift"
         "macos-wm"
       ];
 
