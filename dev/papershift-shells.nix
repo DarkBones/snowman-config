@@ -54,12 +54,14 @@ forSystems (
     pulseBackendStateDir = "$HOME/.local/state/pulse";
     pulseBackendCommonExports = pulseCommonExports // {
       PGDATA = "${pulseBackendStateDir}/postgres";
-      PGHOST = "${pulseBackendStateDir}/postgres-socket";
-      PGPORT = "54329";
-      PGUSER = "$USER";
-      POSTGRES_HOST = "${pulseBackendStateDir}/postgres-socket";
-      POSTGRES_PORT = "54329";
-      POSTGRES_USER = "$USER";
+      PGHOST = "127.0.0.1";
+      PGPORT = "5433";
+      PGUSER = "postgres";
+      PGPASSWORD = "postgres_password";
+      POSTGRES_HOST = "127.0.0.1";
+      POSTGRES_PORT = "5433";
+      POSTGRES_USER = "postgres";
+      POSTGRES_PASSWORD = "postgres_password";
     };
 
     pulseFrontendCommonExports = pulseCommonExports // {

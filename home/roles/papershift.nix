@@ -52,6 +52,9 @@ let
       runtime,
       port ? 54329,
       redisPort ? 6381,
+      listenAddresses ? "",
+      ensureRole ? null,
+      ensurePassword ? null,
     }:
     mkScript "${name}-ensure-infra" ''
       mkdir -p "${runtime}/postgres-socket" "${runtime}/redis"
@@ -76,7 +79,7 @@ let
           rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
           ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
             -l "${runtime}/postgres.log" \
-            -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
+            -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=${listenAddresses}" \
             start >/dev/null
           
           # Wait for socket to appear to ensure next service sees it as ready
@@ -85,6 +88,27 @@ let
             sleep 0.1
           done
         fi
+
+        ${lib.optionalString (ensureRole != null && ensurePassword != null) ''
+          if ! ${pkgs.postgresql}/bin/psql \
+            -h "${runtime}/postgres-socket" \
+            -p ${toString port} \
+            -d postgres \
+            -tAc "SELECT 1 FROM pg_roles WHERE rolname = '${ensureRole}'" | grep -q 1; then
+            echo "[${name}] creating postgres role"
+            ${pkgs.postgresql}/bin/psql \
+              -h "${runtime}/postgres-socket" \
+              -p ${toString port} \
+              -d postgres \
+              -c "CREATE ROLE ${ensureRole} LOGIN SUPERUSER PASSWORD '${ensurePassword}'"
+          fi
+
+          ${pkgs.postgresql}/bin/psql \
+            -h "${runtime}/postgres-socket" \
+            -p ${toString port} \
+            -d postgres \
+            -c "ALTER ROLE ${ensureRole} WITH LOGIN SUPERUSER PASSWORD '${ensurePassword}'" >/dev/null
+        ''}
 
         if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
           echo "[${name}] starting redis"
@@ -104,6 +128,10 @@ let
   pulseEnsureInfra = mkInfraManager {
     name = "pulse";
     runtime = pulseRuntime;
+    port = 5433;
+    listenAddresses = "127.0.0.1";
+    ensureRole = "postgres";
+    ensurePassword = "postgres_password";
   };
   coreEnsureInfra = mkInfraManager {
     name = "core";
@@ -140,12 +168,14 @@ let
     ${loadEnvFile "$HOME/Developer/papershift/pulse/.env"}
 
     # Override with local development settings (after .env so these take precedence)
-    export PGHOST="$HOME/.local/state/pulse/postgres-socket"
-    export PGPORT="54329"
-    export PGUSER="$(whoami)"
-    export POSTGRES_HOST="$HOME/.local/state/pulse/postgres-socket"
-    export POSTGRES_PORT="54329"
-    export POSTGRES_USER="$(whoami)"
+    export PGHOST="127.0.0.1"
+    export PGPORT="5433"
+    export PGUSER="postgres"
+    export PGPASSWORD="postgres_password"
+    export POSTGRES_HOST="127.0.0.1"
+    export POSTGRES_PORT="5433"
+    export POSTGRES_USER="postgres"
+    export POSTGRES_PASSWORD="postgres_password"
     export REDIS_URL="redis://127.0.0.1:6381/0"
 
     # Override service URLs for local development
