@@ -74,6 +74,25 @@ rec {
       #   networks = [ "home" ];
       # };
 
+      availableRoles = [
+        "bas"
+        "desktop"
+        "dev"
+        "dev-heavy"
+        "gaming"
+        "gaming-mods"
+        "hyprland"
+        "lsp"
+        "macos-wm"
+        "secrets"
+        "searxng"
+        "snowman"
+        "ssh"
+        "openclaw"
+        "video-editing"
+        "dotfiles"
+      ];
+
       bootstrap.usb = {
         enable = true;
         label = "SNOWMAN_KEY";
