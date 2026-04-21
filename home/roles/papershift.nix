@@ -74,10 +74,15 @@ let
           echo "[${name}] starting postgres"
           ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" stop -m fast >/dev/null 2>&1 || true
           rm -f "${runtime}/postgres-socket/.s.PGSQL.${toString port}"*
-          ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
-            -l "${runtime}/postgres.log" \
-            -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
-            start >/dev/null
+          # Close the lock fd before daemon startup so postgres does not inherit it
+          # and keep infra.lock held across future pulse-dev restarts.
+          (
+            exec 9>&-
+            ${pkgs.postgresql}/bin/pg_ctl -D "${runtime}/postgres" \
+              -l "${runtime}/postgres.log" \
+              -o "-k ${runtime}/postgres-socket -p ${toString port} -c listen_addresses=" \
+              start >/dev/null
+          )
           
           # Wait for socket to appear to ensure next service sees it as ready
           for i in {1..50}; do
@@ -89,8 +94,12 @@ let
         if ! ${pkgs.redis}/bin/redis-cli -p ${toString redisPort} ping >/dev/null 2>&1; then
           echo "[${name}] starting redis"
           [ -f "${runtime}/redis.pid" ] && kill "$(cat "${runtime}/redis.pid")" 2>/dev/null || true
-          ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
-            --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
+          # Same for redis: do not let the daemon inherit the lock fd.
+          (
+            exec 9>&-
+            ${pkgs.redis}/bin/redis-server --daemonize yes --port ${toString redisPort} \
+              --dir "${runtime}/redis" --pidfile "${runtime}/redis.pid" --logfile "${runtime}/redis.log"
+          )
           
           # Wait for redis to be ready
           for i in {1..50}; do
