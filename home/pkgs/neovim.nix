@@ -11,7 +11,9 @@ let
 in
 pkgs.symlinkJoin {
   name = "neovim";
-  paths = [ pkgsUnstable.neovim ];
+  # The current Neovim config still uses the legacy nvim-treesitter stack,
+  # so keep Neovim on the stable package until that stack is migrated.
+  paths = [ pkgs.neovim ];
   buildInputs = [ pkgs.makeWrapper ];
 
   postBuild = ''
