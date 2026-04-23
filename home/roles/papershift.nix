@@ -222,6 +222,7 @@ in
         [
           # Editor tooling
           ruby_3_4
+          ruby-lsp
           solargraph
           rubocop
           typescript
