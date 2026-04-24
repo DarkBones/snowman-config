@@ -222,6 +222,7 @@ in
         [
           # Editor tooling
           ruby_3_4
+          ruby-lsp
           solargraph
           rubocop
           typescript
@@ -261,6 +262,17 @@ in
             ensureInfra = pulseEnsureInfra;
           })
           (mkDevShell {
+            name = "pulse-api-debug";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = ''
+              ./lib/scripts/entrypoint.sh
+              echo "[pulse-api] Starting with rdbg on port 1234 (ready to attach)..."
+              exec rdbg --nonstop --open=vscode --host 127.0.0.1 --port 1234 -c -- bundle exec puma -C config/puma.rb
+            '';
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
             name = "pulse-anycable-dev";
             shell = "pulse-backend";
             envSetup = pulseEnvSetup + "\nexport ANYCABLE_RPC_HOST=0.0.0.0:50051";
@@ -272,6 +284,16 @@ in
             shell = "pulse-backend";
             envSetup = pulseEnvSetup;
             cmd = "exec bin/worker";
+            ensureInfra = pulseEnsureInfra;
+          })
+          (mkDevShell {
+            name = "pulse-sidekiq-debug";
+            shell = "pulse-backend";
+            envSetup = pulseEnvSetup;
+            cmd = ''
+              echo "[pulse-sidekiq] Starting with rdbg on port 1235 (ready to attach)..."
+              exec rdbg --nonstop --open=vscode --host 127.0.0.1 --port 1235 -c -- bundle exec sidekiq -C config/sidekiq.yml
+            '';
             ensureInfra = pulseEnsureInfra;
           })
           (mkDevShell {
@@ -372,11 +394,11 @@ in
               frontend:
                 command: pulse-frontend-dev
               api:
-                command: pulse-api-dev
+                command: pulse-api-debug
               agent:
                 command: $agent_cmd
               sidekiq:
-                command: pulse-sidekiq-dev
+                command: pulse-sidekiq-debug
               anycable:
                 command: pulse-anycable-dev
             ''${chrome_line}''${ws_line}
