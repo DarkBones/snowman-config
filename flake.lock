@@ -23,11 +23,11 @@
     "bas-dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1777046198,
-        "narHash": "sha256-05Rs3eBCPcF57W8nDzRaKkomBoZJTxYnLIwXS2HIGiw=",
+        "lastModified": 1777109035,
+        "narHash": "sha256-SEB3KH28EkmeuRsWsEJ7BgI7iEyTeHb4PWKzVALJL08=",
         "owner": "DarkBones",
         "repo": "dotfiles",
-        "rev": "f939ae5efb2451c9925a7d86748e790104df1e29",
+        "rev": "c5333e237780c4cde644ac65beac05814a086913",
         "type": "github"
       },
       "original": {

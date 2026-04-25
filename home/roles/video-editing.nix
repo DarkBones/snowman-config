@@ -34,7 +34,7 @@ let
         cat <<'EOF'
       usage: resolve-transcode [options] [directory]
 
-      Convert common video files into Resolve-friendly DNxHR MOV files.
+      Convert common video files into Resolve-friendly ProRes MOV files.
       By default, scans the current directory recursively and writes sibling
       files with a "_resolve.mov" suffix.
 
@@ -44,6 +44,7 @@ let
         -d, --directory DIR   directory to scan (default: .)
         -s, --suffix SUFFIX   output suffix before .mov (default: _resolve)
         -o, --overwrite       replace existing output files
+        --replace-source      replace the source file after successful transcode
         -h, --help            show this help
       EOF
       }
@@ -51,6 +52,7 @@ let
       recursive=1
       dry_run=0
       overwrite=0
+      replace_source=0
       suffix="_resolve"
       scan_dir="."
 
@@ -73,6 +75,10 @@ let
             shift
             ;;
           -o|--overwrite)
+            overwrite=1
+            ;;
+          --replace-source)
+            replace_source=1
             overwrite=1
             ;;
           -h|--help)
@@ -101,6 +107,11 @@ let
         exit 2
       fi
 
+      if [ "$replace_source" -eq 1 ] && [ "$suffix" = "" ]; then
+        echo "resolve-transcode: suffix cannot be empty when replacing source" >&2
+        exit 2
+      fi
+
       find_args=("$scan_dir")
       if [ "$recursive" -eq 0 ]; then
         find_args+=(-maxdepth 1)
@@ -116,12 +127,16 @@ let
         ")"
         !
         -iname "*''${suffix}.mov"
+        !
+        -iname "*.part.mov"
         -print0
       )
 
       count=0
       converted=0
       skipped=0
+      failed=0
+      replaced=0
 
       while IFS= read -r -d "" input_path; do
         count=$((count + 1))
@@ -129,7 +144,7 @@ let
         input_name="$(basename "$input_path")"
         stem="''${input_name%.*}"
         output_path="$input_dir/''${stem}''${suffix}.mov"
-        temp_output_path="$input_dir/''${stem}''${suffix}.part.mov"
+        final_output_path="$output_path"
 
         if [ -e "$output_path" ] && [ "$overwrite" -ne 1 ]; then
           printf 'skip: %s -> %s (exists)\n' "$input_path" "$output_path"
@@ -144,16 +159,29 @@ let
           continue
         fi
 
-        rm -f "$temp_output_path"
-        ffmpeg -hide_banner -loglevel warning -stats \
+        temp_output_path="$(mktemp "/tmp/resolve-transcode-XXXXXX.mov")"
+        if ! ffmpeg -hide_banner -loglevel warning -stats \
+          -nostdin \
           -y \
           -i "$input_path" \
           -map 0:v:0 -map 0:a? \
-          -c:v dnxhd -profile:v dnxhr_hq \
+          -c:v prores_ks -profile:v 3 -pix_fmt yuv422p10le \
           -c:a pcm_s16le \
-          "$temp_output_path"
+          "$temp_output_path"; then
+          printf 'fail: %s\n' "$input_path" >&2
+          rm -f "$temp_output_path"
+          failed=$((failed + 1))
+          continue
+        fi
 
-        mv -f "$temp_output_path" "$output_path"
+        if [ "$replace_source" -eq 1 ]; then
+          rm -f "$input_path"
+          final_output_path="$input_dir/$input_name"
+          mv -f "$temp_output_path" "$final_output_path"
+          replaced=$((replaced + 1))
+        else
+          mv -f "$temp_output_path" "$output_path"
+        fi
       done < <(find "''${find_args[@]}")
 
       if [ "$count" -eq 0 ]; then
@@ -161,7 +189,7 @@ let
         exit 1
       fi
 
-      printf 'done: scanned=%d converted=%d skipped=%d\n' "$count" "$converted" "$skipped"
+      printf 'done: scanned=%d converted=%d skipped=%d failed=%d replaced=%d\n' "$count" "$converted" "$skipped" "$failed" "$replaced"
     '';
   };
 in
