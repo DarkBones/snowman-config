@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   pkgsUnstable,
   config,
   hostRoles ? [ ],
@@ -18,6 +19,151 @@ let
       }
     else
       null;
+
+  resolveTranscode = pkgs.writeShellApplication {
+    name = "resolve-transcode";
+    runtimeInputs = with pkgs; [
+      coreutils
+      ffmpeg
+      findutils
+    ];
+    text = ''
+      set -euo pipefail
+
+      usage() {
+        cat <<'EOF'
+      usage: resolve-transcode [options] [directory]
+
+      Convert common video files into Resolve-friendly DNxHR MOV files.
+      By default, scans the current directory recursively and writes sibling
+      files with a "_resolve.mov" suffix.
+
+      options:
+        -n, --dry-run         print planned work without converting
+        --no-recursive        only scan the top-level directory
+        -d, --directory DIR   directory to scan (default: .)
+        -s, --suffix SUFFIX   output suffix before .mov (default: _resolve)
+        -o, --overwrite       replace existing output files
+        -h, --help            show this help
+      EOF
+      }
+
+      recursive=1
+      dry_run=0
+      overwrite=0
+      suffix="_resolve"
+      scan_dir="."
+
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          -n|--dry-run)
+            dry_run=1
+            ;;
+          --no-recursive)
+            recursive=0
+            ;;
+          -d|--directory)
+            [ $# -ge 2 ] || { echo "resolve-transcode: missing value for $1" >&2; exit 2; }
+            scan_dir="$2"
+            shift
+            ;;
+          -s|--suffix)
+            [ $# -ge 2 ] || { echo "resolve-transcode: missing value for $1" >&2; exit 2; }
+            suffix="$2"
+            shift
+            ;;
+          -o|--overwrite)
+            overwrite=1
+            ;;
+          -h|--help)
+            usage
+            exit 0
+            ;;
+          -*)
+            echo "resolve-transcode: unknown option: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+          *)
+            scan_dir="$1"
+            ;;
+        esac
+        shift
+      done
+
+      if [ ! -d "$scan_dir" ]; then
+        echo "resolve-transcode: directory not found: $scan_dir" >&2
+        exit 1
+      fi
+
+      if [ -z "$suffix" ]; then
+        echo "resolve-transcode: suffix cannot be empty" >&2
+        exit 2
+      fi
+
+      find_args=("$scan_dir")
+      if [ "$recursive" -eq 0 ]; then
+        find_args+=(-maxdepth 1)
+      fi
+      find_args+=(
+        -type f
+        "("
+          -iname "*.mov" -o
+          -iname "*.mp4" -o
+          -iname "*.m4v" -o
+          -iname "*.mkv" -o
+          -iname "*.avi"
+        ")"
+        !
+        -iname "*''${suffix}.mov"
+        -print0
+      )
+
+      count=0
+      converted=0
+      skipped=0
+
+      while IFS= read -r -d "" input_path; do
+        count=$((count + 1))
+        input_dir="$(dirname "$input_path")"
+        input_name="$(basename "$input_path")"
+        stem="''${input_name%.*}"
+        output_path="$input_dir/''${stem}''${suffix}.mov"
+        temp_output_path="$input_dir/''${stem}''${suffix}.part.mov"
+
+        if [ -e "$output_path" ] && [ "$overwrite" -ne 1 ]; then
+          printf 'skip: %s -> %s (exists)\n' "$input_path" "$output_path"
+          skipped=$((skipped + 1))
+          continue
+        fi
+
+        printf 'convert: %s -> %s\n' "$input_path" "$output_path"
+        converted=$((converted + 1))
+
+        if [ "$dry_run" -eq 1 ]; then
+          continue
+        fi
+
+        rm -f "$temp_output_path"
+        ffmpeg -hide_banner -loglevel warning -stats \
+          -y \
+          -i "$input_path" \
+          -map 0:v:0 -map 0:a? \
+          -c:v dnxhd -profile:v dnxhr_hq \
+          -c:a pcm_s16le \
+          "$temp_output_path"
+
+        mv -f "$temp_output_path" "$output_path"
+      done < <(find "''${find_args[@]}")
+
+      if [ "$count" -eq 0 ]; then
+        echo "resolve-transcode: no matching media files found in $scan_dir" >&2
+        exit 1
+      fi
+
+      printf 'done: scanned=%d converted=%d skipped=%d\n' "$count" "$converted" "$skipped"
+    '';
+  };
 in
 {
   options.roles."video-editing" = {
@@ -53,6 +199,10 @@ in
       The rest of the role remains enabled; DaVinci Resolve is being skipped for this rebuild.
     '';
 
-    home.packages = lib.optional hasDavinciSource davinciResolve;
+    home.packages = [
+      pkgs.ffmpeg
+      resolveTranscode
+    ]
+    ++ lib.optional hasDavinciSource davinciResolve;
   };
 }
