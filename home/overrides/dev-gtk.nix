@@ -10,6 +10,11 @@ let
   hasDesktopHost = hostRoles == null || lib.elem "desktop" hostRoles;
   dotfilesEnabled = config.roles.dotfiles.enable or false;
   dotRoot = config.dotfiles.root;
+  darklingCssSource =
+    if config.dotfiles.isDev then
+      config.lib.file.mkOutOfStoreSymlink "${dotRoot}/gtk/.config/gtk/darkling.css"
+    else
+      "${dotRoot}/gtk/.config/gtk/darkling.css";
 in
 {
   config = lib.mkIf (pkgs.stdenv.isLinux && hasDesktopHost && dotfilesEnabled) (
@@ -35,8 +40,7 @@ in
           };
         };
 
-        xdg.configFile."gtk/darkling.css".source =
-          config.lib.file.mkOutOfStoreSymlink "${dotRoot}/gtk/.config/gtk/darkling.css";
+        xdg.configFile."gtk/darkling.css".source = darklingCssSource;
 
         xdg.configFile."gtk-3.0/gtk.css" = lib.mkForce {
           text = ''
