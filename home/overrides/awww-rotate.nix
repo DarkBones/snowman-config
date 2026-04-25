@@ -55,7 +55,10 @@ in
           exit 1
         fi
 
-        exec ${awww}/bin/awww img --transition-step 255 "$pic"
+        exec ${awww}/bin/awww img \
+          --transition-type fade \
+          --transition-duration 3 \
+          "$pic"
       '';
     in
     {
