@@ -16,6 +16,7 @@ in
       (with pkgsUnstable; [
         aichat
         codex
+        gemini-cli
         starship
         claude-code
       ])
