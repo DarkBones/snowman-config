@@ -18,6 +18,12 @@
     "nvidia_drm.fbdev=1"
   ];
 
+  # Disable snd_hda_intel power saving to prevent the DP audio codec from gating
+  # itself during silence, which causes intermittent drops + static on resume.
+  boot.extraModprobeConfig = ''
+    options snd_hda_intel power_save=0
+  '';
+
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
