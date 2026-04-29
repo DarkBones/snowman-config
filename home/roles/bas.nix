@@ -10,6 +10,16 @@ let
 
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
 
+  tmuxinator = pkgs.symlinkJoin {
+    name = "tmuxinator-${pkgsUnstable.tmuxinator.version}-isolated";
+    paths = [ pkgsUnstable.tmuxinator ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram "$out/bin/tmuxinator" \
+        --set GEM_HOME "${pkgsUnstable.tmuxinator}/${pkgsUnstable.tmuxinator.ruby.gemPath}"
+    '';
+  };
+
   commonPkgs = with pkgsUnstable; [
     bat
     btop
@@ -22,7 +32,6 @@ let
     ripgrep
     taskwarrior2
     tmux
-    tmuxinator
     unzip
     wget
     zoxide
@@ -46,7 +55,10 @@ in
       commonPkgs
       ++ lib.optionals pkgs.stdenv.isLinux linuxPkgs
       ++ lib.optionals pkgs.stdenv.isDarwin darwinPkgs
-      ++ [ neovim ];
+      ++ [
+        neovim
+        tmuxinator
+      ];
 
     home.file.".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";

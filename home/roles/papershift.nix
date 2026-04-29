@@ -17,6 +17,15 @@ let
 
   mkScript = name: script: pkgs.writeShellScriptBin name "set -euo pipefail\n${script}";
 
+  projectRubyEnv = projectRoot: ''
+    export BUNDLE_PATH="${projectRoot}/.bundle/vendor"
+    export BUNDLE_BIN="${projectRoot}/.bundle/bin"
+    export BUNDLE_DISABLE_SHARED_GEMS="true"
+    export GEM_HOME="$BUNDLE_PATH"
+    unset GEM_PATH
+    export PATH="$BUNDLE_BIN:$PATH"
+  '';
+
   # Helper to load .env files (clean, reusable)
   loadEnvFile = envPath: ''
     if [ -f "${envPath}" ]; then
@@ -162,12 +171,14 @@ let
     export API_URL="http://127.0.0.1:3000"
     export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
+    ${projectRubyEnv "$HOME/Developer/papershift/pulse"}
     cd "$HOME/Developer/papershift/pulse/backend"
   '';
 
   coreEnvSetup = ''
     export PGHOST="$HOME/.local/state/core/postgres-socket"
     export PGPORT="54329"
+    ${projectRubyEnv "$HOME/Developer/papershift/shift_app"}
     cd "$HOME/Developer/papershift/shift_app"
   '';
 
