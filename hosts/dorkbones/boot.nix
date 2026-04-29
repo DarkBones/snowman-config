@@ -44,7 +44,7 @@ in
     device = "nodev";
     efiInstallAsRemovable = true;
     useOSProber = false;
-    configurationLimit = 10;
+    configurationLimit = 3;
 
     theme = lib.mkForce cyberreTheme;
   };
