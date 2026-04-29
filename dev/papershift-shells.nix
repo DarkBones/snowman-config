@@ -44,14 +44,22 @@ forSystems (
       + ''
         cd "${cwd}"
       '';
-    rubyBundleEnv = projectRoot: ''
-      export BUNDLE_PATH="${projectRoot}/.bundle/vendor"
-      export BUNDLE_BIN="${projectRoot}/.bundle/bin"
-      export BUNDLE_DISABLE_SHARED_GEMS="true"
-      export GEM_HOME="$BUNDLE_PATH"
-      unset GEM_PATH
-      export PATH="$BUNDLE_BIN:$PATH"
-    '';
+    rubyBundleEnv =
+      {
+        projectRoot,
+        quietRubyWarnings ? false,
+      }:
+      ''
+        export BUNDLE_PATH="${projectRoot}/.bundle/vendor"
+        export BUNDLE_DISABLE_SHARED_GEMS="true"
+        unset BUNDLE_BIN GEM_HOME GEM_PATH
+        ${nixpkgs.lib.optionalString quietRubyWarnings ''
+          case " ''${RUBYOPT:-} " in
+            *" -W0 "*) ;;
+            *) export RUBYOPT="-W0 ''${RUBYOPT:-}" ;;
+          esac
+        ''}
+      '';
 
     pulseRoot = "$HOME/Developer/papershift/pulse";
     pulseCommonExports = {
@@ -135,7 +143,10 @@ forSystems (
         export VITE_API_URL="http://127.0.0.1:3000"
         export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
-        ${rubyBundleEnv pulseRoot}
+        ${rubyBundleEnv {
+          projectRoot = pulseRoot;
+          quietRubyWarnings = true;
+        }}
 
         # Note: .env is loaded by wrapper scripts with proper parsing
         # No need to load here to avoid double-loading
@@ -228,7 +239,7 @@ forSystems (
         export PLAN_APP_PUSHER_SECRET="local-plan-secret"
         export SEGMENT_API_KEY="local-segment-key"
 
-        ${rubyBundleEnv "$HOME/Developer/papershift/shift_app"}
+        ${rubyBundleEnv { projectRoot = "$HOME/Developer/papershift/shift_app"; }}
 
         if [ -n "''${RAILSLTS_KEY_DEV:-}" ] && [ -z "''${BUNDLE_GEMS__RAILSLTS__COM:-}" ]; then
           export BUNDLE_GEMS__RAILSLTS__COM="$RAILSLTS_KEY_DEV"

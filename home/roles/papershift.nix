@@ -17,14 +17,22 @@ let
 
   mkScript = name: script: pkgs.writeShellScriptBin name "set -euo pipefail\n${script}";
 
-  projectRubyEnv = projectRoot: ''
-    export BUNDLE_PATH="${projectRoot}/.bundle/vendor"
-    export BUNDLE_BIN="${projectRoot}/.bundle/bin"
-    export BUNDLE_DISABLE_SHARED_GEMS="true"
-    export GEM_HOME="$BUNDLE_PATH"
-    unset GEM_PATH
-    export PATH="$BUNDLE_BIN:$PATH"
-  '';
+  projectRubyEnv =
+    {
+      projectRoot,
+      quietRubyWarnings ? false,
+    }:
+    ''
+      export BUNDLE_PATH="${projectRoot}/.bundle/vendor"
+      export BUNDLE_DISABLE_SHARED_GEMS="true"
+      unset BUNDLE_BIN GEM_HOME GEM_PATH
+      ${lib.optionalString quietRubyWarnings ''
+        case " ''${RUBYOPT:-} " in
+          *" -W0 "*) ;;
+          *) export RUBYOPT="-W0 ''${RUBYOPT:-}" ;;
+        esac
+      ''}
+    '';
 
   # Helper to load .env files (clean, reusable)
   loadEnvFile = envPath: ''
@@ -171,14 +179,17 @@ let
     export API_URL="http://127.0.0.1:3000"
     export VITE_CABLE_URL="ws://127.0.0.1:8081/cable"
 
-    ${projectRubyEnv "$HOME/Developer/papershift/pulse"}
+    ${projectRubyEnv {
+      projectRoot = "$HOME/Developer/papershift/pulse";
+      quietRubyWarnings = true;
+    }}
     cd "$HOME/Developer/papershift/pulse/backend"
   '';
 
   coreEnvSetup = ''
     export PGHOST="$HOME/.local/state/core/postgres-socket"
     export PGPORT="54329"
-    ${projectRubyEnv "$HOME/Developer/papershift/shift_app"}
+    ${projectRubyEnv { projectRoot = "$HOME/Developer/papershift/shift_app"; }}
     cd "$HOME/Developer/papershift/shift_app"
   '';
 
