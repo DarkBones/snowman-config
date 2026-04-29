@@ -6,6 +6,14 @@ let
     proxyVendor = true;
     subPackages = [ "." ];
     vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
+    # postPatch is version-specific in nixpkgs-unstable: newer ollama versions add
+    # substituteInPlace calls for files (e.g. openclaw_test.go) that don't exist in
+    # our pinned v0.20.2 source, causing --replace-fail to abort the build.
+    # We own the src pin, so we own postPatch too.
+    postPatch = ''
+      substituteInPlace version/version.go --replace-fail 0.0.0 0.20.2
+      rm -r app
+    '';
   });
 in
 {
