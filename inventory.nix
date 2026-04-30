@@ -3,8 +3,12 @@ rec {
 
   networks = {
     home = {
-      ssid = "frizzlesnizzle";
+      ssid = "home/ssid";
       passwordSecret = "home/password";
+    };
+    s10 = {
+      ssid = "s10/ssid";
+      passwordSecret = "s10/password";
     };
   };
 
@@ -69,10 +73,13 @@ rec {
         )
       ];
 
-      # wifi = {
-      #   mode = "roaming";
-      #   networks = [ "home" ];
-      # };
+      wifi = {
+        mode = "roaming";
+        networks = [
+          "home"
+          "s10"
+        ];
+      };
 
       availableRoles = [
         "bas"
