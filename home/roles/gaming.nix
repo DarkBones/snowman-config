@@ -64,6 +64,7 @@ in
       piper
       openrgb
       picom # X11 compositor for startx environment
+      pcsx2
       alvrPkg
       alvrDashboardX11
     ];
