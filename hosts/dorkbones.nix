@@ -13,6 +13,9 @@ in
     ];
   };
 
+  # Deep S3 intermittently hangs during resume on this desktop.
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+
   systemd.services.NetworkManager-wait-online.serviceConfig.ExecStart = [
     ""
     "${pkgs.networkmanager}/bin/nm-online -q --timeout=30"
