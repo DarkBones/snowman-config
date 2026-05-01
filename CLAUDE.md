@@ -1,4 +1,4 @@
-# CLAUDE.md — snowman-config (Snowman Body)
+# snowman-config (Snowman Body)
 
 This is **bas's personal Snowman body repo** — a NixOS configuration built on top of the
 [Snowman framework](https://github.com/DarkBones/snowman).
