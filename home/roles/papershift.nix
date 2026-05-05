@@ -17,6 +17,18 @@ let
 
   mkScript = name: script: pkgs.writeShellScriptBin name "set -euo pipefail\n${script}";
 
+  disableLegacyRubyDebuggers = pkgs.writeText "disable-legacy-ruby-debuggers.rb" ''
+    module Kernel
+      alias_method :snowman_require_without_legacy_debuggers, :require
+
+      def require(name)
+        return false if name == "pry-byebug" || name == "byebug"
+
+        snowman_require_without_legacy_debuggers(name)
+      end
+    end
+  '';
+
   projectRubyEnv =
     {
       projectRoot,
@@ -288,8 +300,8 @@ in
             shell = "pulse-backend";
             envSetup = pulseEnvSetup;
             cmd = ''
-              ./lib/scripts/entrypoint.sh
-              echo "[pulse-api] Starting with rdbg on port 1234 (ready to attach)..."
+              export RUBYOPT="-r ${disableLegacyRubyDebuggers} ''${RUBYOPT:-}"
+              echo "[pulse-api] Starting with rdbg on port 1234 (attach optional)..."
               exec rdbg --nonstop --open=vscode --host 127.0.0.1 --port 1234 -c -- bundle exec puma -C config/puma.rb
             '';
             ensureInfra = pulseEnsureInfra;
@@ -313,7 +325,8 @@ in
             shell = "pulse-backend";
             envSetup = pulseEnvSetup;
             cmd = ''
-              echo "[pulse-sidekiq] Starting with rdbg on port 1235 (ready to attach)..."
+              export RUBYOPT="-r ${disableLegacyRubyDebuggers} ''${RUBYOPT:-}"
+              echo "[pulse-sidekiq] Starting with rdbg on port 1235 (attach optional)..."
               exec rdbg --nonstop --open=vscode --host 127.0.0.1 --port 1235 -c -- bundle exec sidekiq -C config/sidekiq.yml
             '';
             ensureInfra = pulseEnsureInfra;
@@ -408,6 +421,35 @@ in
             ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
 
             # Always use debug agent (debugpy on port 5678)
+            agent_cmd="pulse-agent-debug"
+
+            cat > "$config_file" <<EOF
+            version: "0.5"
+            processes:
+              frontend:
+                command: pulse-frontend-dev
+              api:
+                command: pulse-api-debug
+              agent:
+                command: $agent_cmd
+              sidekiq:
+                command: pulse-sidekiq-debug
+              anycable:
+                command: pulse-anycable-dev
+            ''${chrome_line}''${ws_line}
+            EOF
+            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
+          '')
+          (mkScript "pulse-debug" ''
+            config_file="$(mktemp)"
+            trap 'rm -f "$config_file"' EXIT
+
+            ws_line=""
+            command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
+
+            chrome_line=""
+            ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
+
             agent_cmd="pulse-agent-debug"
 
             cat > "$config_file" <<EOF
