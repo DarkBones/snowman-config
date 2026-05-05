@@ -165,10 +165,10 @@ let
     mkScript name (
       lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n"
       + ''
-        exec nix develop "${configFlake}#${shell}" -c bash <<'DEV_SCRIPT'
+        exec nix develop "${configFlake}#${shell}" -c bash -lc ${lib.escapeShellArg ''
           ${envSetup}
           ${cmd}
-        DEV_SCRIPT
+        ''}
       ''
     );
 
