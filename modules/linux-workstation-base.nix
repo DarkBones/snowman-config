@@ -27,5 +27,11 @@
     powerOnBoot = true;
   };
 
+  boot.extraModprobeConfig = ''
+    # USB Bluetooth adapters on this desktop have produced stale HCI
+    # controllers after sleep/resume when runtime autosuspend is enabled.
+    options btusb enable_autosuspend=0
+  '';
+
   services.blueman.enable = true;
 }
