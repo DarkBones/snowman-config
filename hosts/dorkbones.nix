@@ -13,24 +13,8 @@ in
     ];
   };
 
-  # Use real S3 sleep on this desktop so fans and board power down.
-  boot.kernelParams = [ "mem_sleep_default=deep" ];
-
-  powerManagement.resumeCommands = ''
-    for dev in /sys/bus/usb/devices/*; do
-      [ -r "$dev/idVendor" ] && [ -r "$dev/idProduct" ] || continue
-
-      if [ "$(${pkgs.coreutils}/bin/cat "$dev/idVendor")" = "0bda" ] \
-        && [ "$(${pkgs.coreutils}/bin/cat "$dev/idProduct")" = "a729" ]; then
-        usb_id="$(${pkgs.coreutils}/bin/basename "$dev")"
-        echo "$usb_id" > /sys/bus/usb/drivers/usb/unbind || true
-        ${pkgs.coreutils}/bin/sleep 1
-        echo "$usb_id" > /sys/bus/usb/drivers/usb/bind || true
-      fi
-    done
-
-    ${pkgs.systemd}/bin/systemctl try-restart bluetooth.service
-  '';
+  # Deep S3 intermittently hangs during resume on this desktop.
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
 
   systemd.services.NetworkManager-wait-online.serviceConfig.ExecStart = [
     ""
