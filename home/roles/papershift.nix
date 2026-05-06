@@ -245,6 +245,14 @@ let
     };
   };
 
+  qoveryPackage = pkgs.symlinkJoin {
+    name = "qovery-with-alias";
+    paths = [ pkgs.qovery-cli ];
+    postBuild = ''
+      ln -s $out/bin/qovery-cli $out/bin/qovery
+    '';
+  };
+
 in
 {
   options.roles.papershift.enable = lib.mkEnableOption "Papershift role";
@@ -270,6 +278,7 @@ in
           # Infrastructure
           postgresql
           redis
+          qoveryPackage
           pulseEnsureInfra
           anycable-go
 

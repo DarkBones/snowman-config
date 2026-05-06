@@ -10,9 +10,13 @@ let
   # openldap 2.6.13 has a timing-sensitive sync replication test (test017) that
   # consistently fails in Nix's sandboxed build environment. Lutris pulls it in
   # via its FHS rootfs. Extend pkgsUnstable to disable the test until nixpkgs fixes it.
-  pkgsUnstable' = pkgsUnstable.extend (_: prev: {
-    openldap = prev.openldap.overrideAttrs (_: { doCheck = false; });
-  });
+  pkgsUnstable' = pkgsUnstable.extend (
+    _: prev: {
+      openldap = prev.openldap.overrideAttrs (_: {
+        doCheck = false;
+      });
+    }
+  );
   alvrPkg = pkgs.callPackage ../../pkgs/alvr-20.13.0.nix { };
   alvrDashboardX11 = pkgs.writeShellScriptBin "alvr-dashboard-x11" ''
     unset WAYLAND_DISPLAY

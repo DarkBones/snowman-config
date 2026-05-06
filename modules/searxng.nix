@@ -1,43 +1,43 @@
 { pkgs, ... }:
 let
   wideResultsTemplates = pkgs.runCommand "searxng-wide-results-templates" { } ''
-    cp -R ${pkgs.searxng}/lib/python*/site-packages/searx/templates "$out"
-    chmod -R u+w "$out"
+        cp -R ${pkgs.searxng}/lib/python*/site-packages/searx/templates "$out"
+        chmod -R u+w "$out"
 
-    cat > wide-results-style.html <<'EOF'
-  <style>
-    @media screen and (min-width: 92rem) {
-      #main_results .search_box {
-        max-width: 62rem;
-      }
+        cat > wide-results-style.html <<'EOF'
+      <style>
+        @media screen and (min-width: 92rem) {
+          #main_results .search_box {
+            max-width: 62rem;
+          }
 
-      #main_results div#results:not(.only_template_images, .image-detail-open) {
-        grid-template:
-          "corrections sidebar" min-content
-          "answers sidebar" min-content
-          "urls sidebar" 1fr
-          "pagination sidebar" min-content / 62rem 25rem !important;
-      }
+          #main_results div#results:not(.only_template_images, .image-detail-open) {
+            grid-template:
+              "corrections sidebar" min-content
+              "answers sidebar" min-content
+              "urls sidebar" 1fr
+              "pagination sidebar" min-content / 62rem 25rem !important;
+          }
 
-      #main_results div#results:not(.only_template_images, .image-detail-open) #backToTop {
-        left: 73.3rem;
-      }
+          #main_results div#results:not(.only_template_images, .image-detail-open) #backToTop {
+            left: 73.3rem;
+          }
 
-      .center-alignment-yes #main_results {
-        --center-page-width: 92rem !important;
-      }
+          .center-alignment-yes #main_results {
+            --center-page-width: 92rem !important;
+          }
 
-      #main_results .result .content,
-      #main_results .result .stat {
-        max-width: none;
-      }
-    }
-  </style>
-EOF
+          #main_results .result .content,
+          #main_results .result .stat {
+            max-width: none;
+          }
+        }
+      </style>
+    EOF
 
-    substituteInPlace "$out/simple/base.html" \
-      --replace-fail '</head>' "$(cat wide-results-style.html)
-</head>"
+        substituteInPlace "$out/simple/base.html" \
+          --replace-fail '</head>' "$(cat wide-results-style.html)
+    </head>"
   '';
 in
 {

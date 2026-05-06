@@ -97,23 +97,37 @@ forSystems (
       POSTGRESQL_HOST = "${coreStateDir}/postgres-socket";
       POSTGRESQL_PORT = "54329";
     };
+
+    qoveryPackage = pkgs.symlinkJoin {
+      name = "qovery-with-alias";
+      paths = [ pkgs.qovery-cli ];
+      postBuild = ''
+        ln -s $out/bin/qovery-cli $out/bin/qovery
+      '';
+    };
+
+    papershiftCliPackages = with pkgs; [
+      qoveryPackage
+    ];
   in
   {
     pulse-backend = pkgs.mkShell {
-      buildInputs = with pkgs; [
-        libyaml
-        openssl
-        postgresql
-        vips
-        zlib
-        libffi
-        nghttp2
-        protobuf
-        ruby_3_4
-        nodejs_22
-        pnpm
-        redis
-      ];
+      buildInputs =
+        papershiftCliPackages
+        ++ (with pkgs; [
+          libyaml
+          openssl
+          postgresql
+          vips
+          zlib
+          libffi
+          nghttp2
+          protobuf
+          ruby_3_4
+          nodejs_22
+          pnpm
+          redis
+        ]);
 
       nativeBuildInputs = with pkgs; [
         pkg-config
@@ -154,12 +168,14 @@ forSystems (
     };
 
     pulse-frontend = pkgs.mkShell {
-      packages = with pkgs; [
-        nodejs_22
-        pnpm
-        git
-        zsh
-      ];
+      packages =
+        papershiftCliPackages
+        ++ (with pkgs; [
+          nodejs_22
+          pnpm
+          git
+          zsh
+        ]);
 
       shellHook = mkShellHook pulseFrontendCommonExports "${pulseRoot}/frontend" ''
         # Override WebSocket URL (process-compose uses 8080, so we use 8081)
@@ -168,7 +184,7 @@ forSystems (
     };
 
     pulse-agent = pkgs.mkShell {
-      packages = [
+      packages = papershiftCliPackages ++ [
         (pkgs.python3.withPackages (
           ps: with ps; [
             fastapi
@@ -197,7 +213,10 @@ forSystems (
     };
 
     core-backend = corePkgs.mkShell {
-      buildInputs = with corePkgs; [
+      buildInputs = [
+        pkgs.qovery-cli
+      ]
+      ++ (with corePkgs; [
         imagemagick
         libffi
         libxml2
@@ -210,7 +229,7 @@ forSystems (
         ruby_2_7
         nodejs
         redis
-      ];
+      ]);
 
       nativeBuildInputs =
         with corePkgs;
