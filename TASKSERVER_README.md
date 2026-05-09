@@ -1,184 +1,144 @@
-# Adding a New Machine to Snowman Taskserver
+# Taskwarrior 3 / TaskChampion Sync
 
-This assumes:
+This repo now uses Taskwarrior 3 and TaskChampion sync.
 
-* Taskserver is already running on your Snowman host
-* `/var/lib/taskserver` is the data dir
-* Server CA + server certs already exist
-* Port 53589 is reachable
-* You are using strict TLS
+Old Taskwarrior 2 `taskd`/Taskserver is not protocol-compatible with Taskwarrior 3.
+There is no server-side conversion from `/var/lib/taskserver`; migrate by importing the
+Taskwarrior 2 data on one fully synced client, then seeding the new TaskChampion server
+from that client.
 
----
+## Repo Wiring
 
-## 1. On the Server (rpi4)
+On clients, `home/roles/bas.nix` installs `taskwarrior3` and writes `~/.taskrc` with:
 
-### 1.1 Create org (only once ever)
-
-Skip if it already exists.
-
-```
-sudo TASKDDATA=/var/lib/taskserver taskd add org bas
+```ini
+sync.server.url=http://100.126.175.104:53589
+sync.server.client_id=c97db027-a4d3-4ff9-9e8e-ac4d1987399a
+include ~/.task/sync.rc
 ```
 
----
+The included `~/.task/sync.rc` is intentionally local and untracked because it contains
+the shared sync encryption secret:
 
-### 1.2 Create a user for the new machine
-
-Example: machine name `laptop`
-
-```
-sudo TASKDDATA=/var/lib/taskserver taskd add user bas laptop
+```ini
+sync.encryption_secret=<same secret on every replica>
 ```
 
-You will get:
+On rpi4, `modules/taskserver.nix` now runs `taskchampion-sync-server` on port 53589 with
+SQLite storage in `/var/lib/taskchampion-sync-server`. The filename is kept for the
+existing inventory reference; the service inside it is no longer old Taskserver. The
+server is plain HTTP; keep it on Tailscale/LAN or put it behind a TLS reverse proxy
+before exposing it publicly.
 
-```
-New user key: <UUID>
-```
+## Migration Procedure
 
-Copy this UUID. You will need it.
+### 1. Drain old Taskserver
 
----
+Before rebuilding anything, run this on every Taskwarrior 2 client that might have local
+changes:
 
-### 1.3 Generate client certificate
-
-```
-sudo sh -c '
-  cd /var/lib/taskserver/pki &&
-  ./generate.client laptop
-'
-```
-
-This creates:
-
-```
-/var/lib/taskserver/pki/laptop.cert.pem
-/var/lib/taskserver/pki/laptop.key.pem
+```bash
+task sync
+task count
 ```
 
----
+Resolve any old sync errors first. Pick one fully synced machine as the migration source;
+normally `dorkbones`.
 
-### 1.4 Install the certificate into the user directory
+### 2. Back up old data
 
-Find the user UUID directory:
+On the migration source:
 
-```
-sudo ls /var/lib/taskserver/orgs/bas/users
-```
-
-It will look like:
-
-```
-<UUID>
+```bash
+stamp="$(date +%Y%m%d-%H%M%S)"
+cp -a ~/.task ~/.task.backup-taskwarrior2-"$stamp"
+cp -a ~/.taskrc ~/.taskrc.backup-taskwarrior2-"$stamp"
 ```
 
-Then:
+On rpi4, optional but recommended:
 
-```
-sudo cp /var/lib/taskserver/pki/laptop.cert.pem \
-  /var/lib/taskserver/orgs/bas/users/<UUID>/cert.pem
-
-sudo chown -R taskd:taskd /var/lib/taskserver/orgs
-sudo chmod -R 700 /var/lib/taskserver/orgs
+```bash
+sudo cp -a /var/lib/taskserver /var/lib/taskserver.backup-taskwarrior2-"$(date +%Y%m%d-%H%M%S)"
 ```
 
-This step is critical.
-If the cert is not inside the UUID folder as `cert.pem`, authentication will fail.
+### 3. Deploy rpi4
 
----
+Rebuild rpi4 so it runs TaskChampion instead of old Taskserver:
 
-### 1.5 Restart server
-
-```
-sudo systemctl restart taskserver
-```
-
-Server side is done.
-
----
-
-## 2. On the New Machine (Client)
-
-### 2.1 Install Taskwarrior
-
-Nix:
-
-```
-nix profile install nixpkgs#taskwarrior3
+```bash
+nix run nixpkgs#nixos-rebuild -- switch \
+  --flake ~/snowman-config#rpi4 \
+  --target-host bas@rpi4 \
+  --use-remote-sudo
 ```
 
-Or your Snowman package set.
+Check it:
 
----
-
-### 2.2 Copy certificates from server
-
-Copy:
-
-* CA cert
-* client cert
-* client key
-
-```
-ssh bas@rpi4 "sudo cat /var/lib/taskserver/keys/ca.cert" > ~/.task/keys/ca.cert.pem
-ssh bas@rpi4 "sudo cat /var/lib/taskserver/pki/laptop.cert.pem" > ~/.task/keys/laptop.cert.pem
-ssh bas@rpi4 "sudo cat /var/lib/taskserver/pki/laptop.key.pem"  > ~/.task/keys/laptop.key.pem
+```bash
+ssh bas@rpi4 'systemctl status taskchampion-sync-server --no-pager'
 ```
 
-Secure permissions:
+### 4. Deploy the primary client
 
-```
-chmod 600 ~/.task/keys/laptop.key.pem
-chmod 644 ~/.task/keys/laptop.cert.pem
-chmod 644 ~/.task/keys/ca.cert.pem
-```
+Rebuild the primary client, then set the local sync secret:
 
----
+```bash
+snowman dev
 
-### 2.3 Configure Taskwarrior
-
-```
-task config taskd.server 100.126.175.104:53589
-task config taskd.credentials bas/laptop/<UUID>
-task config taskd.certificate ~/.task/keys/laptop.cert.pem
-task config taskd.key ~/.task/keys/laptop.key.pem
-task config taskd.ca ~/.task/keys/ca.cert.pem
-task config taskd.trust strict
+secret="$(openssl rand -base64 48)"
+printf 'sync.encryption_secret=%s\n' "$secret" > ~/.task/sync.rc
+chmod 600 ~/.task/sync.rc
 ```
 
-Use the UUID from step 1.2.
+Save that secret somewhere private; every replica must use the same value.
 
----
+### 5. Import Taskwarrior 2 data
 
-### 2.4 Initialize sync
+On the primary client:
 
-```
-task sync init
-```
-
-You should see:
-
-```
-Sync successful.
+```bash
+task import-v2 rc.hooks=0
+task count
 ```
 
----
+Taskwarrior 3 stores tasks in `~/.task/taskchampion.sqlite3`. The old `*.data` files can
+be moved out of `~/.task` after you have verified the import and backup.
 
-# Mental Model (So You Never Debug This Again)
+### 6. Seed the new server
 
-Taskserver authentication requires:
+On the primary client:
 
-1. Correct org
-2. Correct user
-3. Correct UUID
-4. Client cert signed by the same CA
-5. That exact client cert placed inside:
-   `/var/lib/taskserver/orgs/<org>/users/<UUID>/cert.pem`
-6. Correct ownership (taskd)
-7. Correct permissions
-8. Matching credentials in `.taskrc`
+```bash
+task sync
+```
 
-If even one of these mismatches →
-`Auth failure: org 'bas' user 'bas' bad key`
+Do not use `task sync init`; that was for old `taskd`.
 
-That error is never random. It is always structural mismatch.
+### 7. Add other replicas
+
+For every other machine, rebuild it, install the same `~/.task/sync.rc` content, then
+start from an empty Taskwarrior 3 data directory and pull from the server:
+
+```bash
+stamp="$(date +%Y%m%d-%H%M%S)"
+mv ~/.task ~/.task.backup-taskwarrior2-"$stamp"
+mkdir -p ~/.task
+printf 'sync.encryption_secret=%s\n' '<same secret>' > ~/.task/sync.rc
+chmod 600 ~/.task/sync.rc
+task sync
+```
+
+The Snowman config keeps `recurrence=on` on `dorkbones` and `recurrence=off` on the other
+replicas to avoid duplicate recurring task generation.
+
+## After Cutover
+
+Once all replicas sync successfully:
+
+```bash
+task diagnostics
+task sync
+```
+
+Old client certificate files under `~/.task/keys` and the rpi4 `/var/lib/taskserver`
+backup are no longer used by Taskwarrior 3.

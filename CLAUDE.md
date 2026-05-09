@@ -35,7 +35,7 @@ snowman-config/
 │   ├── dorkbones/
 │   │   └── boot.nix           # Custom GRUB + cyberre theme
 │   ├── dorkbones-hardware-configuration.nix
-│   ├── rpi4.nix               # Raspberry Pi 4 (home server, HA, pihole, taskserver)
+│   ├── rpi4.nix               # Raspberry Pi 4 (home server, HA, pihole, TaskChampion sync)
 │   ├── rpi4-hardware-configuration.nix
 │   └── secrets/               # Per-host sops-encrypted secrets
 │
@@ -52,7 +52,7 @@ snowman-config/
 │   ├── vpn.nix                # PIA VPN via NetworkManager + OpenVPN
 │   ├── home-assistant.nix     # Home Assistant (runs on rpi4)
 │   ├── pihole.nix             # Pi-hole DNS (runs on rpi4)
-│   ├── taskserver.nix         # Taskwarrior sync server (runs on rpi4)
+│   ├── taskserver.nix         # TaskChampion sync server (runs on rpi4)
 │   └── stylix.nix             # Stylix theming (GTK/Qt disabled, custom theme)
 │
 ├── home/                      # Home Manager configuration (user environments)
@@ -109,7 +109,7 @@ snowman-config/
 
 ### `rpi4` (home server, aarch64)
 
-- **Services:** Home Assistant, Pi-hole, Taskwarrior sync server, Tailscale
+- **Services:** Home Assistant, Pi-hole, TaskChampion sync server, Tailscale
 
 ---
 

@@ -9,16 +9,15 @@
 let
   cfg = config.roles.bas;
   homeDir = config.home.homeDirectory;
-  taskwarriorClientNames = {
-    dorkbones = "dorkbones";
-    papershift-mbp = "papershift";
-    mbp = "laptop";
-  };
-  taskwarriorClientName =
-    if currentHost != null && builtins.hasAttr currentHost taskwarriorClientNames then
-      taskwarriorClientNames.${currentHost}
-    else
-      null;
+  taskwarriorSyncHosts = [
+    "dorkbones"
+    "papershift-mbp"
+    "mbp"
+  ];
+  taskwarriorSyncEnabled = currentHost != null && lib.elem currentHost taskwarriorSyncHosts;
+  taskwarriorPrimaryHost = "dorkbones";
+  taskwarriorClientId = "c97db027-a4d3-4ff9-9e8e-ac4d1987399a";
+  taskwarriorSyncRc = "${homeDir}/.task/sync.rc";
 
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
 
@@ -42,7 +41,7 @@ let
     less
     fastfetch
     ripgrep
-    taskwarrior2
+    taskwarrior3
     tmux
     unzip
     wget
@@ -79,23 +78,39 @@ in
       sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
     };
 
-    home.file.".taskrc" = lib.mkIf (taskwarriorClientName != null) {
+    home.file.".taskrc" = lib.mkIf taskwarriorSyncEnabled {
       force = true;
       text = ''
-        # Managed by Snowman. Taskserver config is host-specific because the
-        # client certificate and key differ per machine.
+        # Managed by Snowman. Taskwarrior 3 sync uses TaskChampion.
+        # The included sync rc is local because it contains the shared
+        # sync.encryption_secret and must not enter the Nix store.
         data.location=${homeDir}/.task
-        news.version=2.6.0
+        news.version=3.4.2
         editor=nvim
         uda.link.type=string
         uda.link.label=Link
-        taskd.server=100.126.175.104:53589
-        taskd.credentials=bas\/bas\/c97db027-a4d3-4ff9-9e8e-ac4d1987399a
-        taskd.ca=${homeDir}/.task/keys/ca.cert.pem
-        taskd.trust=ignore hostname
-        taskd.certificate=${homeDir}/.task/keys/${taskwarriorClientName}.cert.pem
-        taskd.key=${homeDir}/.task/keys/${taskwarriorClientName}.key.pem
+        sync.server.url=http://100.126.175.104:53589
+        sync.server.client_id=${taskwarriorClientId}
+        recurrence=${if currentHost == taskwarriorPrimaryHost then "on" else "off"}
+        include ${taskwarriorSyncRc}
       '';
     };
+
+    home.activation.ensureTaskwarriorSyncRc = lib.mkIf taskwarriorSyncEnabled (
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        task_dir=${lib.escapeShellArg "${homeDir}/.task"}
+        sync_rc=${lib.escapeShellArg taskwarriorSyncRc}
+
+        mkdir -p "$task_dir"
+        if [ ! -e "$sync_rc" ]; then
+          {
+            echo "# Local Taskwarrior sync secret. Not managed by Snowman."
+            echo "# Put this exact setting on every replica:"
+            echo "# sync.encryption_secret=<shared secret>"
+          } > "$sync_rc"
+          chmod 600 "$sync_rc"
+        fi
+      ''
+    );
   };
 }
