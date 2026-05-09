@@ -312,7 +312,8 @@
                   ./home
                   ./home/roles
                   ./home/overrides
-                ];
+                ]
+                ++ (host.extraHomeModules or [ ]);
               };
             in
             [

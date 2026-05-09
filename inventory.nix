@@ -185,7 +185,9 @@ rec {
         "macos-wm"
       ];
 
-      extraModules = [ ];
+      extraHomeModules = [
+        ./home/modules/tailscale.nix
+      ];
     };
   };
 
@@ -281,7 +283,6 @@ rec {
             ".config/yabai" = "yabai/.config/yabai";
             ".fzf" = "fzf/.fzf";
             ".gitconfig" = "git/.gitconfig";
-            ".taskrc" = "taskwarrior/.taskrc";
             ".tmux.conf" = "tmux/.tmux.conf";
             ".zsh" = "zsh/.zsh";
             ".zshrc" = "zsh/.zshrc";

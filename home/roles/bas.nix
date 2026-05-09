@@ -3,10 +3,22 @@
   pkgs,
   pkgsUnstable,
   config,
+  currentHost ? null,
   ...
 }:
 let
   cfg = config.roles.bas;
+  homeDir = config.home.homeDirectory;
+  taskwarriorClientNames = {
+    dorkbones = "dorkbones";
+    papershift-mbp = "papershift";
+    mbp = "laptop";
+  };
+  taskwarriorClientName =
+    if currentHost != null && builtins.hasAttr currentHost taskwarriorClientNames then
+      taskwarriorClientNames.${currentHost}
+    else
+      null;
 
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
 
@@ -65,6 +77,25 @@ in
       repo = "tpm";
       rev = "v3.1.0";
       sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
+    };
+
+    home.file.".taskrc" = lib.mkIf (taskwarriorClientName != null) {
+      force = true;
+      text = ''
+        # Managed by Snowman. Taskserver config is host-specific because the
+        # client certificate and key differ per machine.
+        data.location=${homeDir}/.task
+        news.version=2.6.0
+        editor=nvim
+        uda.link.type=string
+        uda.link.label=Link
+        taskd.server=100.126.175.104:53589
+        taskd.credentials=bas\/bas\/c97db027-a4d3-4ff9-9e8e-ac4d1987399a
+        taskd.ca=${homeDir}/.task/keys/ca.cert.pem
+        taskd.trust=ignore hostname
+        taskd.certificate=${homeDir}/.task/keys/${taskwarriorClientName}.cert.pem
+        taskd.key=${homeDir}/.task/keys/${taskwarriorClientName}.key.pem
+      '';
     };
   };
 }
