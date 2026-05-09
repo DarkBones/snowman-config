@@ -58,7 +58,7 @@ snowman-config/
 ├── home/                      # Home Manager configuration (user environments)
 │   ├── default.nix
 │   ├── roles/                 # Reusable user roles (each maps to a home.nix feature set)
-│   │   ├── bas.nix            # Core CLI tools (bat, btop, eza, taskwarrior, tmux…)
+│   │   ├── bas.nix            # Core CLI tools (bat, btop, eza, tmux…)
 │   │   ├── desktop.nix        # GUI apps (ghostty, zen-browser, spotify, vlc…)
 │   │   ├── dev.nix            # Dev tools (neovim, lazygit, docker, fzf, node…)
 │   │   ├── dev-heavy.nix      # Heavy dev extras (starship, aichat, codex)
@@ -67,6 +67,7 @@ snowman-config/
 │   │   ├── hyprland.nix       # Hyprland home config (waybar, wofi, hyprlock…)
 │   │   ├── lsp.nix            # Language servers and formatters
 │   │   ├── macos-wm.nix       # yabai + skhd + karabiner (macOS only)
+│   │   ├── taskwarrior.nix    # Taskwarrior 3 client + TaskChampion sync
 │   │   └── dotfiles.nix       # Dotfiles wiring (handled by Snowman engine)
 │   ├── overrides/             # One-off home-manager configs that don't fit a role
 │   │   ├── awww-rotate.nix    # Wallpaper rotation timer

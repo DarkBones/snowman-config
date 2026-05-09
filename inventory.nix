@@ -95,6 +95,7 @@ rec {
         "searxng"
         "snowman"
         "ssh"
+        "taskwarrior"
         "openclaw"
         "video-editing"
         "dotfiles"
@@ -129,6 +130,7 @@ rec {
         "dev"
         "dotfiles"
         "ssh"
+        "taskwarrior"
       ];
       users = [ "bas" ];
 
@@ -156,6 +158,7 @@ rec {
         "searxng"
         "snowman"
         "ssh"
+        "taskwarrior"
         "macos-wm"
       ];
 
@@ -181,6 +184,7 @@ rec {
         "searxng"
         "snowman"
         "ssh"
+        "taskwarrior"
         "papershift"
         "macos-wm"
       ];
@@ -224,9 +228,9 @@ rec {
           "openclaw_gateway_token"
           "openclaw_telegram_bot_token"
           "home_assistant_long_lived_token"
+          "taskwarrior_sync_encryption_secret"
           "nzb_geek_username"
           "nzb_geek_key"
-          "home_assistant_long_lived_token"
         ];
         userPasswordHashKey = "password_hash";
       };
@@ -248,6 +252,7 @@ rec {
         searxng.enable = true;
         snowman.enable = true;
         ssh.enable = true;
+        taskwarrior.enable = true;
         openclaw.enable = true;
         video-editing = {
           enable = true;

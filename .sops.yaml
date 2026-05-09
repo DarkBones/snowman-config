@@ -3,6 +3,8 @@
   snowmankey_usb: &snowmankey_usb age1h3y9z9qx9jpkr8qgvptjlmpy9m5yx5vv0crhfwhjug50q20smc2qzncecg
   bas_dorkbones: &bas_dorkbones age1hhn93yt6fctv0t6a8wmtyrpznvtnc0hdg9z80m4dc5wtpad9kfwsqyc9le
   bas_rpi4: &bas_rpi4 age1ng290vq2490n59nfevejcdsn0xqv5azeuyctsp0rpncaskqfv59sckp52l
+  bas_mbp: &bas_mbp age1naze0yg4sje83g37398cqjggntfkg3qg656kcl0lxl55r7us03tqlmzc3y
+  bas_papershift_mbp: &bas_papershift_mbp age1e2hn8rytu5xz80auknmskqesy48j9npnvhcjrsx4y7hydemvmy6q3pcseg
 
   dorkbones: &dorkbones age1dv57l6fqyps0sdygr4c5qyt4rznycq29e3q8nrja69tzt49gwdgsvyey2x
   rpi4: &rpi4 age1kkxkn9qwd3gwpfjv5ju36yk0ufvnpedqf5rnlqswvfg9hwzwwfqsljyst5
@@ -12,6 +14,8 @@
   - *snowmankey_usb
   - *bas_dorkbones
   - *bas_rpi4
+  - *bas_mbp
+  - *bas_papershift_mbp
 
 .host_keys: &host_keys
   - *dorkbones
@@ -20,6 +24,9 @@
 .all_keys: &all_keys
   - *snowmankey_usb
   - *bas_dorkbones
+  - *bas_rpi4
+  - *bas_mbp
+  - *bas_papershift_mbp
   - *dorkbones
   - *rpi4
 

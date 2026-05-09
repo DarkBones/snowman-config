@@ -9,7 +9,8 @@ from that client.
 
 ## Repo Wiring
 
-On clients, `home/roles/bas.nix` installs `taskwarrior3` and writes `~/.taskrc` with:
+On clients, `home/roles/taskwarrior.nix` installs `taskwarrior3` and writes `~/.taskrc`
+with:
 
 ```ini
 sync.server.url=http://100.126.175.104:53589
@@ -17,12 +18,17 @@ sync.server.client_id=c97db027-a4d3-4ff9-9e8e-ac4d1987399a
 include ~/.task/sync.rc
 ```
 
-The included `~/.task/sync.rc` is intentionally local and untracked because it contains
-the shared sync encryption secret:
+The included `~/.task/sync.rc` is rendered locally at activation time from SOPS because
+it contains the shared sync encryption secret:
 
 ```ini
 sync.encryption_secret=<same secret on every replica>
 ```
+
+The encrypted value lives in `users/secrets/bas_secrets.yml` as
+`taskwarrior_sync_encryption_secret`. On NixOS clients, Snowman exposes it through
+`/run/secrets/taskwarrior_sync_encryption_secret`. On standalone Home Manager clients
+such as macOS, the activation script decrypts the same SOPS file with the local SSH key.
 
 On rpi4, `modules/taskserver.nix` now runs `taskchampion-sync-server` on port 53589 with
 SQLite storage in `/var/lib/taskchampion-sync-server`. The filename is kept for the
@@ -80,17 +86,19 @@ ssh bas@rpi4 'systemctl status taskchampion-sync-server --no-pager'
 
 ### 4. Deploy the primary client
 
-Rebuild the primary client, then set the local sync secret:
+Rebuild the primary client, then create the local sync secret:
 
 ```bash
 snowman dev
 
-secret="$(openssl rand -base64 48)"
+secret="$(head -c 48 /dev/urandom | base64 -w0)"
 printf 'sync.encryption_secret=%s\n' "$secret" > ~/.task/sync.rc
 chmod 600 ~/.task/sync.rc
 ```
 
-Save that secret somewhere private; every replica must use the same value.
+Save that value into `users/secrets/bas_secrets.yml` under
+`taskwarrior_sync_encryption_secret`, then rebuild each client so Home Manager renders
+`~/.task/sync.rc` from SOPS.
 
 ### 5. Import Taskwarrior 2 data
 
@@ -116,15 +124,14 @@ Do not use `task sync init`; that was for old `taskd`.
 
 ### 7. Add other replicas
 
-For every other machine, rebuild it, install the same `~/.task/sync.rc` content, then
-start from an empty Taskwarrior 3 data directory and pull from the server:
+For every other machine, rebuild it, then start from an empty Taskwarrior 3 data
+directory and pull from the server:
 
 ```bash
 stamp="$(date +%Y%m%d-%H%M%S)"
 mv ~/.task ~/.task.backup-taskwarrior2-"$stamp"
 mkdir -p ~/.task
-printf 'sync.encryption_secret=%s\n' '<same secret>' > ~/.task/sync.rc
-chmod 600 ~/.task/sync.rc
+snowman dev
 task sync
 ```
 

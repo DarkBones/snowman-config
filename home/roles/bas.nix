@@ -3,21 +3,10 @@
   pkgs,
   pkgsUnstable,
   config,
-  currentHost ? null,
   ...
 }:
 let
   cfg = config.roles.bas;
-  homeDir = config.home.homeDirectory;
-  taskwarriorSyncHosts = [
-    "dorkbones"
-    "papershift-mbp"
-    "mbp"
-  ];
-  taskwarriorSyncEnabled = currentHost != null && lib.elem currentHost taskwarriorSyncHosts;
-  taskwarriorPrimaryHost = "dorkbones";
-  taskwarriorClientId = "c97db027-a4d3-4ff9-9e8e-ac4d1987399a";
-  taskwarriorSyncRc = "${homeDir}/.task/sync.rc";
 
   neovim = import ../pkgs/neovim.nix { inherit pkgs pkgsUnstable; };
 
@@ -41,7 +30,6 @@ let
     less
     fastfetch
     ripgrep
-    taskwarrior3
     tmux
     unzip
     wget
@@ -77,40 +65,5 @@ in
       rev = "v3.1.0";
       sha256 = "sha256-CeI9Wq6tHqV68woE11lIY4cLoNY8XWyXyMHTDmFKJKI=";
     };
-
-    home.file.".taskrc" = lib.mkIf taskwarriorSyncEnabled {
-      force = true;
-      text = ''
-        # Managed by Snowman. Taskwarrior 3 sync uses TaskChampion.
-        # The included sync rc is local because it contains the shared
-        # sync.encryption_secret and must not enter the Nix store.
-        data.location=${homeDir}/.task
-        news.version=3.4.2
-        editor=nvim
-        uda.link.type=string
-        uda.link.label=Link
-        sync.server.url=http://100.126.175.104:53589
-        sync.server.client_id=${taskwarriorClientId}
-        recurrence=${if currentHost == taskwarriorPrimaryHost then "on" else "off"}
-        include ${taskwarriorSyncRc}
-      '';
-    };
-
-    home.activation.ensureTaskwarriorSyncRc = lib.mkIf taskwarriorSyncEnabled (
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        task_dir=${lib.escapeShellArg "${homeDir}/.task"}
-        sync_rc=${lib.escapeShellArg taskwarriorSyncRc}
-
-        mkdir -p "$task_dir"
-        if [ ! -e "$sync_rc" ]; then
-          {
-            echo "# Local Taskwarrior sync secret. Not managed by Snowman."
-            echo "# Put this exact setting on every replica:"
-            echo "# sync.encryption_secret=<shared secret>"
-          } > "$sync_rc"
-          chmod 600 "$sync_rc"
-        fi
-      ''
-    );
   };
 }
