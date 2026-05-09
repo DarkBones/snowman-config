@@ -1,0 +1,27 @@
+  On papershift-mbp, after pulling/applying the updated Snowman config:
+
+  task --version
+
+  Make sure it says 3.4.2.
+
+  Then back up the old local Taskwarrior data and start clean:
+
+  stamp="$(date +%Y%m%d-%H%M%S)"
+  mv ~/.task ~/.task.backup-taskwarrior2-"$stamp"
+  mkdir -p ~/.task
+  chmod 700 ~/.task
+
+  Put the same ~/.task/sync.rc from dorkbones onto the MacBook:
+
+  sync.encryption_secret=<same secret from dorkbones>
+
+  Then:
+
+  chmod 600 ~/.task/sync.rc
+  task sync
+  task count
+
+  Do not run task import-v2 on the MacBook unless you know it had unique unsynced Taskwarrior 2 tasks
+  before the migration. Since dorkbones already imported and seeded the new server, the MacBook should
+  just pull from rpi4.
+
