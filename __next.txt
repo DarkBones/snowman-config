@@ -1,27 +1,63 @@
-  On papershift-mbp, after pulling/applying the updated Snowman config:
+snowman-config on  mbp-papershift [$]
+❯ snowman dev
+➜ Enabling dotfiles DEV mode (SNOWMAN_DOTFILES_MODE=dev)
+➜ Rebuilding home-manager for Bas@papershift-mbp using flake: /Users/Bas/snowman-config
+Starting Home Manager activation
+Activating checkFilesChanged
+Activating checkLinkTargets
+Activating dotfilesSync
+Activating writeBoundary
+Activating ensureNvimUndoDir
+Activating ensureSshKey
+🔑 Existing SSH key found at /Users/Bas/.ssh/id_ed25519 — skipping generation.
+Activating ensureTaskwarriorSyncRc
+Activating installHomeAssistantToken
+Activating installNerdFonts
+Activating installPackages
+replacing old 'home-manager-path'
+installing 'home-manager-path'
+building '/nix/store/1wa5f6zk3q665gjbrgxcm05yy47vz7xn-user-environment.drv'...
+Activating linkGeneration
+Cleaning up orphan links from /Users/Bas
+Creating home file links in /Users/Bas
+Activating macosDefaults
+Applying macOS defaults
+Activating onFilesChange
+Activating setupLaunchAgents
 
-  task --version
+There are 207 unread and relevant news items.
+Read them by running the command "home-manager news".
 
-  Make sure it says 3.4.2.
 
-  Then back up the old local Taskwarrior data and start clean:
+snowman-config on  mbp-papershift [$] took 19s
+❯ task --version
+3.4.2
 
-  stamp="$(date +%Y%m%d-%H%M%S)"
-  mv ~/.task ~/.task.backup-taskwarrior2-"$stamp"
-  mkdir -p ~/.task
-  chmod 700 ~/.task
+snowman-config on  mbp-papershift [$]
+❯ stamp="$(date +%Y%m%d-%H%M%S)"
 
-  Put the same ~/.task/sync.rc from dorkbones onto the MacBook:
+snowman-config on  mbp-papershift [$]
+❯ mv ~/.task ~/.task.backup-taskwarrior2-"$stamp"
 
-  sync.encryption_secret=<same secret from dorkbones>
+snowman-config on  mbp-papershift [$]
+❯ mkdir -p ~/.task
 
-  Then:
+snowman-config on  mbp-papershift [$]
+❯ chmod 700 ~/.task
 
-  chmod 600 ~/.task/sync.rc
-  task sync
-  task count
+snowman-config on  mbp-papershift [$]
+❯ v ~/.task/sync.rc
 
-  Do not run task import-v2 on the MacBook unless you know it had unique unsynced Taskwarrior 2 tasks
-  before the migration. Since dorkbones already imported and seeded the new server, the MacBook should
-  just pull from rpi4.
+snowman-config on  mbp-papershift [$] took 7s
+❯ chmod 600 ~/.task/sync.rc
 
+snowman-config on  mbp-papershift [$]
+❯ task sync
+Failed to synchronize with server: error while unsealing encrypted value
+
+snowman-config on  mbp-papershift [$]
+❯ task count
+0
+
+snowman-config on  mbp-papershift [$]
+❯
