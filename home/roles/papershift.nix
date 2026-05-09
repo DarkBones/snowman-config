@@ -165,7 +165,9 @@ let
     mkScript name (
       lib.optionalString (ensureInfra != null) "${ensureInfra}/bin/${ensureInfra.name}\n"
       + ''
-        exec nix develop "${configFlake}#${shell}" -c bash -lc ${lib.escapeShellArg ''
+        # Avoid a login shell here: `bash -l` can reset PATH on macOS and
+        # shadow the Nix devShell's Ruby/Node toolchain with system binaries.
+        exec nix develop "${configFlake}#${shell}" -c ${pkgs.bash}/bin/bash -c ${lib.escapeShellArg ''
           ${envSetup}
           ${cmd}
         ''}
@@ -268,8 +270,9 @@ in
           solargraph
           rubocop
           typescript
-          typescript-language-server
+          vtsls
           vue-language-server
+          tailwindcss-language-server
           astro-language-server
           eslint
           prettier
