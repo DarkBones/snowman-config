@@ -14,21 +14,21 @@ with:
 
 ```ini
 sync.server.url=http://100.126.175.104:53589
-sync.server.client_id=c97db027-a4d3-4ff9-9e8e-ac4d1987399a
 include ~/.task/sync.rc
 ```
 
 The included `~/.task/sync.rc` is rendered locally at activation time from SOPS because
-it contains the shared sync encryption secret:
+it contains the shared sync client ID and encryption secret:
 
 ```ini
+sync.server.client_id=<same client id on every replica>
 sync.encryption_secret=<same secret on every replica>
 ```
 
-The encrypted value lives in `users/secrets/bas_secrets.yml` as
-`taskwarrior_sync_encryption_secret`. On NixOS clients, Snowman exposes it through
-`/run/secrets/taskwarrior_sync_encryption_secret`. On standalone Home Manager clients
-such as macOS, the activation script decrypts the same SOPS file with the local SSH key.
+The encrypted values live in `users/secrets/bas_secrets.yml` as
+`taskwarrior_sync_client_id` and `taskwarrior_sync_encryption_secret`. On NixOS clients,
+Snowman exposes them through `/run/secrets`. On standalone Home Manager clients such as
+macOS, the activation script decrypts the same SOPS file with the local SSH key.
 
 On rpi4, `modules/taskserver.nix` now runs `taskchampion-sync-server` on port 53589 with
 SQLite storage in `/var/lib/taskchampion-sync-server`. The filename is kept for the
@@ -86,19 +86,21 @@ ssh bas@rpi4 'systemctl status taskchampion-sync-server --no-pager'
 
 ### 4. Deploy the primary client
 
-Rebuild the primary client, then create the local sync secret:
+Rebuild the primary client, then create the local sync values:
 
 ```bash
 snowman dev
 
+client_id="$(uuidgen)"
 secret="$(head -c 48 /dev/urandom | base64 -w0)"
-printf 'sync.encryption_secret=%s\n' "$secret" > ~/.task/sync.rc
+printf 'sync.server.client_id=%s\n' "$client_id" > ~/.task/sync.rc
+printf 'sync.encryption_secret=%s\n' "$secret" >> ~/.task/sync.rc
 chmod 600 ~/.task/sync.rc
 ```
 
-Save that value into `users/secrets/bas_secrets.yml` under
-`taskwarrior_sync_encryption_secret`, then rebuild each client so Home Manager renders
-`~/.task/sync.rc` from SOPS.
+Save those values into `users/secrets/bas_secrets.yml` under
+`taskwarrior_sync_client_id` and `taskwarrior_sync_encryption_secret`, then rebuild each
+client so Home Manager renders `~/.task/sync.rc` from SOPS.
 
 ### 5. Import Taskwarrior 2 data
 

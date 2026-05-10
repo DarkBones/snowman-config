@@ -222,6 +222,7 @@ rec {
           "openclaw_telegram_bot_token"
           "home_assistant_long_lived_token"
           "taskwarrior_sync_encryption_secret"
+          "taskwarrior_sync_client_id"
           "nzb_geek_username"
           "nzb_geek_key"
         ];
