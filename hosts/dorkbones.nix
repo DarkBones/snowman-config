@@ -37,6 +37,18 @@ in
     "${pkgs.networkmanager}/bin/nm-online -q --timeout=30"
   ];
 
+  system.activationScripts."dorkbones-remove-wifi-profiles" = ''
+    ${pkgs.coreutils}/bin/rm -f /etc/NetworkManager/system-connections/snowman-home.nmconnection
+    ${pkgs.coreutils}/bin/rm -f /etc/NetworkManager/system-connections/snowman-s10.nmconnection
+    ${pkgs.networkmanager}/bin/nmcli connection reload >/dev/null 2>&1 || true
+    ${pkgs.networkmanager}/bin/nmcli -t -f UUID,TYPE connection show 2>/dev/null | while IFS=: read -r uuid type; do
+      if [ "$type" = "802-11-wireless" ]; then
+        ${pkgs.networkmanager}/bin/nmcli connection modify "$uuid" connection.autoconnect no >/dev/null 2>&1 || true
+      fi
+    done
+    ${pkgs.networkmanager}/bin/nmcli radio wifi off >/dev/null 2>&1 || true
+  '';
+
   security = {
     sudo = {
       extraConfig = ''
@@ -103,7 +115,6 @@ in
 
       # Trust LAN + Tailscale interfaces
       trustedInterfaces = [
-        "wlan0"
         "tailscale0"
       ];
     };

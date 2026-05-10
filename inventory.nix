@@ -73,14 +73,6 @@ rec {
         )
       ];
 
-      wifi = {
-        mode = "roaming";
-        networks = [
-          "home"
-          "s10"
-        ];
-      };
-
       availableRoles = [
         "bas"
         "desktop"
@@ -203,6 +195,7 @@ rec {
         "wheel"
         "media"
         "adbusers"
+        "networkmanager"
       ];
       shell = "zsh";
       face = ./users/faces/bas.jpg;
