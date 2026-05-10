@@ -13,8 +13,24 @@ in
     ];
   };
 
-  # Deep S3 intermittently hangs during resume on this desktop.
-  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+  # Use real S3 sleep on this desktop. s2idle resumes more like "modern standby"
+  # here: fans stay up, board power stays high, and NVIDIA/Hyprland has resumed
+  # with a broken lock surface.
+  boot.kernelParams = [
+    "mem_sleep_default=deep"
+    "usbcore.autosuspend=-1"
+  ];
+  systemd.sleep.extraConfig = ''
+    SuspendState=mem
+    MemorySleepMode=deep
+  '';
+
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="change", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="change", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", TEST=="power/control", ATTR{power/control}="on"
+  '';
 
   systemd.services.NetworkManager-wait-online.serviceConfig.ExecStart = [
     ""
