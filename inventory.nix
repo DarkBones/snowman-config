@@ -271,6 +271,7 @@ rec {
             ".config/karabiner" = "karabiner/.config/karabiner";
             ".config/MangoHud" = "mangohud/.config/MangoHud";
             ".config/nvim" = "nvim/.config/nvim";
+            ".config/opencode.json" = "opencode/.config/opencode.json";
             ".config/raycast" = "raycast/.config/raycast";
             ".config/skhd" = "skhd/.config/skhd";
             ".config/sketchybar" = "sketchybar/.config/sketchybar";
