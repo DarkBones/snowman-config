@@ -68,6 +68,8 @@ in
         editor=nvim
         uda.link.type=string
         uda.link.label=Link
+        uda.notes.type=string
+        uda.notes.label=Notes
         sync.server.url=${cfg.serverUrl}
         recurrence=${if currentHost == cfg.primaryHost then "on" else "off"}
         include ${syncRc}
