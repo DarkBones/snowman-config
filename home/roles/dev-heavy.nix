@@ -19,6 +19,7 @@ in
         gemini-cli
         starship
         claude-code
+        opencode
       ])
       ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.bubblewrap ];
   };
