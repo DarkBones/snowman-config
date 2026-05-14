@@ -28,6 +28,7 @@ let
     htop
     jq
     less
+    lsof
     fastfetch
     ripgrep
     tmux
