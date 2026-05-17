@@ -30,7 +30,7 @@ let
 
     $mkdir_bin -p "$state_dir"
 
-    current_boot_id="$($boot_id_bin)"
+    current_boot_id="$($boot_id_bin boot-id)"
     stored_boot_id=""
 
     if [ -r "$boot_id_file" ]; then

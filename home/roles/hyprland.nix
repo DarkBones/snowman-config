@@ -36,6 +36,7 @@ in
         swappy
         wlogout
         wl-clipboard
+        cliphist
         grim
         slurp
         nwg-look
