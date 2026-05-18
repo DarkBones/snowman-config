@@ -452,35 +452,6 @@ in
             EOF
             exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
           '')
-          (mkScript "pulse-debug" ''
-            config_file="$(mktemp)"
-            trap 'rm -f "$config_file"' EXIT
-
-            ws_line=""
-            command -v anycable-go >/dev/null 2>&1 && ws_line=$'  ws:\n    command: pulse-ws-dev\n'
-
-            chrome_line=""
-            ${lib.optionalString pkgs.stdenv.isLinux ''chrome_line=$'  chrome:\n    command: pulse-chrome-dev\n' ''}
-
-            agent_cmd="pulse-agent-debug"
-
-            cat > "$config_file" <<EOF
-            version: "0.5"
-            processes:
-              frontend:
-                command: pulse-frontend-dev
-              api:
-                command: pulse-api-debug
-              agent:
-                command: $agent_cmd
-              sidekiq:
-                command: pulse-sidekiq-debug
-              anycable:
-                command: pulse-anycable-dev
-            ''${chrome_line}''${ws_line}
-            EOF
-            exec ${pkgs.process-compose}/bin/process-compose -f "$config_file" up
-          '')
 
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
